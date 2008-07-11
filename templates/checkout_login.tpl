@@ -1,0 +1,59 @@
+<~ include file="cart_header.tpl" heading="checkout/sign on" ~>
+
+
+			  
+
+    <div class="cartLoginFormBox" id="cartLoginForm">
+    
+      <~ $cform.FORM ~>
+      <~ if $BAD_PASS ~>
+        <div class="userError">Sorry, the credentials you sent could not be validated.
+            <br />
+            Please try again or <a href="pass.recover.php">click here if you have forgotten your password</a>.
+        </div>
+        <div style="clear: both; height: 1px; overflow: hidden">&nbsp;</div>
+      <~ else ~>
+      <strong>I am a returning customer.</strong> 
+      <~ /if ~>
+          <table cellpadding="4" cellspacing="0" border="0">
+            <tr>
+              <td class="<~ $cform.username.CLASS ~>">
+                <label for="username" accesskey="e"><~ $cform.username.LABEL ~></label>
+              </td>
+              <td class="formField">
+                <~ $cform.username.TAG ~>
+              </td>
+              <td class="<~ $cform.password.CLASS ~>">
+                <label for="password" accesskey="e"><~ $cform.password.LABEL ~></label>
+              </td>
+              <td class="formField">
+                <~ $cform.password.TAG ~>
+              </td>
+              <td style="text-align: right" colspan="2">
+                <~ $cform.op_login.TAG ~>
+              </td>
+            </tr>
+          </table>
+      </form>
+    </div>
+
+    <div class="cartLoginFormBox">
+        <strong>I am a new customer.</strong> &raquo;&raquo; <a href="account.php">CREATE ACCOUNT</a>
+        <p>
+            By creating an account at <~ $SITE_DOMAIN_NAME ~> you will be able to shop faster, 
+            be up to date on an orders status, 
+            and keep track of the orders you have previously made.
+        </p>
+    </div>
+
+    <~ if $smarty.const.CSHOP_ALLOW_ANON_ACCOUNT ~>
+    <div class="cartLoginFormBox" id="cartLoginBypass">
+      <~ $cform.FORM ~>
+        <a href="checkout.php" onclick="document.forms[1].submit(); return false">&raquo;&raquo; CONTINUE TO CHECKOUT WITHOUT REGISTERING</a>
+        <input type="hidden" name="auth_cancel_login" value="PROCEED TO CHECKOUT" />
+        <input type="hidden" name="auth_bypass" value="1" />
+      </form>
+    </div>
+    <~/if~>
+
+<~ include file="cart_footer.tpl" ~>

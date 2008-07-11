@@ -1,0 +1,540 @@
+html {
+        font-size: 10px; 
+}
+body {
+    background-color: #ccc;
+    font-family: Arial, Helvetica, sans-serif; 
+    font-size: 10px;
+    margin: 0;
+    padding: 0;
+}
+a {
+        font-family: Arial, Helvetica, sans-serif; 
+            text-decoration: none; 
+                color: #996600;
+}
+a:hover {
+        color: #000066; 
+            background-color: #FFFFFF;
+}
+input, textarea { 
+        font-size:11px;
+            font-family: Arial, Helvetica, sans-serif; 
+}
+#circusinfo a {
+    text-decoration: none; 
+        background-color: #FFCC00;
+}
+#circusinfo a:hover {
+    text-decoration: none; 
+        background-color: #FFCC00;
+}
+div #container { 
+        height: 100%;
+            width: 100%;
+}
+div #headertext {
+        width: 100%;
+            background-color: #000000;
+                color: #FFFFFF;
+                    font-weight: bold;
+                        font-size: 12px;
+}
+div #navbar {
+        border: 0px solid;
+            width: 130px;
+                padding-left: 5px;
+                    padding-top: 5px;
+                        float: left;
+}
+div #content {
+        float: left;
+            margin-left: 20px;
+                border:1px solid;
+                    margin-top: 10px;
+}
+div #contentheader{
+        background-color: #000000;
+            color: #FFFFFF;
+                padding-top: 3px;
+                    padding-bottom: 3px;
+                        font-weight: bold;
+}
+div #contenttext{
+        width: 630px;
+            padding: 3px;
+}
+
+
+
+
+
+/** NEW CSHOP INSTALLATION STUFF */
+h2,h3,h4,h5,h6 {
+    margin: 1.1em 1em;
+    padding: 0;
+    color: #333;
+    background-color: #bbb;
+    font-weight: bold;
+    font-size: 1.3em;
+    text-align: left;
+}
+h3 {
+        font-size: 1.2em;
+}
+h4,h5,h6 {
+        font-size: 1.1em;
+}
+
+a {
+      color: #006;
+}
+
+a:hover {
+}
+
+p.navBlock {
+      margin: 0;
+        margin-left: 10px;
+}
+p.navBlock a:hover {
+      background: #fff;
+}
+.navHeading {
+      background: #000;
+        color: #fff;
+          font-weight: bold;
+            padding: 1px;
+}
+table#controlNavTable {
+        background-color: #fc0;
+            color: #000;
+}
+table#controlNavTable a {
+        color: #000;
+            text-decoration: none;
+}
+table#controlNavTable a:hover {
+        border: 0;
+            background-color: #ddd;
+}
+
+
+input {
+    font-family: Arial,helvetica,sans-serif;
+    font-size: 11px;
+    background-color: #EEEEEE;
+    border: 1px solid #888888;
+    color: #555555;
+}
+textarea
+{
+    font-family: Arial,helvetica,sans-serif;
+    font-size: 11px;
+    background-color: #EEEEEE;
+    border: 1px solid #888888;
+    color: #555555;
+}
+select
+{
+    font-family: Arial,helvetica,sans-serif;
+    font-size: 11px;
+    background-color: #EEEEEE;
+    border: 1px solid #888888;
+    color: #555555;
+}
+
+
+
+.heading {
+      color: #fff;
+        background: #000;
+          padding: 2px;
+            font-weight: bold;
+}
+#tabContentContainer {
+  position: relative;
+    width: 600px;
+}
+#tabActiveContent {
+    position: relative;
+    clear: both;
+}
+.formContainer {
+    clear: both;
+    border: 1px solid black;
+    display: none;
+    width: 100%;
+    top: 0;
+    left: 0;
+    margin-bottom: 3em;
+}
+
+td
+{
+    font-size: 11px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+th {
+      font-size: 11px;
+        padding:5px;
+          border-bottom:1px solid #333333;
+}
+
+div.orderItems th {
+}
+div.orderItems .cartRowOdd {
+    background: #cecece;
+}
+div.orderItems .cartRowOdd {
+    background: #d4d4d4;
+}
+div.orderItems .backordered {
+    background: #fc0 !important;
+}
+.indicator {
+    font-size: 1.1em;
+    margin: 0 1em;
+    color: #640;
+    background-color:#e0e0e0;
+    font-weight: bold;
+}
+
+.userError, .userWarning {
+    font-size: 1.1em;
+    margin: 0 1em;
+    color: #d33;
+    background-color:#e0e0e0;
+    font-weight: bold;
+}
+.userWarning {
+    color: #000;
+}
+
+
+
+a.buttonAddItem, a.buttonEditItem {
+        padding: 2px;
+            margin: 3px;
+                background-color:#e0e0e0;
+                    border: 1px outset #333333;
+                        text-decoration: none;
+}
+
+a.printInvoice {
+    position: absolute;
+    right: 0;
+    top: 0;
+    border: 1px solid #888;
+    background-color: #bbb;
+    padding: 1px 2px 1px 20px;
+    text-decoration: none;
+    background: #bbb url(img/printer_empty.png) no-repeat 2px center;
+}
+
+div.headlineW {
+    width: 662px;
+    margin: 0 0 8px 0;
+    position: relative;
+}
+h2.headline {
+    margin: 0;
+    padding-left: 0.5em;
+}
+h3.order {
+    background-color: inherit;
+    margin: 0;
+    border-bottom: 1px solid #333;
+    padding-top: 1.1em;
+}
+div.history {
+    text-align: left;
+    border: 1px solid black;
+    padding: 3px;
+}
+div.history h3.order {
+    padding: 0;
+}
+
+table.orderDetail {
+    background-color: #d6d6d5;
+}
+table.orderDetail td {
+      border-bottom: 1px dashed #bababa;
+}
+div.orderItems {
+      text-align: left;
+      border-bottom: 1px solid black;
+}
+div.orderItems table {
+      width: 100%;
+}
+
+
+tr.controlListingRow {
+        cursor: pointer;
+}
+tr.controlListingRow:hover {
+        background-color: #fc0 !important;
+}
+
+form {
+        margin: 4px;
+            border-top: 1px dashed #333;
+                border-bottom: 1px dashed #333;
+                    padding: 2px;
+}
+.controlKillLink {
+        float: right;
+            padding: 2px 2px 0 0;
+}
+
+.newsEditFrame {
+        margin-left: 10%;
+            margin-top: 10px;
+}
+
+
+div.cshopNavBar {
+    background: #000;
+    color: #ddd;
+    font-weight: bold;
+    background: #000;
+    width: 98%;
+    height: 16px;
+    clear: both;
+    padding-left: 2%;
+    margin: 0 0 1px 0;
+}
+
+div.cshopNavBar a {
+        text-decoration: none;
+            color: #fff;
+                font-weight: bold;
+                    border: 0;
+                        border-right: 1px solid #fff;
+                            padding: 0 16px;
+                                font-size: 10px;
+                                    background: #222;
+                                        float: left;
+                                            display: block;
+                                                height: 14px;
+                                                    margin: 0;
+                                                        line-height: 14px;
+}
+
+div.cshopNavBar a:hover {
+        text-decoration: none;
+            border-top: 0;
+                border-bottom: 2px solid #fc0;
+                    background: #445;
+                        color: #fff;
+}
+div.navSectionTitle {
+        float: left;
+            width: 8em;
+}
+
+a.buttonAddItem, a.buttonEditItem {
+    padding: 2px;
+    margin: 3px;
+	background-color:#e0e0e0;
+    border: 1px outset #333333;
+    text-decoration: none;
+}
+
+
+.cartPriceStrikeout {
+    text-decoration: line-through;
+    color: #666;
+}
+
+
+tr.controlListingRow {
+    cursor: pointer;
+}
+tr.controlListingRowSelected td {
+    background-color: #222 !important;
+    color: #fff !important;
+    font-weight: bold;
+}
+tr.controlListingRow:hover {
+    background-color: #fc0 !important;
+}
+
+form {
+    margin: 4px;
+    border-top: 1px dashed #333;
+    border-bottom: 1px dashed #333;
+    padding: 2px;
+}
+.controlKillLink {
+    float: right;
+    padding: 2px 2px 0 0;
+}
+
+.newsEditFrame {
+    margin-left: 10%;
+    margin-top: 10px;
+}
+
+
+
+input.trBasisInput, input.trShipInput {
+    width: 8em;
+    border: 0;
+    background: inherit;
+    color: #000;
+    text-align: center;
+    margin: 0;
+}
+input.trBasisInput {
+    width: 4em;
+    text-align: left;
+}
+
+
+.formexFieldReadonly span {
+    display: block;
+    padding: 2px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+
+}
+
+
+
+/* for tooltips in form help */
+a.formexHelpToolTip{
+    position:relative; /*this is the key*/
+    z-index:24; 
+    font-weight: normal;
+    text-decoration: none; }
+a.formexHelpToolTip:hover { z-index:25; background-color:#ccc }
+a.formexHelpToolTip span{ display: none }
+a.formexHelpToolTip:hover span{ /*the span will display just on :hover state*/
+    display:block;
+    position:absolute;
+    top:1.5em; left:1.5em; 
+    background-color:#efefef; 
+    color:#000;
+    width: 20em;
+    padding: 0.2em;
+    border: 1px dotted black;
+}
+
+
+
+
+div .tabLabel {
+    float: left; 
+    padding: 0 4px; 
+    margin-right: 4px;
+    color: #333;
+    background: #a5a5a5;
+    font-weight: bold;
+    border: 1px solid black;
+    border-bottom: 0;
+    cursor: pointer;
+}
+div.tabSelected  {
+    color: #fff;
+    background: #000;
+}
+
+
+#userAddressC {
+    display: block;
+}
+#controlW {
+    margin-bottom: 3em;
+}
+#controlFooter {
+    position: fixed;
+    bottom: 0;
+    width: 98%;
+    padding-right: 2%;
+    background: #efefef;
+    text-align: right;
+    border-top: 1px solid #888;
+}
+#controlFooter .statslink {
+    float: left;
+    background: url(img/stats_icon.gif) right top no-repeat;
+    padding-right: 25px;
+}
+table.cart tr.backordered span.dBackOrder {
+    border: 1px solid #980;
+    padding: 2px 3px;
+    width: 2em;
+    cursor: pointer;
+}
+table.cart input {
+    text-align: center;
+    background: #ddd;
+    border: 1px solid #eee;
+    width: 2em;
+    padding: 2px 3px;
+}
+
+input#op_oiform {
+    display: none;
+    width: auto;
+}
+
+
+ul.reportmenu {
+    list-style-type: none;
+    padding: 0;
+    margin: 2em 1em;
+}
+ul.reportmenu li {
+    float: left;
+    padding: 0 0.6em;
+    border-right: 1px solid #454;
+    margin-bottom: 1.2em;
+}
+ul.reportmenu li.sel {
+    background-color: #eee;
+}
+h2.report {
+    clear: left;
+    margin-top: 1.2em;
+}
+#reportW h2 {
+}
+#reportW table {
+    margin: 0 1em;
+}
+#reportW table th {
+    vertical-align: bottom;
+}
+#reportW table td {
+    text-align: right;
+    padding: 0 0.5em;
+    font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace;
+    white-space: nowrap;
+}
+#reportW table td.tfoot {
+    background: #bbb;
+}
+.steps {
+    margin: 0.8em 0;
+}
+
+div.reportBox {
+    border: 1px solid #333;
+    background: #eee;
+    padding: 2em;
+    overflow: auto;
+    height: 15em;
+}
+
+#loadInventoryWrap {
+    width: 90%; 
+    margin: 2em auto;
+}
+#loadInventoryWrap .userError, #loadInventoryWrap .userWarning {
+    margin: 1em 0;
+}
