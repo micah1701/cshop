@@ -265,6 +265,21 @@ if [ "$DO_IT" == "y" ]; then
 fi 
 
 
+read -p "Add mod_rewrite rules to .htaccess file for SEF URLs? [y/n] " DO_IT
+if [ "$DO_IT" == "y" ]; then
+    (
+    cat <<EOF
+RewriteEngine On
+RewriteRule ^browse/([a-z0-9_-]+)/?$ store.browse.php?cn=$1 [QSA,NS]
+RewriteRule ^product/([0-9]+)/([^/]+)(/in/([a-z0-9_-]+))?(.*) /store.browse.php?pid=$1&cn=$4&etc=$5 [QSA,NS]
+EOF
+    ) >> $CSHOP_BASEDIR/../../web/.htaccess
+
+    if [ $? -ne 0 ]; then
+        echo "WARNING: failed to create .htaccess file."
+    fi
+fi 
+
 cd $CSHOP_BASEDIR
 
 echo "done."

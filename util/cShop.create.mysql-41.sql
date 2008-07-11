@@ -206,7 +206,7 @@ CREATE TABLE `cm_categories` (
   KEY `ix_imid` (`icon_media_id`),
   KEY `ix_scc` (`swi_cat_class`),
   KEY `ix_pcat` (`parent_cat_id`),
-  KEY ix_urlkey (urlkey)
+  UNIQUE uq_urlkey (urlkey)
 ) TYPE=InnoDB;
 
 --

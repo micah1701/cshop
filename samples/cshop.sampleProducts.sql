@@ -237,7 +237,7 @@ UNLOCK TABLES;
 
 /*!40000 ALTER TABLE `cm_categories` DISABLE KEYS */;
 LOCK TABLES `cm_categories` WRITE;
-INSERT INTO `cm_categories` VALUES (1,1,'Men\'s',0,1,1,0,0,0,10,'',NULL,NULL,NULL,NULL,NULL),(2,1,'Women\'s',0,1,1,0,0,1,20,'',NULL,NULL,NULL,NULL,NULL),(3,1,'Accessories',0,1,1,0,0,2,30,'',NULL,NULL,NULL,NULL,NULL),(4,1,'Shirts',1,1,1,1,0,0,12,'',NULL,NULL,NULL,NULL,NULL),(5,1,'Shoes',1,1,1,1,0,3,14,'',NULL,NULL,NULL,NULL,NULL),(6,1,'Shirts',1,1,1,2,0,0,22,'',NULL,NULL,NULL,NULL,NULL),(7,1,'Shoes',1,1,1,2,0,0,24,'',NULL,NULL,NULL,NULL,NULL),(8,1,'Scarves',1,1,1,2,0,0,26,'',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `cm_categories` VALUES (1,1,'Men\'s',0,1,1,0,0,0,10,'',NULL,NULL,NULL,NULL,NULL,'mens'),(2,1,'Women\'s',0,1,1,0,0,1,20,'',NULL,NULL,NULL,NULL,NULL,'womens'),(3,1,'Accessories',0,1,1,0,0,2,30,'',NULL,NULL,NULL,NULL,NULL,'accessories'),(4,1,'Shirts',1,1,1,1,0,0,12,'',NULL,NULL,NULL,NULL,NULL,'shirts'),(5,1,'Shoes',1,1,1,1,0,3,14,'',NULL,NULL,NULL,NULL,NULL,'shoes'),(6,1,'Shirts',1,1,1,2,0,0,22,'',NULL,NULL,NULL,NULL,NULL,'shirts2'),(7,1,'Shoes',1,1,1,2,0,0,24,'',NULL,NULL,NULL,NULL,NULL,'shoes2'),(8,1,'Scarves',1,1,1,2,0,0,26,'',NULL,NULL,NULL,NULL,NULL,'scarves');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `cm_categories` ENABLE KEYS */;
 
@@ -312,7 +312,7 @@ UNLOCK TABLES;
 
 /*!40000 ALTER TABLE `cm_inventory` DISABLE KEYS */;
 LOCK TABLES `cm_inventory` WRITE;
-INSERT INTO `cm_inventory` VALUES (1,1,15,6,3,'A1-S-BLU',NULL),(2,1,15,6,2,'A1-S-GRN',NULL),(3,1,15,6,4,'A1-S-GRY',NULL),(4,1,15,6,1,'A1-S-RD',NULL),(5,2,24,6,4,'W1-S-GRY',NULL),(6,2,25,2,4,'W1-M-GRY',NULL),(7,2,25,3,4,'W1-L-GRY',NULL),(8,2,25,1,4,'W1-XS-GRY',NULL);
+INSERT INTO `cm_inventory` VALUES (5,2,24,6,4,'W1-S-GRY',NULL),(6,2,25,2,4,'W1-M-GRY',NULL),(7,2,25,3,4,'W1-L-GRY',NULL),(8,2,25,1,4,'W1-XS-GRY',NULL),(9,1,100,3,2,'ZAAA1-L-GRN',NULL),(10,1,100,2,2,'ZAAA1-M-GRN',NULL),(11,1,100,4,2,'ZAAA1-XL-GRN',NULL),(12,1,100,5,2,'ZAAA1-XXL-GRN',NULL),(13,1,100,1,2,'ZAAA1-XS-GRN',NULL),(14,1,15,2,3,'ZAAA1-M-BLU',NULL),(15,1,1,6,3,'ZAAA1-S-BLU',NULL),(16,1,1,6,4,'ZAAA1-S-GRY',NULL),(17,1,1,6,1,'ZAAA1-S-RD',NULL);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `cm_inventory` ENABLE KEYS */;
 
@@ -323,7 +323,7 @@ UNLOCK TABLES;
 
 /*!40000 ALTER TABLE `cm_inventory_seq` DISABLE KEYS */;
 LOCK TABLES `cm_inventory_seq` WRITE;
-INSERT INTO `cm_inventory_seq` VALUES (8);
+INSERT INTO `cm_inventory_seq` VALUES (801);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `cm_inventory_seq` ENABLE KEYS */;
 
@@ -383,7 +383,7 @@ UNLOCK TABLES;
 
 /*!40000 ALTER TABLE `cm_order_items` DISABLE KEYS */;
 LOCK TABLES `cm_order_items` WRITE;
-INSERT INTO `cm_order_items` VALUES (11,5,1,4,1,1,45.00,0.00,0.0000,'A1-S-RD','Test Shirt A1','N;','a:2:{s:4:\"Size\";s:5:\"Small\";s:5:\"Style\";s:3:\"Red\";}',0),(12,5,2,5,1,1,78.00,0.00,0.0000,'W1-S-GRY','Test Shirt W1','N;','a:2:{s:4:\"Size\";s:5:\"Small\";s:5:\"Style\";s:4:\"Grey\";}',0);
+INSERT INTO `cm_order_items` VALUES (11,5,1,4,1,1,45.00,0.00,0.0000,'A1-S-RD','Test Shirt A1','N;','a:2:{s:4:\"Size\";s:5:\"Small\";s:5:\"Style\";s:3:\"Red\";}',0,0),(12,5,2,5,1,1,78.00,0.00,0.0000,'W1-S-GRY','Test Shirt W1','N;','a:2:{s:4:\"Size\";s:5:\"Small\";s:5:\"Style\";s:4:\"Grey\";}',0,0);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `cm_order_items` ENABLE KEYS */;
 
@@ -415,7 +415,7 @@ UNLOCK TABLES;
 
 /*!40000 ALTER TABLE `cm_order_transactions` DISABLE KEYS */;
 LOCK TABLES `cm_order_transactions` WRITE;
-INSERT INTO `cm_order_transactions` VALUES (3,5,2,'2007-09-18 15:04:16','MANUAL',':',128.75,NULL,NULL,NULL,NULL,'0','0',NULL,'0',NULL);
+INSERT INTO `cm_order_transactions` VALUES (3,5,2,'2007-09-18 15:04:16','MANUAL',':',128.75,NULL,NULL,NULL,NULL,'0',0,'0',NULL,'0',NULL);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `cm_order_transactions` ENABLE KEYS */;
 
@@ -502,7 +502,7 @@ UNLOCK TABLES;
 
 /*!40000 ALTER TABLE `cm_products` DISABLE KEYS */;
 LOCK TABLES `cm_products` WRITE;
-INSERT INTO `cm_products` VALUES (1,1,2,45.00,NULL,1.10,NULL,'Test Shirt A1',1,1,1,'A1','',NULL,14,NULL,NULL),(2,1,1,78.00,NULL,1.20,NULL,'Test Shirt W1',1,1,7,'W1','',NULL,3,NULL,NULL);
+INSERT INTO `cm_products` VALUES (1,1,2,45.00,45.00,1.20,1,'Test Shirt A1',1,1,1,'ZAAA1','Donec quis lorem. Pellentesque sapien. Fusce condimentum metus id nibh pharetra tristique. Sed lobortis. Vivamus condimentum euismod enim. Integer posuere. Phasellus sit amet nisi. Integer ut magna in elit aliquet dictum. Suspendisse vehicula quam quis nisi. Fusce est. Etiam metus. Fusce auctor dolor eu velit.','',0,14,NULL,0),(2,1,1,78.00,78.00,0.66,1,'Test Shirt W1',1,1,1,'W1','Gothica quam nunc putamus parum claram anteposuerit litterarum. Claritatem Investigationes demonstraverunt lectores legere me lius, quod mazim placerat facer possim assum Typi non habent claritatem insitam est usus legentis. Possim assum Typi non habent claritatem insitam.','',0,3,NULL,0);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `cm_products` ENABLE KEYS */;
 
@@ -695,7 +695,7 @@ UNLOCK TABLES;
 
 /*!40000 ALTER TABLE `cm_sizes_seq` DISABLE KEYS */;
 LOCK TABLES `cm_sizes_seq` WRITE;
-INSERT INTO `cm_sizes_seq` VALUES (6)order_weight int(5) not null;
+INSERT INTO `cm_sizes_seq` VALUES (622);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `cm_sizes_seq` ENABLE KEYS */;
 
