@@ -7,8 +7,8 @@
  */
 require_once('formex.class.php');
 require_once('mosh_tool.class.php');
-require_once('circusShop/cmUser.class.php');
-require_once('circusShop/cmOrder.class.php');
+require_once('cshop/cmUser.class.php');
+require_once('cshop/cmOrder.class.php');
 require_once("fu_HTML_Table.class.php");      
 require_once("filter_form.class.php");      
 require_once("res_pager.class.php");      

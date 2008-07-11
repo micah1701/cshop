@@ -4,7 +4,7 @@
  *
  * $Id: order_detail.php,v 1.16 2008/05/01 20:21:15 sbeam Exp $
  */
-require_once(CONFIG_DIR . 'circusShop.config.php');
+require_once(CONFIG_DIR . 'cshop.config.php');
 require_once('formex.class.php');
 require_once(CSHOP_CLASSES_ORDER.'.class.php');
 require_once(CSHOP_CLASSES_USER.'.class.php');

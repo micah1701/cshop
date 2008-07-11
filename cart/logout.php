@@ -7,7 +7,7 @@
  */
 
 // init page auth objects
-require_once(CONFIG_DIR . 'circusShop.config.php');
+require_once(CONFIG_DIR . 'cshop.config.php');
 page_open(array('sess'=>'jen_Session', 'auth'=>'selfAuth'));
 
 $auth->unauth();

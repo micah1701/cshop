@@ -1,6 +1,6 @@
 <?php
 
-require_once(CONFIG_DIR . 'circusShop.config.php');
+require_once(CONFIG_DIR . 'cshop.config.php');
 require_once('db_container.class.php');
 require_once(CSHOP_CLASSES_PRODUCT.'.class.php');
 require_once(CSHOP_CLASSES_USER.'.class.php');
@@ -850,7 +850,7 @@ class cmCart extends db_container {
       * set the payment id that is being used for this cart. Used during
       * checkout when a user has entered their payment info for an order but
       * has not been authorized or confirmed yet.  
-      * @param $pay obj a circusShop/cmPayment object of some kind
+      * @param $pay obj a cshop/cmPayment object of some kind
       * @return success
       */
       function set_payment(&$pay) {

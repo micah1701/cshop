@@ -4,7 +4,7 @@
  *
  */
 
-require_once(CONFIG_DIR.'circusShop.config.php');
+require_once(CONFIG_DIR.'cshop.config.php');
 require_once('formex.class.php');
 require_once('mosh_tool.class.php');
 require_once('uploadable.class.php');

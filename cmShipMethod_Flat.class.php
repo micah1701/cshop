@@ -6,7 +6,7 @@
  *
  * $Id: cmShipMethod_Flat.class.php,v 1.6 2006/12/29 20:36:29 sbeam Exp $
  */
-require_once('circusShop/cmShipMethod.class.php');
+require_once('cshop/cmShipMethod.class.php');
 
 class cmShipMethod_Flat extends cmShipMethod {
 

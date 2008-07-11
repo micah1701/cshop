@@ -6,7 +6,7 @@
  */
 require_once('formex.class.php');
 require_once("fu_HTML_Table.class.php");      
-require_once(CONFIG_DIR.'circusShop.config.php');    
+require_once(CONFIG_DIR.'cshop.config.php');    
 require_once(CSHOP_CLASSES_USER . '.class.php');
 
 

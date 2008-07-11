@@ -3,7 +3,7 @@
  * get shipping rates from a Zone rate table matrix based on weight or price
  *
  * $Id: cmShipMethod_Zone.class.php,v 1.9 2008/04/22 20:35:32 sbeam Exp $
- */ require_once('circusShop/cmShipMethod.class.php');
+ */ require_once('cshop/cmShipMethod.class.php');
 
 class cmShipMethod_Zone extends cmShipMethod {
 

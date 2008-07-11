@@ -1,8 +1,8 @@
 <?php
 require_once('db_container.class.php');
-require_once(CONFIG_DIR.'circusShop.config.php');
+require_once(CONFIG_DIR.'cshop.config.php');
 require_once(CSHOP_CLASSES_ADDRESSBOOK.'.class.php');
-require_once('circusShop/mailer.class.php');
+require_once('cshop/mailer.class.php');
 require_once('Mail.php');
 require_once('Mail/mime.php');
 

@@ -4,7 +4,7 @@
  *
  * $Id: orders.reports.php,v 1.11 2008/07/08 16:21:24 sbeam Exp $
  */
-require_once(CONFIG_DIR . 'circusShop.config.php');
+require_once(CONFIG_DIR . 'cshop.config.php');
 require_once("fu_HTML_Table.class.php");      
 require_once("res_pager.class.php");      
 require_once(CSHOP_CLASSES_ORDER.'.class.php');

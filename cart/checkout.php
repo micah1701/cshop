@@ -5,7 +5,7 @@
  *
  * $Id: checkout.php,v 1.37 2008/01/10 20:15:25 sbeam Exp $
  */
-require_once(CONFIG_DIR . 'circusShop.config.php');
+require_once(CONFIG_DIR . 'cshop.config.php');
 require_once('formex.class.php');
 require_once('mosh_tool.class.php');
 require_once(CSHOP_CLASSES_CART.'.class.php');

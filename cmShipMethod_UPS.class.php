@@ -5,7 +5,7 @@
  * $Id: cmShipMethod_UPS.class.php,v 1.8 2008/01/17 02:43:51 sbeam Exp $
  */
 require_once("HTTP/Request.php");
-require_once('circusShop/cmShipMethod.class.php');
+require_once('cshop/cmShipMethod.class.php');
 
 class cmShipMethod_UPS extends cmShipMethod {
 

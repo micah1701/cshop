@@ -1,6 +1,6 @@
 <?php
 
-require_once('circusShop/cmPaymentGateway.class.php');
+require_once('cshop/cmPaymentGateway.class.php');
 
 class cmPaymentGatewayManual extends cmPaymentGateway {
 

@@ -4,7 +4,7 @@
  *
  */
 
-require_once('../../../config/circusShop.config.php');
+require_once('../../../config/cshop.config.php');
 require_once('formex.class.php');
 require_once('mosh_tool.class.php');
 require_once('uploadable.class.php');
@@ -16,7 +16,7 @@ if (!isset($_REQUEST['class'])) {
 }
 $class = $_REQUEST['class'];
 
-// constant matching this param should be in circusShop.config.php */
+// constant matching this param should be in cshop.config.php */
 $cconst = 'CSHOP_CLASSES_' . strtoupper($class);
 if (defined($cconst)) {
     $className = constant($cconst);

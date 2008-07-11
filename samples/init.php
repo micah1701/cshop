@@ -5,12 +5,12 @@
  *
  * loaded via "php_value auto_prepend_file" Directive in httpd.conf
  *
- * THIS IS A generic init.php site for circusShop sites. Site-specific config 
+ * THIS IS A generic init.php site for cshop sites. Site-specific config 
  * is in local-init.*.php files and may vary depending if we are on dev, stage 
  * or production server
  *
  * NOTE:
- * If anything is changed in this file, copy the changes back into circusShop/samples folder as 
+ * If anything is changed in this file, copy the changes back into cshop/samples folder as 
  * well (if applicable to ALL cshop sites 
  */
 
@@ -56,7 +56,7 @@ $pathsep = ':';
 ini_set("include_path", 
                     INCL_DIR.$pathsep.
                     INCL_DIR.'/onsetlib'.$pathsep.
-                    INCL_DIR.'/circusShop'.$pathsep.
+                    INCL_DIR.'/cshop'.$pathsep.
                     SITE_ROOT_DIR.'/pear'.$pathsep.
                     ini_get('include_path'));
 

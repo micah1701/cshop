@@ -3,14 +3,14 @@
 /**
  * help someone recover their password to access this site
  *
- * this file is part of circusShop
+ * this file is part of cshop
  *
  * $Id: pass.recover.php,v 1.6 2008/01/16 19:01:37 sbeam Exp $
  */
 require_once('formex.class.php');
 require_once('mosh_tool.class.php');
-require_once('circusShop/cmCart.class.php');
-require_once('circusShop/cmUser.class.php');
+require_once('cshop/cmCart.class.php');
+require_once('cshop/cmUser.class.php');
 
 // init page auth objects
 page_open(array('sess'=>'jen_Session'));

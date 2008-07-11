@@ -9,7 +9,7 @@
  *
  * $Id: store.edit.list.php,v 1.10 2008/06/24 19:34:47 sbeam Exp $
  */
-require_once(CONFIG_DIR.'circusShop.config.php');
+require_once(CONFIG_DIR.'cshop.config.php');
 require_once("fu_HTML_Table.class.php");      
 require_once("filter_form.class.php");      
 require_once("res_pager.class.php");      

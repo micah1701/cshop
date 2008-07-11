@@ -7,7 +7,7 @@ Wed Mar 22 08:20:26 EST 2006
  * $Id: cmShipMethod_USPS.class.php,v 1.5 2006/11/30 02:27:57 sbeam Exp $
  */
 require_once("HTTP/Request.php");
-require_once('circusShop/cmShipMethod.class.php');
+require_once('cshop/cmShipMethod.class.php');
 
 class cmShipMethod_USPS extends cmShipMethod {
 

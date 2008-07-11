@@ -6,12 +6,12 @@
  *
  * $Id: checkout_confirm.php,v 1.20 2007/11/12 17:46:00 sbeam Exp $
  */
-require_once(CONFIG_DIR.'circusShop.config.php');
+require_once(CONFIG_DIR.'cshop.config.php');
 require_once('formex.class.php');
 require_once(CSHOP_CLASSES_CART.'.class.php');
 require_once(CSHOP_CLASSES_ORDER.'.class.php');
 require_once(CSHOP_CLASSES_USER.'.class.php');
-require_once('circusShop/cmPaymentCC.class.php');
+require_once('cshop/cmPaymentCC.class.php');
 require_once(CSHOP_CLASSES_PAYMENT.'.class.php');
 require_once(CSHOP_CLASSES_GIFTCARD.'.class.php');
 

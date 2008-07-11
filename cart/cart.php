@@ -8,7 +8,7 @@
  *      have a config for template locations...
  *
  */
-require_once(CONFIG_DIR . 'circusShop.config.php');
+require_once(CONFIG_DIR . 'cshop.config.php');
 require_once(CSHOP_CLASSES_PRODUCT . '.class.php');
 require_once(CSHOP_CLASSES_CART . '.class.php');
 require_once(CSHOP_CLASSES_USER . '.class.php');

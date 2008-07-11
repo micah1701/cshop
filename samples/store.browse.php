@@ -1,5 +1,5 @@
 <?php
-require_once('../config/circusShop.config.php');
+require_once('../config/cshop.config.php');
 require_once("res_pager.class.php");      
 require_once(CSHOP_CLASSES_PRODUCT . '.class.php');
 require_once(CSHOP_CLASSES_CART.'.class.php');

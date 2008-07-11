@@ -11,7 +11,7 @@
  */
 error_reporting(E_ALL);
 
-require_once(CONFIG_DIR . 'circusShop.config.php');
+require_once(CONFIG_DIR . 'cshop.config.php');
 
 require_once('formex.class.php');
 require_once('db_container.class.php');
@@ -19,7 +19,7 @@ require_once('mosh_tool.class.php');
 require_once("fu_HTML_Table.class.php");      
 
 require_once(CSHOP_CLASSES_PRODUCT . '.class.php');
-require_once('circusShop/cmShipMethod_Zone.class.php');
+require_once('cshop/cmShipMethod_Zone.class.php');
 
 $pagetitle = 'Zone Shipping Method';
 

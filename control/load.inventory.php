@@ -4,7 +4,7 @@
  *
  * $Id: load.inventory.php,v 1.6 2008/06/24 19:29:50 sbeam Exp $
  */
-require_once(CONFIG_DIR . 'circusShop.config.php');
+require_once(CONFIG_DIR . 'cshop.config.php');
 require_once("mosh_tool.class.php");      
 require_once("fu_HTML_Table.class.php");      
 require_once(CSHOP_CLASSES_PRODUCT.'.class.php');

@@ -1,5 +1,5 @@
 <?php
-require_once(CONFIG_DIR.'circusShop.config.php');
+require_once(CONFIG_DIR.'cshop.config.php');
 
 /**
  * managing users, addresses, login credentials etc.

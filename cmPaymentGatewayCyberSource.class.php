@@ -1,5 +1,5 @@
 <?php
-require_once('circusShop/cmPaymentGateway.class.php');
+require_once('cshop/cmPaymentGateway.class.php');
 
 /** the gateway for CyberSource goes here
  * $Id: cmPaymentGatewayCyberSource.class.php,v 1.4 2008/07/01 15:39:07 sbeam Exp $

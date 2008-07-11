@@ -1,12 +1,12 @@
 <?php
-/** configration file for circusShop. defines some image metrics and more
+/** configration file for cshop. defines some image metrics and more
  * importantly, classnames to be used in this implementation. 
  *
 
 
-/** set local classnames for site-specific circusShop extensions 
+/** set local classnames for site-specific cshop extensions 
  * Since we can't use PHP5 autoloading (*sob*) you have to enter the 
- * classname to be used for each important circusShop object below. That should
+ * classname to be used for each important cshop object below. That should
  * do it, the controllers will look in include_path for the class file matching
  * the name.
 */

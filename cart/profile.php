@@ -4,7 +4,7 @@
  *
  * $Id: profile.php,v 1.8 2008/02/05 16:35:21 sbeam Exp $
  */
-require_once(CONFIG_DIR.'circusShop.config.php');
+require_once(CONFIG_DIR.'cshop.config.php');
 require_once('formex.class.php');
 require_once('mosh_tool.class.php');
 require_once(CSHOP_CLASSES_USER.'.class.php');

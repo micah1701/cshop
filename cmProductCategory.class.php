@@ -1,6 +1,6 @@
 <?php
 require_once('db_container.class.php');
-require_once('circusShop/cmShipping.class.php');
+require_once('cshop/cmShipping.class.php');
 
 /**
  * basic container class Product Categories. Simple. provides the colmap of

@@ -4,7 +4,7 @@
  *
  * $Id: store.orders.php,v 1.29 2008/07/08 16:21:24 sbeam Exp $
  */
-require_once(CONFIG_DIR . 'circusShop.config.php');
+require_once(CONFIG_DIR . 'cshop.config.php');
 require_once(CSHOP_CLASSES_USER . '.class.php');
 require_once(CSHOP_CLASSES_ORDER . '.class.php');
 require_once(CSHOP_CLASSES_CART . '.class.php');

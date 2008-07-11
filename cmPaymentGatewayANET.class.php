@@ -1,5 +1,5 @@
 <?php
-require_once('circusShop/cmPaymentGateway.class.php');
+require_once('cshop/cmPaymentGateway.class.php');
 
 /** the gateway for Authorize.net goes here
  * $Id: cmPaymentGatewayANET.class.php,v 1.9 2008/07/01 19:34:00 sbeam Exp $
