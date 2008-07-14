@@ -114,10 +114,7 @@ elseif (isset($_POST['op_update'])) {
         }
     }
     else {
-        print "<pre>DEBUG: at line " . __LINE__ . ' of ' . __FILE__ . "\n";
-        print_r($_POST);
-        print '</pre>';
-        #header("Location: " . $_SERVER['PHP_SELF']);
+        header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
 }
