@@ -1248,6 +1248,16 @@ class cmCart extends db_container {
              }
          }
     }
+
+
+    function get_minicart_values() {
+        $subtotal = $this->get_subtotal();
+        $mini = $this->fetch(array('ship_total', 'ship_method', 'tax_total', 'tax_method'));
+        $mini['giftcard_total'] = $this->get_giftcard_total();
+        $mini['discount_amt'] = $this->get_discount($subtotal);
+        $mini['subtotal'] = $subtotal;
+        return $mini;
+    }
 }
 
 

@@ -29,7 +29,7 @@
 
       </div>
       <form id="cartform" name="cartform" action="<~ $smarty.server.PHP_SELF ~>" method='post'>
-        <~ include file="float:cart_show.tpl" ~>
+        <~ include file="float:cart_contents.tpl" ~>
 
         <~ if !$SUPPRESS_CHECKOUT ~>
           <div class="userCartControl" id="cartControlButtons">

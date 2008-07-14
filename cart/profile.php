@@ -47,6 +47,20 @@ define('OP_KILL_ADDR', 'DELETE ADDRESS');
 define('OP_SHOW_ORDERS', 'YOUR ORDER HISTORY');
 define('OP_EDIT_LOGIN', 'UPDATE LOGIN');
 
+
+$cart = cmClassFactory::getInstanceOf(CSHOP_CLASSES_CART,$pdb);
+
+/* decide what currency to show. They would have set this in the cart */
+$sess->register('CSHOP_CURRENCY_DISPLAY');
+$cart->set_display_currency($CSHOP_CURRENCY_DISPLAY);
+
+/** setup smarty with a method from the $cart object to convery currencies */
+$smarty->register_modifier('currency_format', array(&$cart, 'currency_format'));
+
+// setup the minicart
+$smarty->assign('minicart', $cart->get_minicart_values());
+$smarty->assign('cartitems', $cart->fetch_items());
+
 /** decide on a course of action **/
 if ($userinfo and empty($_POST)) { // flags in GET causes various forms to display
     $ACTION = OP_VIEW_ACCOUNT;

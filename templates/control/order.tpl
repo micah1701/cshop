@@ -1,6 +1,6 @@
 <div class="headlineW">
   <h2 class="productName headline">ORDER DETAIL</h2>
-  <a class="printInvoice" href="<~ $smarty.server.PHP_SELF ~>?op_print=<~ $orderinfo.id ~>" target="printWin">Print Invoice</a>
+  <a class="printInvoice" href="<~ $smarty.server.PHP_SELF ~>?op_print=<~ $orderinfo.order_token ~>" target="printWin">Print Invoice</a>
 </div>
 
 
@@ -16,7 +16,7 @@
             <strong>Order Number:</strong>
           </td>
           <td>
-            <~ $orderinfo.id ~>
+            <~ $orderinfo.order_token ~>
           </td>
         </tr>
         <tr>

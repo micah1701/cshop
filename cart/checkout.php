@@ -343,7 +343,6 @@ $smarty->assign('cart_itemcount', $cart->count_items());
 
 $subtotal = $cart->get_subtotal();
 $smarty->assign('subtotal', $subtotal);
-$smarty->assign('mini_discount_amt', $cart->get_discount($subtotal));
 
 
 /*** create form object, set up and pass to smarty **/
@@ -375,7 +374,7 @@ if ($SHOWFORM) {
                 $fex->set_elem_attrib('country', 'limit_to', $countrylist);
             }
 
-            if (!$op_new_ship and ($shipping = $user->fetchShippingAddr())) {
+            if (empty($errs) && !$op_new_ship and ($shipping = $user->fetchShippingAddr())) {
                 $smarty->assign('has_shipping', true);
                 $fex->add_element('shipping_addr_id', array(null, 'hidden', $shipping['id']));
 
@@ -423,10 +422,8 @@ if ($SHOWFORM) {
 
             /** also now we can calculate tax to that shipping address. Store in the cart table
               * and let the luser know */
-            if ($taxtotal = $cart->calculate_tax()) {
-                $smarty->assign('mini_tax', array('tax_total'=>$taxtotal, 
-                                                  'tax_method'=>$cart->header['tax_method']));
-            }
+            $taxtotal = $cart->calculate_tax();
+            $smarty->assign('tax_total', $taxtotal);
 
             $smarty->assign('action', 'checkout_pickshipmethod');
             $tpl = 'checkout_pickship.tpl';
@@ -435,10 +432,6 @@ if ($SHOWFORM) {
 
             $cart_total = $cart->get_grandtotal();
 
-            /* totals for minicart thing */
-            $smarty->assign('mini_shipping', $cart->fetch(array('ship_total','ship_method')));
-            $smarty->assign('mini_tax', $cart->fetch(array('tax_total','tax_method')));
-            $smarty->assign('mini_gc', $cart->get_giftcard_total());
             $smarty->assign('cart_grandtotal', $cart_total);
 
             /* add form fields for GiftCards and get current totals for display */
@@ -522,6 +515,8 @@ if ($SHOWFORM) {
 
     $smarty->assign('cform', $fex->get_struct());
     unset($fex);
+
+    $smarty->assign('minicart', $cart->get_minicart_values());
 }
 
 // trigger_error sends a email to somebody who gives a damn (maybe)

@@ -28,7 +28,7 @@ $PRINT_TEMPLATE = false;
 
 $parentid = null;
 $itemid = null;
-$reqIdKey = 'oid';
+$reqIdKey = 'tok';
 $table_title = 'Order';
 
 
@@ -70,7 +70,7 @@ $smarty->register_modifier('currency_format', array(&$cart, 'currency_format'));
 
 /* update the backordered amount for a certain line item */
 if ($ACTION == OP_EDIT_LINEITEM) {
-    $order->set_id($itemid);
+    $order->set_id_by_token($itemid);
     $count = 0;
     foreach ($_POST as $k => $v) {
         if (preg_match('/^dBackOrder_(\d+)/', $k, $m)) {
@@ -98,7 +98,7 @@ elseif ($ACTION == OP_UPDATE) {
     $mosh->form_field_prefix = '';
     $msg = '';
 
-    $order->set_id($itemid);
+    $order->set_id_by_token($itemid);
 
     $vals = array();
     if ($errs = $mosh->check_form($order->colmap)) { // handled below
@@ -134,7 +134,7 @@ elseif ($ACTION == OP_UPDATE) {
 }
 
 if ($ACTION == OP_DUMP) {
-    $order->set_id($itemid);
+    $order->set_id_by_token($itemid);
     $file = $order->dump_data_file();
     if ($file) {
         $msg = "Order info has been dumped to $file";
@@ -149,7 +149,7 @@ if ($ACTION == OP_DUMP) {
 
 if ($ACTION == OP_VIEW) {
 
-    $order->set_id($itemid);
+    $order->set_id_by_token($itemid);
     if (!$orderinfo = $order->fetch()) {
         trigger_error("The given parameter did not match any order", E_USER_ERROR);
     }
@@ -276,11 +276,11 @@ else {
     }
     /** **/
 
-    $cols = array('cust_name','company','email','order_create_date', 'orders_status', 'currency', 'ship_date', 'amt_quoted');
+    $cols = array('cust_name','company','email','order_create_date', 'orders_status', 'currency', 'ship_date', 'amt_quoted','order_token');
     if (defined('CSHOP_ALLOW_ANON_ACCOUNT')) {
         $cols[] = 'anon_email';
     }
-    $header_row = array('id'=>'Order ID','email'=>'User', 'orders_status'=>'Status', 'order_create_date'=>'Order Date', 'amt_quoted'=>'Total', 'ship_date'=>'Ship Date');
+    $header_row = array('id'=>'Order ID','order_token'=>'Order Number','email'=>'User', 'orders_status'=>'Status', 'order_create_date'=>'Order Date', 'amt_quoted'=>'Total', 'ship_date'=>'Ship Date');
 
     if ($orders = $order->fetch_any($cols, $offset, $range, $orby, $where, $orderdir)) {
         
@@ -296,15 +296,16 @@ else {
             if (!empty($o['company'])) $name .= " [{$o['company']}]";
             $email = (!empty($o['email']))? $o['email'] : $o['anon_email'];
             $vals = array($o['id'],
+                          $o['order_token'],
                           "$name &lt;{$email}&gt;",
                           $order->statuses[$o['orders_status']],
                           $o['order_create_date'],
                           $o['amt_quoted'],
                           $o['ship_date']);
-            $link = sprintf('%s?%s=%d',
+            $link = sprintf('%s?%s=%s',
                               $_SERVER['PHP_SELF'], 
                               $reqIdKey,
-                              $o['id']);
+                              $o['order_token']);
             $table->addRow_fu(array_values($vals), '', true, $link);
         }
 

@@ -17,6 +17,15 @@
         div.orderItems th {
             border-bottom: 1px solid #555;
         }
+        .alignright {
+            text-align: right;
+        }
+        .alignleft {
+            text-align: left;
+        }
+        .aligncenter {
+            text-align: center;
+        }
     </style>
   </head>
 <body>
@@ -31,7 +40,7 @@
             <strong>Order Number:</strong>
           </td>
           <td>
-            <~ $orderinfo.id ~>
+            <~ $orderinfo.order_token ~>
           </td>
         </tr>
         <tr>
@@ -178,7 +187,7 @@
     <div style="text-align: left; border-bottom: 1px solid #555">
         <h3>ORDER ITEMS</h3>
         <div class="orderItems">
-        <~ include file="float:cart_show.tpl" suppress_update=1 ~>
+        <~ include file="float:cart_contents.tpl" suppress_update=1 ~>
         </div>
     </div>
     </td>

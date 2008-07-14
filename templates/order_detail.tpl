@@ -20,17 +20,20 @@
     </div>
 
     
-    <h4 id="chkConfirmCustInfo">
-        <span class="header">Customer:</span>
-                  <span class="cust_name"><~ $user.cust_name ~> &mdash; <~ $user.company ~></span> 
-                  <span class="user_email">&lt;<~ $user_email ~>&gt;</span>
-                  <~ if $user.telephone ~><span class="phone">Phone:&nbsp;<~ $user.telephone ~></span><~/if~></h4>
+    <div id="chkConfirmCustInfo">
+        <h2 class="checkoutSectionHeader">Customer</h2>
+        <div class="custName"><~ $user.cust_name ~> <~ if $user.company ~>&ndash;&nbsp;<~ $user.company ~><~/if~></div> 
+        <div class="custEmail">&lt;<~ $user_email ~>&gt; </div>
+        <~ if $user.telephone ~><div class="custPhone">Phone:&nbsp;<~ $user.telephone ~></div><~/if~>
+    </div>
 
     <div id="chkConfirmOrderInfo">
       <div id="chkConfirmOrderHeader">
-        <div class="orderHeader"><span>Order ID:</span> <~ $orderinfo.id ~></div>
-        <div class="orderHeader"><span>Order Date:</span> <~ $orderinfo.order_create_date|date_format:"%A, %B %e, %Y %I:%M %p" ~>
-        <~ if $orderinfo.cc_type ~></div>
+        <h2 class="checkoutSectionHeader">Order Information</h2>
+        <div class="orderHeader"><span>Order ID:</span> <~ $orderinfo.order_token ~></div>
+        <div class="orderHeader"><span>Order Date:</span> <~ $orderinfo.order_create_date|date_format:"%A, %B %e, %Y %I:%M %p" ~></div>
+            <div class="orderHeader"><span>Order Status:</span> <~ $order_status ~></div>
+        <~ if $orderinfo.cc_type ~>
           <div class="orderHeader"><span>Payment Method:</span> <~ $orderinfo.cc_type ~> <~ $orderinfo.cc_number ~></div>
         <~/if~>
       </div>
@@ -53,10 +56,38 @@
     </div>
 
 
-  <~ include file="float:cart_show.tpl" suppress_update=1 ~>
+    <div class="checkoutFormBox">
+        <h2 class="checkoutSectionHeader">Order Items</h2>
+        <~ include file="float:cart_contents.tpl" suppress_update=1 ~>
+    </div>
+
+
+    <~ if $history ~>
+      <div id="orderHistory">
+        <h2 class="checkoutSectionHeader">Order History</h2>
+
+        <div class="orderItems">
+            <table cellspacing="0" width="100%">
+                <tr>
+                  <th align="left">Date</th>
+                  <th align="left">Status</th>
+                  <th align="left">Comment</th>
+                </tr>
+              <~ foreach from=$history item=h ~>
+                <~ if $h.user_notify ~>
+                    <tr>
+                      <td><~ $h.stamp|date_format:"%e %b %Y %I:%M %p" ~></td>
+                      <td><~ $h.order_status ~></td>
+                      <td><~ $h.comments|escape:"html" ~>&nbsp;</td>
+                    </tr>
+                <~/if~>
+              <~/foreach ~>
+            </table>
+        </div>
+      </div>
+    <~/if~>
 
 </div>
-<div style="height: 8px"></div>
 
 <a href="<~ $smarty.const.CSHOP_PRODUCT_DETAIL_PAGE ~>" class="cartlink" id="cmContinueShopping">RETURN TO STORE</a>
 

@@ -594,7 +594,8 @@ CREATE TABLE `cm_orders` (
   PRIMARY KEY  (`id`),
   KEY `ix_uid` (`user_id`),
   KEY `ix_shp` (`ship_method_id`),
-  KEY `ix_cid` (`cart_id`)
+  KEY `ix_cid` (`cart_id`),
+  UNIQUE uq_tok (order_token)
 ) TYPE=InnoDB;
 
 --

@@ -289,3 +289,6 @@ CREATE TABLE `cm_coupons_categories` (
 -- Fri May  2 08:35:57 EDT 2008
 ALTER TABLE cm_order_transactions ADD has_avs_result bool;
 
+
+-- Mon Jul 14 16:31:48 EDT 2008
+ALTER TABLE cm_orders ADD UNIQUE uq_tok (order_token);

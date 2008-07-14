@@ -1,21 +1,28 @@
 <~ include file="cart_header.tpl" heading="checkout/sign on" ~>
 
+<div id="checkoutWrapper">
 
 			  
 
     <div class="cartLoginFormBox" id="cartLoginForm">
     
       <~ $cform.FORM ~>
+
       <~ if $BAD_PASS ~>
+
         <div class="userError">Sorry, the credentials you sent could not be validated.
             <br />
             Please try again or <a href="pass.recover.php">click here if you have forgotten your password</a>.
         </div>
         <div style="clear: both; height: 1px; overflow: hidden">&nbsp;</div>
+
       <~ else ~>
+
       <strong>I am a returning customer.</strong> 
+
       <~ /if ~>
-          <table cellpadding="4" cellspacing="0" border="0">
+
+          <table class="login" border="0">
             <tr>
               <td class="<~ $cform.username.CLASS ~>">
                 <label for="username" accesskey="e"><~ $cform.username.LABEL ~></label>
@@ -40,9 +47,9 @@
     <div class="cartLoginFormBox">
         <strong>I am a new customer.</strong> &raquo;&raquo; <a href="account.php">CREATE ACCOUNT</a>
         <p>
-            By creating an account at <~ $SITE_DOMAIN_NAME ~> you will be able to shop faster, 
-            be up to date on an orders status, 
-            and keep track of the orders you have previously made.
+            By creating an account at <~ $SITE_DOMAIN_NAME ~> you will be able to shop faster on your next visit, 
+            keep up to date on an orders status, and keep track of the orders you have previously made. Please
+            see our <a href="<~ $smarty.const.CSHOP_PRIVACY_POLICY_URL ~>">Privacy Policy</a>.
         </p>
     </div>
 
@@ -56,4 +63,5 @@
     </div>
     <~/if~>
 
+</div>
 <~ include file="cart_footer.tpl" ~>

@@ -1,4 +1,6 @@
 <~ include file="cart_header.tpl" heading=$ACTION ~>
+<~ include file="float:minicart.tpl" ~>
+<div id="cartWrapper">
 
       <div style="text-align: right">
         <~ if $auth_logged_in ~><a href="/cart/logout.php">Logout</a><~/if~>
@@ -77,7 +79,18 @@
     
 <~else~>
 
+    <h2>Create Customer Account</h2>
    <~ if $ACTION eq $smarty.const.OP_NEW_USER ~>
+        <div class="userNotice">
+            Please fill in the following form to create a new customer account with
+            us. By using your login information in the future, you will be able to
+            check on the status of your orders and place repeat orders with us. We
+            value your privacy and will not use or distribute your information
+            without your consent (please see our <a href="<~ $smarty.const.CSHOP_PRIVACY_POLICY_URL ~>">Privacy Policy</a> for
+            more information). If you do not wish to create an account at this
+            time, you may <a href="checkout.php">go back and checkout anonymously</a>.  
+        </div>
+
         <div class="accountNote">NOTE: If you already have an account with us, please <a href="checkout.php">login here</a>.</div>
     <~ /if ~>
  
@@ -99,10 +112,13 @@
 
   <~ if $ACTION eq $smarty.const.OP_NEW_USER or $ACTION eq $smarty.const.OP_EDIT_PROFILE ~>
       <div class="checkoutFormBox">
-        <h2>Your personal details</h2>
+        <h2 class="checkoutSectionHeader">Your contact information</h2>
+        <div class="userInstruction">
+            We will use this information only to contact you in regard to your order.
+        </div>
           <table>
             <tr>
-              <td class="<~ $cform.fname.CLASS ~>">
+              <td class="<~ $cform.cust_name.CLASS ~>">
                 <label for="cust_name" accesskey="e">Your Name</label>
               </td>
               <td class="formField">
@@ -117,17 +133,11 @@
                 <~ $cform.company.TAG ~>
               </td>
             </tr>
-          </table>
-       </div>
-
-      <div class="checkoutFormBox">
-          <h2>Your contact information</h2>
-          <table>
             <tr>
               <td class="<~ $cform.email.CLASS ~>">
                 <label for="email" accesskey="e"><~ $cform.email.LABEL ~></label>
               </td>
-              <td class="formField">
+              <td class="formField <~ $cform.email.CLASS ~>">
                 <~ $cform.email.TAG ~><span class="formReqStar">*</span>
               </td>
             </tr>
@@ -136,7 +146,7 @@
                 <label for="telephone" accesskey="e"><~ $cform.telephone.LABEL ~></label>
               </td>
               <td class="formField">
-                <~ $cform.telephone.TAG ~><span class="formReqStar">*</span>
+                <~ $cform.telephone.TAG ~>
               </td>
             </tr>
           </table>
@@ -146,7 +156,7 @@
   <~ if $ACTION eq $smarty.const.OP_NEW_USER or $ACTION eq $smarty.const.OP_EDIT_ADDR ~>
    <~ if $ADDRESS_REQUIRED ~>
       <div class="checkoutFormBox">
-          <h2>Your address</h2>
+          <h2 class="checkoutSectionHeader">Your address</h2>
           <table>
         <~ if $cform.name ~>
             <tr>
@@ -223,7 +233,7 @@
 
   <~ if $ACTION eq $smarty.const.OP_NEW_USER or $ACTION eq $smarty.const.OP_EDIT_LOGIN ~>
       <div class="checkoutFormBox" id="checkoutAccountCredentialPicker">
-        <h2>Your sign-on information</h2>
+        <h2 class="checkoutSectionHeader">Your sign-on information</h2>
         <table>
           <~ if $cform.username ~>
             <tr>
@@ -287,4 +297,5 @@
 
 
      <div style="clear: both">&nbsp;</div>
+ </div>
 <~ include file="cart_footer.tpl" ~>

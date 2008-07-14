@@ -103,14 +103,14 @@ class cmOrder extends db_container {
         return $this->user;
     }
 
-    function create_order_token($len=8) { // 135,054,749,375 different possible
+    function create_order_token($len=8) { // 1,102,498,775 different possible
         if (!$this->order_token) { // 28936HW8
-            $tok = mt_rand(10000, 99999);
-            $chrs = '123456789QWERTYUIOPASDFGHJKLZXCVBNM';
-            for ($i=0; $i<$len-4; $i++) {
+            $tok = mt_rand(100000, 999999);
+            $chrs = '1234567890QWERTYUIPASDFGHJKLZXCVBNM';
+            for ($i=0; $i<$len-6; $i++) {
                 $tok .= $chrs{mt_rand(0, strlen($chrs)-1)};
             }
-            $sql = sprintf("SELECT COUNT(*) FROM {$this->get_table_name()} WHERE order_token = %s", $this->db->quoteSmart($tok));
+            $sql = "SELECT COUNT(*) FROM {$this->get_table_name()} WHERE order_token = '$tok'";
             $res = $this->db->getOne($sql);
             if ($res > 0) {
                 $tok = $this->create_order_token($len);
@@ -412,7 +412,7 @@ class cmOrder extends db_container {
     function set_id_by_token($tok) {
         $sql = sprintf("SELECT id FROM %s WHERE order_token = %s",
                         $this->get_table_name(),
-                        $this->db->quoteSmart($tok));
+                        $this->db->quoteSmart(strtoupper($tok)));
         $res = $this->db->getOne($sql);
         if ($res and !PEAR::isError($res)) {
             $this->set_id($res);

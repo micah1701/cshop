@@ -1,10 +1,8 @@
 <~ include file="cart_header.tpl" heading="Confirm Order Details" ~>
-
 			  
 <div id="cartWrapper">
 
   <~ include file="float:cartsteps.tpl" step=4 ~>
-
   <~ if !$cart_itemcount ~>
       <div class="userCartControl" style="text-align: center">
         Your cart is empty.
@@ -28,12 +26,15 @@
     </div>
     <br />
   <~ else ~>
-    <div class="userIndicator">
-    Please check all order details and click CONFIRM ORDER to send your
-    order for processing.
+    <div class="userNotice">
+        Please check all order details and click CONFIRM ORDER to send your order for processing.
     </div>
-    <h4 id="chkConfirmCustInfo">For:
-        <strong><~ $user.cust_name ~> &mdash; <~ $user.company ~></strong> &lt;<~ $user_email ~>&gt; <~ if $user.telephone ~><div class="phone">Phone:&nbsp;<~ $user.telephone ~></div><~/if~></h4>
+    <div id="chkConfirmCustInfo">
+        <h4>Customer:</h4>
+        <div class="custName"><~ $user.cust_name ~> <~ if $user.company ~>&ndash;&nbsp;<~ $user.company ~><~/if~></div> 
+        <div class="custEmail">&lt;<~ $user_email ~>&gt; </div>
+        <~ if $user.telephone ~><div class="custPhone">Phone:&nbsp;<~ $user.telephone ~></div><~/if~>
+    </div>
 
     <table width="90%">
         <tr>
@@ -66,7 +67,7 @@
 
     <~ if $payment_info ~>
         <div class="checkoutFormBox" id="checkoutConfirmPaymentInfoArea">
-          <h2>Payment Information</h2>
+          <h4>Payment Information</h4>
           <~ $payment_info.cctype ~> -<~ $payment_info.ccno ~> (Exp: <~ $payment_info.ccexp|date_format:"%b %Y" ~>)
                         <div class="checkoutConfirmEditAddrLink">
                             [<a href="checkout.php?billing">edit</a>]
@@ -75,7 +76,7 @@
     <~/if~>
       <~ if $giftcards ~>
         <div class="checkoutFormBox">
-          <h2>Giftcards applied to this order:</h2> 
+          <h2 class="checkoutSectionHeader">Giftcards applied to this order:</h2> 
              <table width="80%" cellspacing="1">
                 <~ foreach from=$giftcards item=gc ~>
                   <tr style="background-color: #<~ cycle values=eee,ccc ~>">
@@ -92,7 +93,7 @@
       <~/if~>
     <~ include file="float:checkout_giftcards.tpl" ~>
 
-    <~ include file="float:cart_show.tpl" suppress_update=1 ~>
+    <~ include file="float:cart_contents.tpl" suppress_update=1 ~>
 
   <~ if $grand_total ~>
     <br />

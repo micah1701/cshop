@@ -83,6 +83,10 @@ else {
 
         //$smarty->assign('discount_amt', abs($cart_totals['discount']['amt']));
         $smarty->assign('discount_descrip', $cart_totals['discount']['descrip']);
+
+        $smarty->assign('order_status', $order->get_status());
+
+        $smarty->assign('history', $order->fetch_history());
     }
 }
 

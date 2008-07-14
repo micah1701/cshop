@@ -26,12 +26,6 @@ $user = new $c($pdb);
 // init page auth objects
 page_open(array('sess'=>'jen_Session', 'auth'=>'defaultAuth'));
 
-
-if($auth->auth['uid'] == "nobody"){
-	header("Location: ../index.php");
-}
-
-
 $product_detail_page = CSHOP_PRODUCT_DETAIL_PAGE;
 $smarty->assign('product_detail_page', $product_detail_page);
 
@@ -85,6 +79,15 @@ if (isset($_REQUEST['op_add_pid'])) {
         exit();
     }
 }
+/** EMPTY THE CART **/
+elseif (isset($_REQUEST['op_empty'])) {
+    $res = $cart->emptyCart();
+    if (PEAR::isError($res)) {
+        trigger_error($res->getMessage(), E_USER_ERROR);
+    }
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
 /** UPDATE QTYS **/
 elseif (isset($_POST['op_update'])) {
 
@@ -111,18 +114,12 @@ elseif (isset($_POST['op_update'])) {
         }
     }
     else {
-        header("Location: " . $_SERVER['PHP_SELF']);
+        print "<pre>DEBUG: at line " . __LINE__ . ' of ' . __FILE__ . "\n";
+        print_r($_POST);
+        print '</pre>';
+        #header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }
-}
-/** EMPTY THE CART **/
-elseif (isset($_REQUEST['empty'])) {
-    $res = $cart->emptyCart();
-    if (PEAR::isError($res)) {
-        trigger_error($res->getMessage(), E_USER_ERROR);
-    }
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit();
 }
 
 if (isset($_GET['discounterr'])) { // didn't like that discount code from earlier
@@ -192,7 +189,7 @@ foreach ($cats as $catid => $name) {
 }
 $smarty->assign('productlist', $products);
 
-$smarty->display('float:cart_contents.tpl');
+$smarty->display('float:cart_display.tpl');
 
 
 

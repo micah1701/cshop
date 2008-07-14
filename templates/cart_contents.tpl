@@ -2,7 +2,7 @@
   <table border="0" cellspacing="0" cellpadding="3" class="cart">
       <tr class="cartHeader">
           <th colspan="2" class="alignleft">Product</th>
-          <th>&nbsp;</th>
+          <th class="aligncenter">SKU</th>
           <th class="aligncenter">Quantity</th>
           <th class="alignright">Price</th>
           <th class="alignright">Total</th>
@@ -14,9 +14,10 @@
           </td>
           <td valign="top">
             <~ include file="float:cart_product_attribs.tpl" ~>
+            &nbsp;
           </td>
-          <td valign="top">
-            <!-- <~ $item.product_sku ~> -->
+          <td class="aligncenter" valign="top">
+            <~ $item.product_sku ~>
           </td>
           <td class="aligncenter" valign="top">
             <~ if $suppress_update ~>

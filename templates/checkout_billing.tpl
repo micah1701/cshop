@@ -19,8 +19,10 @@
 			  
 <div id="cartWrapper">
     <~ include file="float:cartsteps.tpl" step=3 ~>
-    <div class="userIndicator">Please enter billing information for your order below.</div>
+    <div class="userNotice">Please enter payment information for your order below.</div>
+
     <~ include file="float:user_error_report.tpl" ~>
+
     <~ if ! $errors ~>
        <~ if $mini_shipping ~>
             <~ if $mini_shipping.ship_total == 0 ~>
@@ -36,7 +38,7 @@
   <~/if~>
 
 
-  <div>
+   <div class="checkoutFormBox">
 
    <~ if ! $PAYMENT_REQUIRED ~>
           <strong class="userIndicator">No additional payment is required.</strong>
@@ -58,7 +60,7 @@
    <~ else ~>
     
       <div class="reqFieldNotice">
-        Fields marked with a <span class="formReqStar">*</span> are required
+        Fields marked with <span class="formReqStar">*</span> are required
       </div>
 
     <~ if $cform ~>
@@ -66,56 +68,57 @@
       <~ $cform.FORM ~>
 
       <div class="checkoutFormBox" id="checkoutBillingPaymentInfoArea">
-      <h2 class="checkoutSectionHeader">Payment information</h2>
-          There is one allowed payment type for this order.<br />
-          <br />
-          <strong>Payment Type:</strong> Credit Card<br />
-          Please enter your card information:
-          <table>
-            <tr>
-              <td class="<~ $cform.cctype.CLASS ~>">
-                <label for="cctype" accesskey="n"><~ $cform.cctype.LABEL ~></label>
-              </td>
-              <td class="formField">
-                <~ $cform.cctype.TAG ~><span class="formReqStar">*</span>
-                <!-- img src="images/4-Credit-Card-Logos-Small.gif" alt="cc logos" -->
-              </td>
-            </tr>
-            <tr>
-              <td class="<~ $cform.ccno.CLASS ~>">
-                <label for="ccno" accesskey="n"><~ $cform.ccno.LABEL ~></label>
-              </td>
-              <td class="formField">
-                <~ $cform.ccno.TAG ~><span class="formReqStar">*</span>
-              </td>
-            </tr>
-            <tr>
-              <td class="<~ $cform.ccexp.CLASS ~>">
-                <label for="ccexp" accesskey="n"><~ $cform.ccexp.LABEL ~></label>
-              </td>
-              <td class="formField">
-                <~ $cform.ccexp.TAG ~><span class="formReqStar">*</span>
-              </td>
-            </tr>
-            <tr>
-              <td class="<~ $cform.csc1.CLASS ~>">
-                <label for="csc1" accesskey="n"><~ $cform.csc1.LABEL ~></label>
-              </td>
-              <td class="formField">
-                <~ $cform.csc1.TAG ~>&nbsp;<a href="csc_help.php" onclick="window.open(this.href, 'cscWin', 'resizable,height=440,width=380'); return false;">What is this?</a>
-              </td>
-            </tr>
-          </table>
+          <h2 class="checkoutSectionHeader">Payment information</h2>
+          <div class="userInstruction">There is one allowed payment type for this order.</div>
+
+          <div class="paymentType">
+              <h3><strong>Payment Type:</strong> Credit Card</h3>
+              <div class="userInstruction">Please enter your card information:</div>
+              <table>
+                <tr>
+                  <td class="<~ $cform.cctype.CLASS ~>">
+                    <label for="cctype" accesskey="n"><~ $cform.cctype.LABEL ~></label>
+                    <div class="userHelpText">(click to select)</div>
+                  </td>
+                  <td class="formField" id="checkoutPaymentCardTypeSelection">
+                    <~ $cform.cctype.TAG ~><span class="formReqStar">*</span>
+                    <!-- img src="/cart/images/4-Credit-Card-Logos-Small.gif" alt="cc logos" -->
+                  </td>
+                </tr>
+                <tr>
+                  <td class="<~ $cform.ccno.CLASS ~>">
+                    <label for="ccno" accesskey="n"><~ $cform.ccno.LABEL ~></label>
+                  </td>
+                  <td class="formField">
+                    <~ $cform.ccno.TAG ~><span class="formReqStar">*</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="<~ $cform.ccexp.CLASS ~>">
+                    <label for="ccexp" accesskey="n"><~ $cform.ccexp.LABEL ~></label>
+                  </td>
+                  <td class="formField">
+                    <~ $cform.ccexp.TAG ~><span class="formReqStar">*</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="<~ $cform.csc1.CLASS ~>">
+                    <label for="csc1" accesskey="n"><~ $cform.csc1.LABEL ~></label>
+                  </td>
+                  <td class="formField">
+                    <~ $cform.csc1.TAG ~>&nbsp;<a href="csc_help.php" onclick="window.open(this.href, 'cscWin', 'resizable,height=440,width=380'); return false;">What is this?</a>
+                  </td>
+                </tr>
+              </table>
+          </div>
        </div>
 
       <a name="addr"> </a>
       <div class="checkoutFormBox" id="checkoutBillingPaymentAddrArea">
           <h2 class="checkoutSectionHeader">Billing Address</h2>
-           <div class="userIndicator">
-             <strong>Please enter the billing address for the card:</strong>
-           </div>
+           <div class="userInstruction">Please enter the billing address for the card:</div>
 
-           <label class="formexFieldRadio"><~ $cform.same_as_shipping.TAG ~><~ $cform.same_as_shipping.LABEL ~></label>
+           <label class="formexFieldRadio"><~ $cform.same_as_shipping.TAG ~>&nbsp;<~ $cform.same_as_shipping.LABEL ~></label>
 
        <~ include file=float:checkout_address_form.tpl ~>
 
