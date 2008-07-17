@@ -4,216 +4,256 @@
   <title>Order Confirmation</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <style rel="stylesheet" type="text/css">
-body {
-	font-family: Arial, Verdana, Helvetica, sans-serif;
-	color: #000000;
-	background: #ffffff;
-}
-.date {
-	font-weight: bold
-}
 
-a {
-	color: #339933;
-	font-weight: bold;
-	text-decoration: underline
-}
-
-a:hover {
-	color: #336633;
-	font-weight: bold;
-	text-decoration: none
-}
-
-#oitemList {
-    text-align: left; margin: 10px; border: 1px solid #666; padding: 4px;
-}
-#oitemList table {
-    width: 100%;
-}
-#oitemList table td.Rt {
-    text-align: right;
-}
-#oitemList table td.Ct {
-    text-align: center;
-}
-#oitemList table td.Lt {
-    text-align: left;
-}
+        body,div,td,th {
+          font-family: arial,helvetica,sans-serif;
+          font-size: 11px;
+          color: #000;
+          background-color: none;
+        }
+        div.orderItems table {
+            width:100%;
+        }
+        div.orderItems td {
+            border-bottom: 1px solid #ddd;
+        }
+        div.orderItems th {
+            border-bottom: 1px solid #555;
+        }
+        h3 {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .alignright {
+            text-align: right;
+        }
+        .alignleft {
+            text-align: left;
+        }
+        .aligncenter {
+            text-align: center;
+        }
 </style>
 </head>
 
 <body>
 
-<strong>Dear <~ $user.cust_name ~>,</strong>
+    <div>
+        <strong>Dear <~ $user.cust_name ~>,</strong>
 
-<~ if $order_status == 'NEW' ~>
-    <p>Your order has been received into our system. For your reference, here are the details:</p>
-<~else~>
-    <p>Your order has been received into our system. For your reference, here are the details:</p>
-<~/if~>
-</p>
-<table cellpadding="2">
+        <~ if $order_status == 'NEW' ~>
+        <p>Your order has been received into our system. For your reference, here are the details:</p>
+        <~ else ~>
+        <p>Your order has been updated. Please see below for current order details.</p>
+        <~/if~>
+    </div>
+
+
+
+<table width="100%">
   <tr>
-    <td>
-      Order ID:
-    </td>
-    <td bgcolor="#e0e0e0">
-      <~ $order_id ~>
-    </td>
-  </tr>
+    <td valign="top">
+    <table>
+        <tr>
+          <td>
+            <strong>Order Number:</strong>
+          </td>
+          <td>
+            <~ $orderinfo.order_token ~>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Submitted on:</strong>
+          </td>
+          <td>
+            <~ $orderinfo.order_create_date|date_format:"%b %e, %Y %I:%M %p" ~>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Order Status:</strong>
+          </td>
+          <td>
+            <~ $order_status ~><br />
+          </td>
+        </tr>
+        <tr>
+            <td valign="top">
+                <strong>Customer:</strong>
+            </td>
+            <td><~ $user.cust_name ~><br />
+                 <~ if $user.company ~><~ $user.company ~><br /><~/if~>
+                 &lt;<~ $user.email ~>&gt;
+            </td>
+         </tr>
+        <tr>
+            <td valign="top">
+                <strong>Number Items:</strong>
+            </td>
+            <td>
+              <~ $numitems ~>
+            </td>
+         </tr>
+  <~ if $orderinfo.orders_status gt 2 ~>
+        <tr>
+          <td>
+            <strong>Ship Method:</strong>
+          </td>
+          <td>
+            <~ $orderinfo.ship_method ~><br />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Tracking#:</strong>
+          </td>
+          <td>
+            <~ $orderinfo.tracking_no ~><br />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Total Shipping:</strong>
+          </td>
+          <td>
+            <~ $orderinfo.ship_total|currency_format ~>&nbsp;<~ $currency ~><br />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Ship Date:</strong>
+          </td>
+          <td>
+            <~ $orderinfo.ship_date|date_format ~><br />
+          </td>
+        </tr>
+  <~/if ~>
+  <~ if $orderinfo.orders_status == 4 and $orderinfo.delivery_date ~>
+        <tr>
+          <td>
+            <strong>Delivery Date:</strong>
+          </td>
+          <td>
+            <~ $orderinfo.delivery_date|date_format ~>
+          </td>
+        </tr>
+  <~/if ~>
 
-  <tr>
-    <td>
-      Order Date:
-    </td>
-    <td bgcolor="#e0e0e0">
-      <~ $order_date ~>
-    </td>
-  </tr>
+        <tr>
+          <td>
+            <strong>Invoice Amount:</strong>
+          </td>
+          <td>
+            <~ $cart_totals.grand_total|currency_format ~>&nbsp;<~ $currency ~> <br />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Billed to date:</strong>
+          </td>
+          <td>
+            <~ $orderinfo.amt_billed_to_date|currency_format ~>&nbsp;<~ $currency ~>
+          </td>
+        </tr>
+        <tr>
+          <td valign="top">
+            <strong>Payment Method:</strong>
+          </td>
+          <td>
+            <~ $orderinfo.payment_method ~> <br />
+          <~ if $orderinfo.cc_type ~>
+            <~ $orderinfo.cc_type ~>: <~ $orderinfo.cc_number ~><br />
+            Exp: <~ $orderinfo.cc_expires ~><br />
+          <~/if~>
+          </td>
+        </tr>
+      </table>
 
-  <tr>
-    <td>
-      Status:
     </td>
-    <td bgcolor="#e0e0e0">
-      <~ $order_status ~>
-    </td>
-  </tr>
+    <td valign="top">
 
-<~ if $order.orders_status lt 5 ~>
-  <tr>
-    <td>
-      Total:
-    </td>
-    <td bgcolor="#e0e0e0">
-      <~ $order.amt_billed_to_date ~> <~ $order.currency ~>
-    </td>
-  </tr>
-<~/if~>
-<~ if $orderinfo.cc_type ~> 
-    <tr>
-      <td>
-        Payment Method:
-      </td>
-      <td>
-        <~ $orderinfo.cc_type ~> <~ $orderinfo.cc_number ~>
-      </td>
-    </tr>
-<~/if~>
-<~ if $order.orders_status eq $smarty.const.CM_ORDER_STATUS_SHIPPED ~>
-    <tr>
-        <td>
-            Ship Date:
-        </td>
-        <td bgcolor="#e0e0e0">
-            <~ $order.ship_date ~>
-        </td>
-    </tr>
-    <~ if $order.ship_method ~>
-      <tr>
-        <td>
-          Ship Method:
-        </td>
-        <td bgcolor="#e0e0e0">
-          <~ $order.ship_method ~>
-        </td>
-      </tr>
-    <~/if~>
-    <~ if $order.ship_total ~>
-      <tr>
-        <td>
-          Shipping Total:
-        </td>
-        <td bgcolor="#e0e0e0">
-          <~ $order.ship_total ~> <~ $order.currency ~>
-        </td>
-      </tr>
-    <~/if~>
-<~/if~>
-<~ if $order.tracking_no ~>
-  <tr>
-    <td>
-      Tracking#:
-    </td>
-    <td bgcolor="#e0e0e0">
-      <~ $order.tracking_no ~>
-    </td>
-  </tr>
-<~/if~>
-<~ if $order.orders_status gt 3 and $order.delivery_date ~>
-  <tr>
-    <td>
-      Delivery Date:
-    </td>
-    <td bgcolor="#e0e0e0">
-      <~ $order.delivery_date ~>
-    </td>
-  </tr>
-<~/if~>
-</table>
+    <table width="100%" cellspacing="0" cellpadding="2" border="0">
+        <tr>
+          <td valign="top">
+            <b>Billing to:</b>
+          </td>
+          <td>
+                <~ include file="cart/address_format.tpl" address=$billing ~>
+         </td>
+       </tr>
 
+        <tr>
+          <td colspan="2" valign="top">
+            &nbsp;
+          </td>
+       </tr>
 
-<~ if $comments ~>
-<br>
-<strong>Comments:</strong> <br>
-<hr size="1">
-<pre><~ $comments ~></pre>
-<hr size="1">
-<~/if~>
+        <tr>
+          <td valign="top">
+            <b>Shipping to:</b>
+          </td>
+          <td>
+                <~ include file="cart/address_format.tpl" address=$shipping ~>
+         </td>
+       </tr>
+     </table>
 
-
-<hr size="1">
-<h3>ORDER DETAILS</h3>
-<br>
-<table width="100%" cellpadding="2">
-  <tr>
-    <td>
-      <strong>SHIPPING TO:</strong><br>
-      <~ include file="float:address_format.tpl" address=$shipping ~>
-    </td>
-    <td>
-      <strong>BILLING TO:</strong><br>
-      <~ include file="float:address_format.tpl" address=$billing ~>
     </td>
   </tr>
   <tr>
     <td colspan="2">
-    <div id="oitemList">
-    <h3>ORDER ITEMS</h3>
-
-    <table cellspacing="0" cellpadding="0" class="GenTable" id="cartContents">
-        <tr class="Th">
-            <th align="left" colspan="3">Product</th>
-            <th align="center">Quantity</th>
-            <th align="right">Price</th>
-            <th align="right">Total</th>
-        </tr>
-    <~ foreach from=$cart item=item ~>
-      <tr class="<~ cycle values=cartRowOdd,cartRowEven ~>">
-          <td align="left" valign="top" colspan="2"><strong><~ $item.product_descrip ~></strong>
-              <~ if $item.out_of_stock ~><br /><em><~ $item.stock_msg ~></em><~ /if ~>
-          </td>
-          <td valign="top" class="Lt"><~ include file="float:cart_product_attribs.tpl" ~></td>
-          <td align="center" valign="top">
-              <~ $item.qty ~>
-          </td>
-          <td align="right" valign="top">
-              <~ $item.price|currency_format ~>
-          </td>
-          <td align="right" valign="top">
-              <~ $item.line_price|currency_format ~>
-          </td>
-      </tr>
-    <~/foreach ~>
-    <~ include file="float:cart_totals.tpl" ~>
+    <div style="text-align: left; border-bottom: 1px solid #555">
+        <h3>ORDER ITEMS</h3>
+        <div class="orderItems">
+        <~ include file="float:cart_contents.tpl" suppress_update=1 ~>
+        </div>
     </div>
     </td>
   </tr>
+
+  <~ if $history ~>
+      <tr>
+        <td colspan="2">
+          <div style="text-align: left; border-bottom: 1px solid #555">
+            <h3>ORDER HISTORY</h3>
+
+            <div class="orderItems">
+                <table cellspacing="0" cellpadding="2" border="0" width="100%">
+                    <tr>
+                      <th align="left">Date</th>
+                      <th align="left">Status</th>
+                      <th align="left">Comment</th>
+                    </tr>
+                  <~ foreach from=$history item=h ~>
+                    <~ if $h.user_notify ~>
+                        <tr>
+                          <td><~ $h.stamp|date_format:"%e %b %Y %I:%M %p" ~></td>
+                          <td><~ $h.order_status ~></td>
+                          <td><~ $h.comments|escape:"html" ~>&nbsp;</td>
+                        </tr>
+                    <~/if~>
+                  <~/foreach ~>
+                </table>
+            </div>
+          </div>
+
+        </td>
+      </tr>
+   <~/if~>
+
+
+
+
+
 </table>
-<hr size="1">
+
+
+
 
 <br>
+
+<hr size="1">
 <div align="center">
 Please note, you can 
     <a href="<~ $order_view_link ~>">view complete details and status on your order at any time on our site.</a>
@@ -222,7 +262,6 @@ Please note, you can
 
 <hr size="1">
     <~ include file="float:store_return_policy.tpl" ~>
-<hr size="1">
 </body>
 </html>
 

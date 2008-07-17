@@ -328,12 +328,12 @@ class cmOrder extends db_container {
                        'order_status' => $this->get_status(),
                        'user_notify' => $do_notify,
                        'comments' => $comment);
+
          $hist = db_container::factory($this->db, $this->_history_table);
          $res = $hist->store($vals);
 
          if ($do_notify) {
-             $user =& $this->get_user();
-             $user->send_order_notification($this, $hist);
+             $this->send_user_notification($comment);
          }
 
          // I wish I could use a trigger to do this.
@@ -796,6 +796,94 @@ class cmOrder extends db_container {
             }
             return $items;
         }
+    }
+
+
+
+    /**
+     * send an email to this order's owner with info on the order
+     * @param $comment any new comment to be included
+     * @return success
+     */
+    function send_user_notification($comment="") {
+        global $smarty;
+
+
+        $user = $this->get_user();
+        $uservals = $user->fetch();
+        if (!isset($uservals['cust_name'])) {
+            $uservals['cust_name'] = sprintf("%s %s", $uservals['fname'], $uservals['lname']);
+        }
+
+        $smarty->assign('user', $uservals);
+
+        $orderinfo = $this->fetch();
+
+        // mask the cc#
+        $orderinfo['cc_number'] = '(last 4) '.substr($orderinfo['cc_number'], -4, 4);
+
+        $orderitems = $this->fetch_items();
+
+        $smarty->assign('orderinfo', $orderinfo);
+        $smarty->assign('suppress_update', true);
+        $smarty->assign('comments', $comment);
+
+        $cart_totals = $this->fetch_totals();
+
+        /** set and display ***********************************************************/
+        $smarty->assign('cart_totals', $cart_totals);
+
+        $smarty->assign('discount_amt', abs($orderinfo['discount_amt']));
+        $smarty->assign('discount_descrip', $orderinfo['discount_descrip']);
+
+        $smarty->assign('currency', $orderinfo['currency']);
+        $smarty->assign('order_status', $this->get_status());
+        $smarty->assign('cart', $orderitems);
+        $smarty->assign('numitems', count($orderitems));
+        $smarty->assign('billing', $this->fetch_addr('billing'));
+        $smarty->assign('shipping', $this->fetch_addr('shipping'));
+
+
+        $h = $this->fetch_history();
+        $smarty->assign('history', $h);
+
+
+        $smarty->assign('order_view_link', sprintf('http://%s'.CSHOP_ORDER_DETAIL_PAGE_FMT,
+                                                    $_SERVER['HTTP_HOST'],
+                                                    $orderinfo['order_token']));
+
+
+        // get 2 versions of the message
+        $msg = $smarty->fetch("float:emails/order_notify.txt.tpl");
+        $msg_html = $smarty->fetch("float:emails/order_notify.html.tpl");
+
+        $recip = sprintf("%s %s <%s>", $uservals['fname'], $uservals['lname'], $uservals['email']);
+
+        $headers['From']   = EMAIL_SENDER;
+        $headers['Subject'] = sprintf('%s: Order #%s - %s', 
+                                      SITE_DOMAIN_NAME, 
+                                      $orderinfo['order_token'], 
+                                      ($orderinfo['orders_status'] == 1)? 'CONFIRMATION':'UPDATE');
+        if (defined('CSHOP_ORDER_EMAIL_BCC')) {
+            $headers['BCC']    = CSHOP_ORDER_EMAIL_BCC;
+        }
+        else {
+            $headers['BCC']    = ERROR_EMAIL_RECIP;
+        }
+
+        $params = "-f".EMAIL_SENDER;
+
+        $mm =& new Mail_mime("\n");
+        $mm->setTXTBody($msg);
+        $mm->setHTMLBody($msg_html);
+
+        $body = $mm->get();
+        $headers = $mm->headers($headers);
+
+        $m =& Mail::factory('mail', $params);
+
+        $res = $m->send($recip, $headers, $body);
+        return $res;
     }
 
 }

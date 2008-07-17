@@ -1,36 +1,56 @@
 Dear <~ $user.cust_name ~>,
 
-<~ if $order.orders_status eq 1 ~>
+<~ if $orderinfo.orders_status eq 1 ~>
 Your order has been received into our system. For your reference, here are the details:
 <~else~>
 The status of your order has been updated. The details are listed  below.
 <~/if~>
 
-  Order ID: <~ $order_id ~>
-  Order Date: <~ $order_date ~>
+Order ID: <~ $orderinfo.order_token ~>
+Order Date: <~ $orderinfo.order_create_date|date_format:"%b %e, %Y %I:%M %p" ~>
 
-  Status: <~ $order_status ~>
+Status: <~ $order_status ~>
 
-<~ if $order.orders_status lt 5 ~>
+Customer: <~ $user.cust_name ~> <~ if $user.company ~>[<~ $user.company ~>]<~/if~> [<~ $user.email ~>]
+
+Number Items: <~ $numitems ~>
+
+<~ if $orderinfo.orders_status lt 5 ~>
 <~ if $cart_totals.grand_total ~>
-    ORDER TOTAL: <~ $cart_totals.grand_total|currency_format ~>
+ORDER TOTAL: <~ $cart_totals.grand_total|currency_format ~> <~ $currency ~>
 <~/if ~>
 <~/if~>
-<~ if $order.orders_status eq $smarty.const.CM_ORDER_STATUS_SHIPPED ~>
-    Ship Date: <~ $order.ship_date ~>
-<~ if $order.ship_method ~>
-    Ship Method: <~ $order.ship_method ~>
+
+<~ if $orderinfo.orders_status gt 2 ~>
+SHIPPING INFORMATION:
+  Ship Date: <~ $orderinfo.ship_date ~>
+<~ if $orderinfo.ship_method ~>
+  Ship Method: <~ $orderinfo.ship_method ~>
 <~/if~>
-<~ if $order.ship_total ~>
-    Shipping Total: <~ $order.ship_total ~> <~ $order.currency ~>
+<~ if $orderinfo.ship_total ~>
+  Shipping Total: <~ $orderinfo.ship_total|currency_format ~> <~ $currency ~>
 <~/if~>
 <~/if~>
-<~ if $order.tracking_no ~>
-    Tracking#: <~ $order.tracking_no ~>
+<~ if $orderinfo.tracking_no ~>
+  Tracking#: <~ $orderinfo.tracking_no ~>
 <~/if~>
-<~ if $order.orders_status gt 3 and $order.delivery_date ~>
-    Delivery Date: <~ $orde.delivery_date ~>
+<~ if $orderinfo.orders_status gt 3 and $orderinfo.delivery_date ~>
+  Delivery Date: <~ $orde.delivery_date ~>
 <~/if~>
+
+
+PAYMENT METHOD: <~ $orderinfo.payment_method ~> 
+<~ if $orderinfo.cc_type ~>
+  <~ $orderinfo.cc_type ~>: <~ $orderinfo.cc_number ~>
+  Exp: <~ $orderinfo.cc_expires ~>
+<~/if~>
+
+BILLING TO:
+<~ include file="cart/address_format.txt.tpl" address=$billing ~>
+
+SHIPPING TO:
+<~ include file="cart/address_format.txt.tpl" address=$shipping ~>
+
 
 <~ if $comments ~>
 Comments: 

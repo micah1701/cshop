@@ -59,7 +59,13 @@ if (!$orderinfo = $order->fetch()) {
 }
 else {
     if ($uid != $orderinfo['user_id']) {
-        trigger_error("illegal attempt to access order", E_USER_ERROR);
+        if ($auth->conditional_login()) { // will show login form if not logged in yet.
+            trigger_error("illegal attempt to access order", E_USER_ERROR);
+        }
+        else {
+            trigger_error("order access deferred pending login", E_USER_WARNING);
+            exit();
+        }
     }
     else {
         $orderitems = $order->fetch_items();

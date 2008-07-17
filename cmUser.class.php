@@ -348,8 +348,60 @@ EOM;
      * @return success
      * @todo make the format of the email in a template somehow...
      */
-    function send_order_notification(&$order, &$hist) {
+    function send_order_notification(&$order) {
         global $smarty;
+
+
+        $uservals = $order->user->fetch();
+        if (!isset($uservals['cust_name'])) {
+            $uservals['cust_name'] = sprintf("%s %s", $uservals['fname'], $uservals['lname']);
+        }
+
+        $smarty->assign('user', $uservals);
+
+        // mask the cc#
+        if (strlen($orderinfo['cc_number']) == 4) {
+            $orderinfo['cc_number'] = '(last 4) '.$orderinfo['cc_number'];
+        }
+
+        $orderitems = $order->fetch_items();
+
+        $smarty->assign('orderinfo', $orderinfo);
+        $smarty->assign('suppress_update', true);
+
+        $cart_totals = $order->fetch_totals();
+
+        /** set and display ***********************************************************/
+        $smarty->assign('cart_totals', $cart_totals);
+
+        $smarty->assign('discount_amt', abs($orderinfo['discount_amt']));
+        $smarty->assign('discount_descrip', $orderinfo['discount_descrip']);
+
+        $smarty->assign('currency', $orderinfo['currency']);
+        $smarty->assign('order_status', $order->get_status());
+        $smarty->assign('cart', $orderitems);
+        $smarty->assign('numitems', count($orderitems));
+        $smarty->assign('billing', $order->fetch_addr('billing'));
+        $smarty->assign('shipping', $order->fetch_addr('shipping'));
+
+
+        $h = $order->fetch_history();
+        $smarty->assign('history', $h);
+
+
+
+
+
+        /*
+
+
+
+
+
+
+
+
+
         $cols = array('payment_method', 'order_create_date', 'orders_status', 'currency',
                       'tax_total', 'ship_total', 'ship_method', 'tracking_no',
                       'ship_date', 'delivery_date', 'amt_billed_to_date', 'order_token',
@@ -359,16 +411,16 @@ EOM;
         $status = $order->get_status();
         $domain = SITE_DOMAIN_NAME;
 
-        /** get order totals for the mini cart display thing */
+        // get order totals for the mini cart display thing 
         $subtotal = $order->get_subtotal();
         $grand_total = $order->get_total();
 
-        /* totals for giftcards are gotten separately for some reason */
+        // totals for giftcards are gotten separately for some reason 
         $gc_total = $order->get_giftcard_total();
         $smarty->assign('giftcards', $order->get_giftcards());
         $smarty->assign('gc_total', $gc_total);
 
-        /* cmOrder knows how to get all the totals we need for the templates */
+        // cmOrder knows how to get all the totals we need for the templates 
         $cart_totals = $order->fetch_totals();
 
         $smarty->assign('cart_totals', $cart_totals);
@@ -376,10 +428,6 @@ EOM;
         $smarty->assign('subtotal', number_format($subtotal, 2));
 
         // info on user
-        $uservals = $order->user->fetch();
-        if (!isset($uservals['cust_name'])) {
-            $uservals['cust_name'] = sprintf("%s %s", $uservals['fname'], $uservals['lname']);
-        }
 
         $oid = $order->get_id();
         $order_date = date('M j, Y h:i A T', strtotime($orderinfo['order_create_date']));
@@ -396,6 +444,7 @@ EOM;
         $smarty->assign('billing', $order->fetch_addr('billing'));
         $smarty->assign('comments', $hist->header['comments']);
         $smarty->assign('cart', $order->fetch_items());
+        */
 
         $smarty->assign('order_view_link', sprintf('http://%s'.CSHOP_ORDER_DETAIL_PAGE_FMT,
                                                     $domain,
@@ -406,7 +455,10 @@ EOM;
         $msg = $smarty->fetch("float:emails/order_notify.txt.tpl");
         $msg_html = $smarty->fetch("float:emails/order_notify.html.tpl");
 
+        print $msg_html;
 
+
+        /*
         $recip = sprintf("%s %s <%s>", $uservals['fname'], $uservals['lname'], $this->get_email());
 
         $headers['From']   = EMAIL_SENDER;
@@ -434,6 +486,7 @@ EOM;
 
         $res = $m->send($recip, $headers, $body);
         return $res;
+         */
     }
 
 
