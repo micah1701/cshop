@@ -178,7 +178,7 @@
           <th>Status</th>
         </tr>
       <~ foreach from=$history item=h ~>
-        <~ cycle assign=bg values=#d2d2c0,#cacac0 ~>
+        <~ cycle assign=bg values=#e0e0e0,#e8e8e8 ~>
         <tr style="background: <~ $bg ~>">
           <td><~ $h.stamp|date_format:"%e %b %Y %I:%M %p" ~></td>
           <td align="center"><~ if $h.user_notify ~><img src="img/tick.gif" /><~else~><img src="img/cross.gif" /><~/if~></td>

@@ -196,7 +196,7 @@ $smarty->display('control/header.tpl');
 
 
 <? if ($SHOWFORM) { ?>
-    <div style="width: 400px" class="container">
+    <div class="container">
       <div class="heading">
           <? if ($ACTION == OP_EDIT) { ?>
             <div style="float: right">
@@ -217,13 +217,13 @@ $smarty->display('control/header.tpl');
        </div>
     <? } ?>
         <?= $form['FORM'] ?>
-        <div style="text-align: left; background: #000; color: #fff; font-weight: bold; padding: 4px">
+        <div style="text-align: left; background: #555; color: #fff; font-weight: bold; padding: 4px">
             Zone Name: <?= $form['zone_name']['TAG'] ?> 
                    <br />
             Included Countries: <?= $form['cm_shipmethods_zone_locales']['TAG'] ?>
 
         </div>
-        <div style="background: #000; color: #fff; font-weight: bold; padding: 4px; text-align: right">
+        <div style="background: #555; color: #fff; font-weight: bold; padding: 4px; text-align: right">
             <input type="submit" name="op" value="SAVE CHANGES" />
         <?= $form['HIDDENS'] ?>
         </div>

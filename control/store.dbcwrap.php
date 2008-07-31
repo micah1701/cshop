@@ -353,7 +353,7 @@ $smarty->display('control/header.tpl');
 ?>
 
 
-<div align="center" style="margin: 10px">
+<div id="controlW1">
 
 <? if ($ACTION) { ?>
     <div style="text-align: left; width: 600px">

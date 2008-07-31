@@ -268,7 +268,7 @@ $smarty->display('control/header.tpl');
        </div>
     <? } ?>
         <form action="<? $_SERVER['PHP_SELF'] ?>" method="post">
-        <div style="text-align: left; background: #000; color: #fff; font-weight: bold; padding: 4px">
+        <div style="text-align: left; background: #555; color: #fff; font-weight: bold; padding: 4px">
             Method: <?= $form['name']['TAG'] ?> 
                    <br />
             Zone: <?= $form['cm_shipmethods_zone_zones_id']['TAG'] ?>
@@ -321,7 +321,7 @@ $smarty->display('control/header.tpl');
             </table>
         </div>
         <? } ?>
-        <div style="background: #000; color: #fff; font-weight: bold; padding: 4px; text-align: right">
+        <div style="background: #555; color: #fff; font-weight: bold; padding: 4px; text-align: right">
             <input type="submit" name="op_basis" value="SAVE CHANGES" />
     <? if ($ACTION == OP_EDIT) { ?>
             <input type="hidden" name="method_id" value="<?= $req_id ?>" />
