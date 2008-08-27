@@ -48,7 +48,9 @@ $(document).ready(
                });
                $(this).addClass('sel').siblings('img').removeClass('sel');
            });
-           $('#checkoutPaymentCardTypeSelection').css('background', 'inherit').find('select').hide(); // hide <select>
+           $('#checkoutPaymentCardTypeSelection').find('select').hide(); // hide <select>
+           $('#checkoutPaymentCardTypeSelection').css('background-image', 'none'); // rid of old BG img
+
            // move the "star" to the end of the group, duh.
            $('#checkoutPaymentCardTypeSelection span.formReqStar').remove().appendTo('#checkoutPaymentCardTypeSelection'); 
        }

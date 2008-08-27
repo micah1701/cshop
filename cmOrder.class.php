@@ -814,6 +814,7 @@ class cmOrder extends db_container {
         if (!isset($uservals['cust_name'])) {
             $uservals['cust_name'] = sprintf("%s %s", $uservals['fname'], $uservals['lname']);
         }
+        if (empty($uservals['email'])) $uservals['email'] = $user->get_email();
 
         $smarty->assign('user', $uservals);
 
@@ -857,7 +858,7 @@ class cmOrder extends db_container {
         $msg = $smarty->fetch("float:emails/order_notify.txt.tpl");
         $msg_html = $smarty->fetch("float:emails/order_notify.html.tpl");
 
-        $recip = sprintf("%s %s <%s>", $uservals['fname'], $uservals['lname'], $uservals['email']);
+        $recip = sprintf("%s <%s>", $uservals['cust_name'], $uservals['email']);
 
         $headers['From']   = EMAIL_SENDER;
         $headers['Subject'] = sprintf('%s: Order #%s - %s', 
