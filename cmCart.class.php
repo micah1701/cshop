@@ -1272,7 +1272,7 @@ class cmCart extends db_container {
 
     function garbage_old_carts() {
         if (mt_rand(1, 100) < $this->gc_prob) {
-            $sqlwhere = sprintf("TO_DAYS(modified_date) > %d", $this->gc_age);
+            $sqlwhere = sprintf(" TO_DAYS(NOW()) - TO_DAYS(modified_date) > %d", $this->gc_age);
             $sql1 = "DELETE FROM cm_cart_items WHERE cart_id IN (SELECT id from cm_cart WHERE $sqlwhere)";
             $sql2 = "DELETE FROM cm_cart WHERE $sqlwhere";
             $res = $this->db->query($sql1);
