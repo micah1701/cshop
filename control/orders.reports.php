@@ -7,6 +7,7 @@
 require_once(CONFIG_DIR . 'cshop.config.php');
 require_once("fu_HTML_Table.class.php");      
 require_once("res_pager.class.php");      
+require_once("csv_table.class.php");      
 require_once(CSHOP_CLASSES_ORDER.'.class.php');
 require_once(CSHOP_CLASSES_PRODUCT.'.class.php');
 
@@ -21,7 +22,7 @@ $xgets = array();
 
 $parentid = null;
 $itemid = null;
-$reqIdKey = 'oid';
+$reqIdKey = 'tok';
 $table_title = 'Order';
 
 define('OP_BY_USER', 1);
@@ -31,12 +32,49 @@ define('OP_BY_PRODUCT', 4);
 define('OP_VIEWS', 5);
 define('OP_ORDERS_PRODUCTS', 6);
 
+$ACTION_NAMES = array(OP_ORDERS_PRODUCTS => 'Order History',
+                      OP_BY_USER => 'By Customer',
+                      OP_BY_DATE => 'By Month',
+                      OP_BY_STATUS => 'By Status',
+                      OP_BY_PRODUCT => 'By Product',
+                      OP_VIEWS => 'Product Views');
+
 
 $orderclass = CSHOP_CLASSES_ORDER;
 $cmOrder = new $orderclass($pdb);
 
 $c = CSHOP_CLASSES_PRODUCT;
 $cmProduct = new $c($pdb);
+
+
+/* special extension to CSV_Table to give it methods that correspond with our 
+ * fu_HTML_Table, so it will work transparently, but then spit out CSV instead of HTML 
+ * at the end. All we do below when CSV is requested is instantiate one of 
+ * these instead, then print out the headers and data at the end. Quick and hacky. */
+class CSV_Table_Fu extends CSV_Table {
+
+    function addRow_fu($vals) {
+        $this->addRow($vals);
+    }
+
+    function addRow($vals) {
+        if (!isset($this->_rows)) {
+            $this->_rows = array();
+        }
+        $this->_rows[] = $vals;
+    }
+
+    function addSortRow($vals) {
+        $this->set_header_row($vals);
+    }
+
+    function displayAll() {
+        return $this->show($this->_rows);
+    }
+
+}
+/* ** */
+
 
 
 $ACTION = OP_ORDERS_PRODUCTS;
@@ -117,12 +155,12 @@ else { // if ($ACTION == OP_ORDERS_PRODUCTS) {
     $xgets[] = "m=$req_month";
 
     /* set up format for header sort links */
-    $link_fmt = 'store.orders.php?oid=%s&op_filter=GO';
-    $link_vals = array('id');
+    $link_fmt = 'store.orders.php?tok=%s&op_filter=GO';
+    $link_vals = array('order_token');
     $def_orby = 'id';
 
     /* things that go after SELECT in the $sql */
-    $fields = array('id', 'order_create_date', 'DATE_FORMAT(order_create_date, \'%%d %%b %%Y\') AS datef'
+    $fields = array('id', 'order_token', 'order_create_date', 'DATE_FORMAT(order_create_date, \'%%d %%b %%Y\') AS datef'
                   , 'ship_total', 'tax_total', 'tax_method', 'amt_quoted');
 
 
@@ -151,7 +189,7 @@ else { // if ($ACTION == OP_ORDERS_PRODUCTS) {
     $sql = "SELECT $fields FROM cm_orders WHERE $where ORDER BY %s %s";
 
     /* the base columns for the report, shortly to be added to. */
-    $header_row = array('id'=>'Order ID', 'datef' => 'Date', 'ship_total'=>'Shipping', 'tax_total'=>'Tax', 'amt_quoted' => 'Total');
+    $header_row = array('order_token'=>'Order Number', 'datef' => 'Date', 'ship_total'=>'Shipping', 'tax_total'=>'Tax', 'amt_quoted' => 'Total');
 
 
     /* create a column for each active product in the DB */
@@ -212,12 +250,26 @@ $res = $pdb->query($sql);
 
 
 /** list all cm_categories in one big ass dump using HTML_Table **/
-$table = new fu_HTML_Table();
-$table->setAutoGrow(true);
-$table->setAutoFill("-");
+/** list all cm_categories in one big ass dump using HTML_Table **/
+if (isset($_GET['op_csv'])) {
+    $table = new CSV_Table_Fu();
 
-$xgets[] = "report=$ACTION";
-$table->addSortRow($header_row, $fake_orby, null, 'TH', join('&', $xgets), $order_dir);
+    $csv_headers = array();
+    foreach ($header_row as $k => $v) {
+        $csv_headers[] = preg_replace('/<[^>]+>/', " ", $v);
+    }
+    $table->addSortRow(array_values($csv_headers));
+}
+else {
+    $table = new fu_HTML_Table();
+    $table->setAutoGrow(true);
+    $table->setAutoFill("-");
+
+    $xgets[] = "report=$ACTION";
+    $table->addSortRow($header_row, $fake_orby, null, 'TH', join('&', $xgets), $order_dir);
+    $sep = (strpos($_SERVER['REQUEST_URI'], '?') === false)? '?' : '&';
+    $csv_link = $_SERVER['REQUEST_URI'] . $sep . 'op_csv';
+}
 
 while ($row = $res->fetchRow()) {
     $vals = array();
@@ -274,6 +326,18 @@ if ($ACTION == OP_ORDERS_PRODUCTS) {
 
 
 
+if (isset($_GET['op_csv'])) {
+    if (!empty($heading) && $ACTION == OP_ORDERS_PRODUCTS) {
+        $filename = $heading;
+    }
+    else {
+        $filename = strtolower($ACTION_NAMES[$ACTION]); 
+    }
+    $filename = preg_replace('/[^\w\d]+/', '-', $filename);
+    $table->print_csv_headers(SITE_DOMAIN_NAME . ".$filename.csv");
+    print $table->displayAll($res);
+    exit();
+}
 
 
 
@@ -286,13 +350,14 @@ $smarty->display('control/header.tpl');
 <div id="reportW">
     <h4>Sales Reports</h4>
     <ul class="reportmenu">
-        <li class="<? if ($ACTION == 6) echo 'sel' ?>"><a href="<?= $_SERVER['PHP_SELF'] ?>?report=6">Order History</a></li>
-        <li class="<? if ($ACTION == 1) echo 'sel' ?>"><a href="<?= $_SERVER['PHP_SELF'] ?>?report=1">By Customer</a></li>
-        <li class="<? if ($ACTION == 2) echo 'sel' ?>"><a href="<?= $_SERVER['PHP_SELF'] ?>?report=2">By Month</a></li>
-        <li class="<? if ($ACTION == 3) echo 'sel' ?>"><a href="<?= $_SERVER['PHP_SELF'] ?>?report=3">By Status</a></li>
-        <li class="<? if ($ACTION == 4) echo 'sel' ?>"><a href="<?= $_SERVER['PHP_SELF'] ?>?report=4">By Product</a></li>
-        <li class="<? if ($ACTION == 5) echo 'sel' ?>"><a href="<?= $_SERVER['PHP_SELF'] ?>?report=5">Product Views</a></li>
+        <? foreach ($ACTION_NAMES as $i => $act) { ?>
+            <li class="<? if ($ACTION == $i) echo 'sel' ?>"><a href="<?= $_SERVER['PHP_SELF'] ?>?report=<?= $i ?>"><?= $act ?></a></li>
+        <? } ?>
     </ul>
+
+    <? if ($numrows) { ?>
+        <div class="csvVersion"><a href="<?= $csv_link ?>">Download</a></div>
+    <? } ?>
 
     <div style="clear: left">&nbsp;</div>
     <? if (!empty($heading)) { ?>

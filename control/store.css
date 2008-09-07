@@ -544,3 +544,30 @@ td.formLabelCell {
     background: #ddd;
     border-bottom: 1px dotted #777;
 }
+
+.cshopLeftNav {
+    background-color: #fc0;
+    padding: 2px 2%;
+}
+.cshopLeftNav strong {
+    padding-right: 2em;
+}
+.cshopLeftNav span {
+    padding: 0 2em;
+}
+
+.csvVersion {
+    text-align: right;
+    padding-right: 1em;
+    max-width: 878px;
+}
+.csvVersion a {
+    float: right;
+    font-size: 90%;
+    background: url(img/csv_icon.gif) right center no-repeat;
+    height: 17px;
+    line-height: 18px;
+    padding-right: 20px;
+}
+#ordersReportTableW {
+}
