@@ -88,6 +88,14 @@ class cmCart extends db_container {
      * be limited by categories, then this NEEDS to be true */
     var $apply_discount_to_line_items = CSHOP_APPLY_DISCOUNT_TO_LINE_ITEMS;
 
+    /* probability in percent of garbage collection of old rows from cm_cart 
+     * and cm_cart_items table, taken each time emptyCart() is called */
+    var $gc_prob = 3;
+
+    /* when garbaging old carts, delete those older than this many days */
+    var $gc_age = 28;
+
+
     /* saves cart to session
      */
     function save() {
@@ -595,6 +603,8 @@ class cmCart extends db_container {
                          $this->_items_table,
                          $this->get_id());
           $this->db->query($sql);
+
+          $this->garbage_old_carts();
 
           return $this->db->affectedRows();
       }
@@ -1258,6 +1268,18 @@ class cmCart extends db_container {
         $mini['subtotal'] = $subtotal;
         return $mini;
     }
+
+
+    function garbage_old_carts() {
+        if (mt_rand(1, 100) < $this->gc_prob) {
+            $sqlwhere = sprintf("TO_DAYS(modified_date) > %d", $this->gc_age);
+            $sql1 = "DELETE FROM cm_cart_items WHERE cart_id IN (SELECT id from cm_cart WHERE $sqlwhere)";
+            $sql2 = "DELETE FROM cm_cart WHERE $sqlwhere";
+            $res = $this->db->query($sql1);
+            $res = $this->db->query($sql2);
+        }
+    }
+
 }
 
 
