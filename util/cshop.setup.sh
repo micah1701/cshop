@@ -270,8 +270,8 @@ if [ "$DO_IT" == "y" ]; then
     (
     cat <<EOF
 RewriteEngine On
-RewriteRule ^browse/([a-z0-9_-]+)/?$ store.browse.php?cn=$1 [QSA,NS]
-RewriteRule ^product/([0-9]+)/([^/]+)(/in/([a-z0-9_-]+))?(.*) /store.browse.php?pid=$1&cn=$4&etc=$5 [QSA,NS]
+RewriteRule ^browse/([a-z0-9./_-]+)/?\$ store.browse.php?cn=\$1 [QSA,NS]
+RewriteRule ^product/([0-9]+)/([^/]+)(/in/([a-z0-9_-]+))?(.*) /store.browse.php?pid=\$1&cn=\$4&etc=\$5 [QSA,NS]
 EOF
     ) >> $CSHOP_BASEDIR/../../web/.htaccess
 

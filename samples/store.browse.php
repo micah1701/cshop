@@ -11,17 +11,20 @@ $smarty->assign('page_id', 'storebrowse');
 $c = CSHOP_CLASSES_PRODUCT;
 $pc = new $c($pdb);
 
+$c = CSHOP_CLASSES_PRODUCT_CATEGORY;
+$pcats = new $c($pdb);
+
+$c = CSHOP_CLASSES_USER;
+$user = new $c($pdb);
+$user->set_auth($auth);
+
+
 /** number of products/page and where to start **/
 $range = 6;
 $offset = (isset($_GET['page']))? (($_GET['page']-1) * $range) : 0;
 
 /* get all categories and sub-categories at once, in a nested array */
-$topcats = $pc->get_categories(0);
-foreach ($topcats as $id => $cat) {
-    $topcats[$id] = array('sub' => $pc->get_categories(1, $id),
-                          'name' => $cat);
-}
-$smarty->assign('product_categories', $topcats);
+$smarty->assign('category_tree', $pc->get_categories());
 
 
 /* show an indiv. product detail page */
@@ -92,17 +95,23 @@ if (isset($_GET['pid'])) {
 /* show the product listing page for some category (top level category or below) */
 else {
 
-    if (isset($_GET['cat'])) {
+    $catid = null;
+    if (isset($_GET['cat']) && is_numeric($_GET['cat'])) {
         $catid = $_GET['cat'];
     }
-    else {
-        if ($default_category = $pc->get_featured_categories(1)) {
+    elseif (isset($_GET['cn'])) {
+        $catid = $pcats->lookup_cat_by_name($_GET['cn']);
+    }
+
+    if (!$catid) {
+        if ($default_category = $product->get_featured_categories(1)) {
             $catid = $default_category[0]['id'];
         }
         else {
             $catid = 1;
         }
     }
+
 
     $smarty->assign('parent_cat', $pc->get_parent_category_id($catid));
 
