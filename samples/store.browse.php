@@ -104,7 +104,7 @@ else {
     }
 
     if (!$catid) {
-        if ($default_category = $product->get_featured_categories(1)) {
+        if ($default_category = $pc->get_featured_categories(1)) {
             $catid = $default_category[0]['id'];
         }
         else {
