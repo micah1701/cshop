@@ -620,6 +620,9 @@ class cmCart extends db_container {
           if ($this->_coupon) { // there was a coupon attached previously!
               $this->_coupon->set_used();
           }
+
+          $this->garbage_old_carts();
+
           return $this->store(array('purchased'=>1));
       }
 

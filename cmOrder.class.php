@@ -27,8 +27,6 @@ class cmOrder extends db_container {
     var $_transaction_history_table = 'cm_order_transactions';
     var $_cart_totals_table = 'cm_cart_extra_totals';
 
-    var $_cart_class = 'circusCart';
-    var $_users_class = 'user_container';
 
     // names of columns in address table we can deal with
     var $_addr_cols = array('name','company','street_addr','addr2','city','state','postcode','country');
@@ -93,7 +91,7 @@ class cmOrder extends db_container {
     /* get a user object assoc with this order */
     function get_user() {
         if (!isset($this->user)) {
-            $class = $this->_users_class;
+            $class = CM_CLASSES_USER;
             $this->user =& new $class($this->db);
             if (!$this->header or !isset($this->header['user_id'])) {
                 $this->fetch(array('user_id'));

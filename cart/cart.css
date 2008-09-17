@@ -129,6 +129,7 @@ h2.checkoutSectionHeader {
 }
 .checkoutHintNotice {
     font-size: 0.9em;
+    display: inline;
 }
 
 #cmCartListing {
@@ -188,4 +189,21 @@ a#cmContinueShopping {
     display: block;
     text-align: right;
     font-weight: bold;
+}
+
+table.checkoutAddressForm td {
+    padding: 0.2em 0;
+    text-align: right;
+}
+table.checkoutAddressForm td.formField {
+    text-align: left;
+}
+table.checkoutAddressForm tr.checkoutUserComments td, table.checkoutAddressForm tr.checkoutEmail td {
+    padding-top: 1.8em;
+}
+table.checkoutAddressForm tr.checkoutUserComments textarea {
+    height: 4em;
+}
+table.checkoutAddressForm input, table.checkoutAddressForm textarea {
+    width: 14em;
 }

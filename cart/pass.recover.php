@@ -13,7 +13,7 @@ require_once('cshop/cmCart.class.php');
 require_once('cshop/cmUser.class.php');
 
 // init page auth objects
-page_open(array('sess'=>'jen_Session'));
+page_open(array('sess'=>'jen_Session', 'auth'=>'defaultAuth'));
 
 // control flags
 $ACTION = null;
@@ -41,7 +41,7 @@ if (isset($_POST['f_op']) and $_POST['f_op'] == OP_GET_EMAIL) {
 elseif (isset($_POST['f_op_send'])) {
     $ACTION = OP_RESET_PASS_PROC;
 }
-elseif (isset($_GET[$recover_key_name])) {
+elseif (!empty($_GET[$recover_key_name])) {
     $ACTION = OP_RESET_PASS;
 }
 else {
@@ -66,6 +66,7 @@ if ($ACTION == OP_SEND_TOKEN) { // check email addr and send email to user
             $user->force_pword_change(false);
             $smarty->assign('EMAIL_SENT', htmlspecialchars($femail));
             $user->send_pass_notification(false);
+            $auth->unauth();
             $SHOWFORM = false;
         }
     }                 

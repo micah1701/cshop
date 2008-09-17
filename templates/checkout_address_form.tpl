@@ -75,14 +75,28 @@
             </tr>
           <~/if ~>
 
-          <tr>
+          <~ if $cform.email ~>
+              <tr class="checkoutEmail">
+                <td valign="top" class="<~ $cform.email.CLASS ~>">
+                  <span><label for="email" accesskey="n">e-mail address:</label></span>
+                </td>
+                <td class="formField" colspan="4">
+                  <div class="checkoutFormBox">
+                    <~ $cform.email.TAG|tabindex:21 ~>
+                  </div>
+                </td>
+              </tr>
+          <~/if~>
+
+          <tr class="checkoutUserComments">
             <td valign="top" class="<~ $cform.user_comments.CLASS ~>">
-              <span><label for="user_comments" accesskey="n">Order <br />Comments:</label></span>
+              <span><label for="user_comments" accesskey="n">Order Comments:</label></span>
             </td>
-            <td colspan="4">
+            <td class="formField" colspan="4">
               <div class="checkoutFormBox">
                 <~ $cform.user_comments.TAG|tabindex:20 ~>
               </div>
             </td>
           </tr>
+
         </table>
