@@ -91,7 +91,7 @@ class cmOrder extends db_container {
     /* get a user object assoc with this order */
     function get_user() {
         if (!isset($this->user)) {
-            $class = CM_CLASSES_USER;
+            $class = CSHOP_CLASSES_USER;
             $this->user =& new $class($this->db);
             if (!$this->header or !isset($this->header['user_id'])) {
                 $this->fetch(array('user_id'));
