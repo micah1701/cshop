@@ -179,7 +179,7 @@
             <b>Billing to:</b>
           </td>
           <td>
-                <~ include file="cart/address_format.tpl" address=$billing ~>
+                <~ include file="float:address_format.tpl" address=$billing ~>
          </td>
        </tr>
 
@@ -194,7 +194,7 @@
             <b>Shipping to:</b>
           </td>
           <td>
-                <~ include file="cart/address_format.tpl" address=$shipping ~>
+                <~ include file="float:address_format.tpl" address=$shipping ~>
          </td>
        </tr>
      </table>
