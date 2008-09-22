@@ -82,7 +82,7 @@
                 </td>
                 <td class="formField" colspan="4">
                   <div class="checkoutFormBox">
-                    <~ $cform.email.TAG|tabindex:21 ~>
+                    <~ $cform.email.TAG|tabindex:20 ~>
                   </div>
                 </td>
               </tr>
@@ -94,7 +94,7 @@
             </td>
             <td class="formField" colspan="4">
               <div class="checkoutFormBox">
-                <~ $cform.user_comments.TAG|tabindex:20 ~>
+                <~ $cform.user_comments.TAG|tabindex:21 ~>
               </div>
             </td>
           </tr>

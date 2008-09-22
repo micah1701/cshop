@@ -152,6 +152,7 @@ class cmUser extends db_container {
         if ($type != 'billing' and $type != 'shipping') {
             return $this->raiseError("bad param '$type'");
         }
+        $this->addr->set_id($addrid); // make sure we don't just override a dbc instance
         if (!$this->get_id()) {
             return $this->raiseError("user id not set");
         }
@@ -163,15 +164,26 @@ class cmUser extends db_container {
      * store an address and associate it with this user
      * @param $type str billing or shipping
      * @param $addr array assoc address values
+     * @param $forcenew force creation of a new cm_address_book entry, defaults to true
      * @see cmAddressBook
      * @return success
      */
-    function store_address($type, $addr) {
+    function store_address($type, $addr, $forcenew=true) {
         if (!$this->get_id()) {
             return $this->raiseError("user id not set");
         }
         $addr['user_id'] = $this->get_id();
-        $this->addr->store($addr);
+
+        if (!$forcenew) { // look for existing addr and update it.
+            if ($addrid = $this->get_header($type.'_addr_id')) {
+                $this->addr->set_id($addrid);
+            }
+            else { // not known.
+                $this->addr->reset();
+            }
+        }
+        
+        $this->addr->store($addr, $forcenew);
         return $this->activateAddress($type, $this->addr->get_id());
     }
 

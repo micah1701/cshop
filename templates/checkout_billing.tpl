@@ -120,7 +120,9 @@
 
            <label class="formexFieldRadio"><~ $cform.same_as_shipping.TAG ~>&nbsp;<~ $cform.same_as_shipping.LABEL ~></label>
 
-       <~ include file=float:checkout_address_form.tpl ~>
+           <div id="checkoutBillingAddr">
+               <~ include file=float:checkout_address_form.tpl ~>
+           </div>
 
          </div>
 

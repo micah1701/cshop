@@ -193,34 +193,3 @@ $smarty->display('float:cart_display.tpl');
 
 
 
-
-/******************************************************** ********************/
-/** handle cart errors, doing a special redirect back to ourselves if its an
- * inventory/stock issue */
-function cmCartErrorHandler(&$err_obj) {
-    if ($err_obj->getCode() == ERR_CART_NO_STOCK or $err_obj->getCode() == ERR_CART_NO_INV) { 
-
-        $msg = base64_encode($err_obj->getMessage());
-
-        if (isset($_POST['op_add_pid'])) {
-            /* totally uncool hack to get the original $pid from the backtrace of
-             * the error object rather than just using global() */
-            $pid = $err_obj->backtrace[2]['args'][0];
-            $url = sprintf('%s?pid=%d&inventoryerror&err=%s', 
-                            CSHOP_PRODUCT_DETAIL_PAGE,
-                            $pid,
-                            $msg);
-        }
-        else {
-            $url = sprintf('%s?inventoryerror&err=%s', 
-                            $_SERVER['PHP_SELF'],
-                            $msg);
-        }
-        header("Location: $url\n");
-        exit();
-    }
-    elseif ($err_obj->getCode() != DBCON_ZERO_EFFECT) { //"0 rows were changed"
-        pear_error_handler($err_obj);
-    }
-    exit();
-}

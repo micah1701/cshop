@@ -205,5 +205,11 @@ table.checkoutAddressForm tr.checkoutUserComments textarea {
     height: 4em;
 }
 table.checkoutAddressForm input, table.checkoutAddressForm textarea {
-    width: 14em;
+    /* width: 14em; dont do this, it overrides the "size" attrib  */
+    max-width: 14em;
+}
+
+option.phold {
+    color: #777;
+    text-align: center;
 }
