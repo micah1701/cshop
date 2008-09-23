@@ -675,6 +675,7 @@ class cmOrder extends db_container {
         }
         catch (Exception $e) {
             $this->db->rollback();
+            $this->db->autoCommit(true);
             throw $e;
         }
         $this->db->autoCommit(true);
