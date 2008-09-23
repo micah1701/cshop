@@ -1,5 +1,5 @@
 <div class="headlineW">
-  <h2 class="productName headline">ORDER DETAIL</h2>
+  <h2 class="productName headline">GIFT ORDER DETAIL</h2>
   <a class="printInvoice" href="<~ $smarty.server.PHP_SELF ~>?op_print=<~ $orderinfo.order_token ~>" target="printWin">Print Invoice</a>
 </div>
 
@@ -181,7 +181,7 @@
         <~ cycle assign=bg values=#e0e0e0,#e8e8e8 ~>
         <tr style="background: <~ $bg ~>">
           <td><~ $h.stamp|date_format:"%e %b %Y %I:%M %p" ~></td>
-          <td align="center"><~ if $h.user_notify ~><img src="img/tick.gif" /><~else~><img src="img/cross.gif" /><~/if~></td>
+          <td align="center"><~ if $h.user_notify ~><img src="/control/cshop/img/tick.gif" /><~else~><img src="/control/cshop/img/cross.gif" /><~/if~></td>
           <td><~ $h.order_status ~></td>
         </tr>
         <~ if $h.comments ~>
