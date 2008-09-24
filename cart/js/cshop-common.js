@@ -123,6 +123,14 @@ function initAttribSelectors() {
                 }
             }
         }
+
+        /* hide the drop-down if there is only one size or color, but make sure
+         * it is set to that value first */
+        $('#colorid, #sizes').each( function() {
+            if (this.options.length == 1 || (this.options.length == 2 && this.options[0].value == '')) {
+                $(this).val( this.options[this.options.length-1].value ).hide();
+            }
+        });
         doCheckInventorySelection();
     }
 }
