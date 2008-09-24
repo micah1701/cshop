@@ -40,6 +40,15 @@ $(document).ready(
            });
        });
 
+       $('div#sizechartW a').bind('click', function() {
+               $('#sizechartW .sizechart').toggle('slow');
+               $(this).blur();
+               return false;
+       });
+       $('div#sizechartW div.sizechartClose').bind('click', function() {
+               $('#sizechartW .sizechart').hide();
+       });
+
 
        /* important! check inventory on change of size or color selects, for immediate feedback. */
        $('select.prAttrInvChecker').bind('change', doCheckInventorySelection);
