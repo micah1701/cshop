@@ -137,6 +137,11 @@ h2.checkoutSectionHeader {
 }
 #cmCartListing table {
     width: 100%;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+#cmCartListing table td {
+    padding: 3px;
 }
 
 #cartDiscountEntry { }
