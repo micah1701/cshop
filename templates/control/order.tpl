@@ -1,5 +1,5 @@
 <div class="headlineW">
-  <h2 class="productName headline">GIFT ORDER DETAIL</h2>
+    <h2 class="productName headline"><~ $pagetitle|escape ~></h2>
   <a class="printInvoice" href="<~ $smarty.server.PHP_SELF ~>?op_print=<~ $orderinfo.order_token ~>" target="printWin">Print Invoice</a>
 </div>
 
@@ -24,7 +24,7 @@
             <strong>Submitted on:</strong>
           </td>
           <td>
-            <~ $orderinfo.order_create_date|date_format:"%b %e, %Y %I:%M %p" ~>
+            <~ $orderinfo.order_create_date|date_format:"%c" ~>
           </td>
         </tr>
         <tr>

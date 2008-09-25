@@ -220,6 +220,8 @@ if ($ACTION == OP_VIEW) {
     if (empty($orderinfo['delivery_date'])) $fex->elem_vals['delivery_date'] = date('Y-m-d');
 
     $smarty->assign('upform', $fex->get_struct());
+
+    $pagetitle = 'ORDER DETAIL - ' . $itemid;
     /* */
     $SHOWFORM = 1;
 }
@@ -312,6 +314,7 @@ else {
         $pager = new res_pager($offset, $range, $order->numRows);
         $smarty->assign('pager', $pager);
     }
+    $pagetitle = 'ORDERS';
 }
 
 
@@ -320,6 +323,7 @@ if (isset($_GET['info'])) {
 }
 
 
+$smarty->assign('pagetitle', $pagetitle);
 ##############################################################################
 # output template
 ##############################################################################
@@ -356,6 +360,9 @@ if (isset($_GET['info'])) { ?>
     <? } ?>
 
 <? } else { ?>
+    <div class="headlineW">
+       <h2 class="productName headline"><?= SITE_DOMAIN_NAME ?> :: <?= $pagetitle ?></h2>
+    </div>
     <div style="width: 600px; padding: 4px;" align="right">
       <? $filt->display(); ?>
     </div>

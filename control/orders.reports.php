@@ -47,35 +47,6 @@ $c = CSHOP_CLASSES_PRODUCT;
 $cmProduct = new $c($pdb);
 
 
-/* special extension to CSV_Table to give it methods that correspond with our 
- * fu_HTML_Table, so it will work transparently, but then spit out CSV instead of HTML 
- * at the end. All we do below when CSV is requested is instantiate one of 
- * these instead, then print out the headers and data at the end. Quick and hacky. */
-class CSV_Table_Fu extends CSV_Table {
-
-    function addRow_fu($vals) {
-        $this->addRow($vals);
-    }
-
-    function addRow($vals) {
-        if (!isset($this->_rows)) {
-            $this->_rows = array();
-        }
-        $this->_rows[] = $vals;
-    }
-
-    function addSortRow($vals) {
-        $this->set_header_row($vals);
-    }
-
-    function displayAll() {
-        return $this->show($this->_rows);
-    }
-
-}
-/* ** */
-
-
 
 $ACTION = OP_ORDERS_PRODUCTS;
 if (isset($_GET['report'])) {
