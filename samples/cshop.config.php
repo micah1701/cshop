@@ -158,6 +158,8 @@ define('CSHOP_APPLY_DISCOUNT_TO_LINE_ITEMS', false);
 /** show a list of Merchant Gateway transactions in the control? */
 define('CSHOP_CONTROL_SHOW_TRANSACTIONS', true);
 
+/* make formex use old-style uppercase field keys like TAG, CLASS, etc */
+define('FORMEX_BACK_COMPAT_UC_FIELD_KEYS', true);
 
 /** choices for "Class" under media tab in products admin. Max 16chars each */
 $CSHOP_MEDIA_CLASSES = array('listing'=>'Listing',
