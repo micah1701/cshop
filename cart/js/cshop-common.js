@@ -82,6 +82,7 @@ $(document).ready(
        }
 
 
+        $('.opEmptyCart').bind('click', function() { return confirm('Empty Cart?'); });
     }
 
 );

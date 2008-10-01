@@ -182,6 +182,10 @@ class cmUser extends db_container {
                 $this->addr->reset();
             }
         }
+        /* use the full country name, not ISO code, whenever possible */
+        if ($addr['country'] != 'US' and is_callable(array('formex', 'get_country_opts'))) {
+            $addr['country'] = formex::get_country_opts(true, $addr['country']);
+        }
         
         $this->addr->store($addr, $forcenew);
         return $this->activateAddress($type, $this->addr->get_id());
