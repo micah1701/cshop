@@ -8,6 +8,7 @@ require_once('formex.class.php');
 require_once("fu_HTML_Table.class.php");      
 require_once(CONFIG_DIR.'cshop.config.php');    
 require_once(CSHOP_CLASSES_USER . '.class.php');
+require_once("res_pager.class.php");      
 
 
 $tablename = 'cm_categories';
@@ -18,6 +19,12 @@ $table_namecol = 'username';
 $SHOWFORM = true; // are we showing a form or not?
 $errs = array();
 $msg = '';
+
+
+/** decide on which result page to show **/
+$range = 50;
+$offset = (isset($_GET['page']))? (($_GET['page']-1) * $range) : 0;
+/** **/
 
 /* set of actions this script may perform */
 $ACTION = null;
@@ -202,19 +209,28 @@ else {
     }
 
     $res = $pdb->query($sql);
-    while ($row = $res->fetchRow()) {
-        $vals = array();
-        foreach ($cols as $k) {
-            $vals[] = $row[$k];
-        }
 
-        $link = sprintf('%s?%s=%d',
-                          $_SERVER['PHP_SELF'], 
-                          $reqIdKey,
-                          $row['id']);
-        $table->addRow_fu($vals, '', true, $link);
-    }
     $numrows = $res->numRows();
+
+    if ($numrows) {
+        for ($ptr = $offset; ($range == 0) or (($offset + $range) > $ptr); $ptr++) {
+            if (! $row = $res->fetchRow(DB_FETCHMODE_ASSOC, $ptr)) break;
+
+            $vals = array();
+            foreach ($cols as $k) {
+                $vals[] = $row[$k];
+            }
+
+            $link = sprintf('%s?%s=%d',
+                              $_SERVER['PHP_SELF'], 
+                              $reqIdKey,
+                              $row['id']);
+            $table->addRow_fu($vals, '', true, $link);
+        }
+    }
+
+    $pager = new res_pager($offset, $range, $numrows);
+    $smarty->assign('pager', $pager);
 }
 
 
@@ -328,6 +344,7 @@ $smarty->display('control/header.tpl');
     <? if (!$numrows) { ?>
 	No customers have signed up yet.
     <? } else { ?>
+      <? $smarty->display('cart/control/res_pager.tpl') ?>
       <br />
       <? echo $table->toHTML() ?>
     <? } ?>
