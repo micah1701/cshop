@@ -21,7 +21,7 @@ class cmAddressBook extends db_container {
                         'street_addr'   => array('Street Address', 'text', 1),
                         'addr2'         => array('Address line 2', 'text'),
                         'city'          => array('City', 'text', 1),
-                        'state'         => array('State/Province', 'state_abbr'),
+                        'state'         => array('State/Province', 'state_abbr', 1),
                         'postcode'      => array('Postal Code/ZIP', 'text', null, array('size'=>6)),
                         'country'       => array('Country', 'country_select', null, array('iso_codes'=>2), 1));
     
