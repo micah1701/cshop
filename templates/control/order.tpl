@@ -197,7 +197,7 @@
         <table border="0"  width="320">
           <tr><td>Status:</td><td><~ $upform.orders_status.TAG ~></td></tr>
           <tr><td>Comments:</td><td><~ $upform.comments.TAG ~></td></tr>
-        <~ if $orderinfo.orders_status lt $smarty.const.CM_ORDER_STATUS_SHIPPED ~>
+        <~ if $orderinfo.orders_status eq $smarty.const.CM_ORDER_STATUS_PROCESSING ~>
           <tr><td>Ship Method:</td><td><~ $upform.ship_method.TAG ~></td></tr>
           <tr><td>Ship Date:</td><td><~ $upform.ship_date.TAG ~></td></tr>
           <tr><td>Tracking#:</td><td><~ $upform.tracking_no.TAG ~></td></tr>

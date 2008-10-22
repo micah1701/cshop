@@ -849,7 +849,7 @@ class cmOrder extends db_container {
 
 
         $smarty->assign('order_view_link', sprintf('http://%s'.CSHOP_ORDER_DETAIL_PAGE_FMT,
-                                                    $_SERVER['HTTP_HOST'],
+                                                    SITE_DOMAIN_NAME,
                                                     $orderinfo['order_token']));
 
 
