@@ -59,6 +59,7 @@ if (!$productid) {
 
 /* handle adding a new inventory item */
 if (isset($_POST['f_op']) and ($ACTION == OP_ADD or $ACTION == OP_EDIT)) {
+    PEAR::pushErrorHandling(PEAR_ERROR_RETURN); 
 
     $vals = array('sizes_id' => $_POST['f_sizes'],
                   'colorways_id' => $_POST['f_colors'],
@@ -102,6 +103,7 @@ if (isset($_POST['f_op']) and ($ACTION == OP_ADD or $ACTION == OP_EDIT)) {
             $ERROR = $res->getMessage();
         }
     }
+    PEAR::popErrorHandling();
 }
 elseif ($ACTION == OP_KILL) {
     $sql = sprintf("DELETE FROM %s WHERE id = %d",
