@@ -11,7 +11,7 @@ require_once(CSHOP_CLASSES_USER . '.class.php');
 require_once("res_pager.class.php");      
 
 
-$tablename = 'cm_categories';
+$tablename = 'auth_user';
 $pagetitle = 'Users';
 $table_title = 'User';
 $table_namecol = 'username';
@@ -103,7 +103,7 @@ if (isset($_POST['op']) and ($ACTION == OP_ADD or $ACTION == OP_EDIT)) {
         }
         else { // OP_ADD
 
-            $itemid = $pdb->nextId($tablename);
+            $itemid = $pdb->nextId($user->get_table_name());
             $vals['id'] = $itemid;
             if (empty($vals['username'])) $vals['username'] = null;
             $res = $user->store($vals, false);
