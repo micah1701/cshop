@@ -98,7 +98,7 @@ elseif ($ACTION == OP_RESET_PASS) { // link in email was clicked - check it out.
         $smarty->assign('KEY_ERROR', $err);
     }
     else { // they checked out 100%. Show the form for entering the new pass (twice)
-        $uniq = md5(uniqid($_GET['mash'], true));
+        $uniq = md5(uniqid($_GET[$recover_key_name], true));
 
         $_SESSION['change_password_uniq'] = $uniq; // just to make sure they have cookies?????
 
@@ -107,7 +107,7 @@ elseif ($ACTION == OP_RESET_PASS) { // link in email was clicked - check it out.
         $fex->add_element('newpass', array('password', 'password', 1));
         $fex->add_element('newpass2', array('password', 'password', 1));
         $fex->add_element('uniq', array('uniq', 'hidden', $uniq, 1));
-        $fex->add_element('mash', array('mash', 'hidden', $_GET['mash'], 1));
+        $fex->add_element('mash', array('mash', 'hidden', $_GET[$recover_key_name], 1));
         $fex->add_element('uid', array('uid', 'hidden', $_GET['u'], 1));
         $fex->add_element('op_send', array('CHANGE PASSWORD', 'submit'));
         $smarty->assign('pwform', $fex->get_struct());

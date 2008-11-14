@@ -106,7 +106,7 @@ define('CSHOP_PRODUCT_DETAIL_PAGE', '/store.browse.php');
 // URL for the order detail page
 define('CSHOP_ORDER_DETAIL_PAGE_FMT', '/store.browse.php?ord=%s'); // sprintf() format w/ order token
 // URL for the password recovery page
-define('CSHOP_PASS_RECOVER_LINK_FMT', '/cart/pass.recover.php?u=%d&mash=%s'); // sprintf() format w/ order token
+define('CSHOP_PASS_RECOVER_LINK_FMT', '/cart/pass.recover.php?u=%d&m=%s'); // sprintf() format w/ order token
 
 // string to be used in <title> tag within cart area
 define('CSHOP_CART_PAGETITLE', 'Your Shopping Cart');
