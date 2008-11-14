@@ -3,9 +3,9 @@
 
 CVS_REPO="maximus.circusmedia.com:/Users/Shared/cvs"
 
-CSHOP_BASEDIR=`pwd`
+CSHOP_BASEDIR="`pwd`/.."
 
-echo "WELCOME TO cShop INSTALLER v.0.4"
+echo "WELCOME TO cShop INSTALLER v.0.5"
 
 read -p "enter full site domain name (no www's): " DOMAIN
 
@@ -37,7 +37,7 @@ if [ "$DO_MYSQL" == "y" ]; then
     fi
 
     echo "applying schema.... "
-    mysql -p$MYSQL_RPASS -u$MYSQL_RUSER $MYSQL_DB < util/cShop.create.mysql-41.sql
+    mysql -p$MYSQL_RPASS -u$MYSQL_RUSER $MYSQL_DB < cShop.create.mysql-50.sql
     if [ $? -eq 0 ]; then
         echo "done."
     else
@@ -52,6 +52,19 @@ MYSQL_NEW_PASS=`/usr/bin/openssl rand -base64 15 | cut -c 5-12`
 read -p "Create a new mysql user unique to this site? [y/n] " DO_MYSQL_USER
 if [ "$DO_MYSQL_USER" == "y" ]; then
     echo "==> Creating mySQL user ======================================="
+
+    if [ $MYSQL_RPASS ]; then
+        echo "I seem to have database credentials already."
+    else 
+        read -p "Enter admin/root mysql user: " MYSQL_RUSER
+        read -p "Enter admin/root mysql pass: " MYSQL_RPASS
+    fi
+
+    read -p "Enter name of database to use (will be created if needed): [$MYSQL_DB] " ans
+    if [ "$ans" != "" ]; then
+        MYSQL_DB="$ans"
+    fi
+
     read -p "Enter new mysql username: [$MYSQL_NEW_USER] " ans
     if [ "$ans" != "" ]; then
         MYSQL_NEW_USER="$ans"
@@ -83,12 +96,12 @@ fi
 
 echo "==> Creating symlinks ========================================="
 echo "control:"
-if [ ! -d ../../web/control ]; then
-    echo "/web/control/ dir does not exist, creating"
-    mkdir ../../web/control
+if [ ! -d ../../../web/control ]; then
+    echo "/../web/control/ dir does not exist, creating"
+    mkdir ../../../web/control
 fi
 
-cd ../../web/control/
+cd ../../../web/control/
 ln -s ../../local/cshop/control cshop
 
 echo "cart templates"
