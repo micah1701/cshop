@@ -31,9 +31,7 @@ class cmOrder extends db_container {
     // names of columns in address table we can deal with
     var $_addr_cols = array('name','company','street_addr','addr2','city','state','postcode','country');
 
-    // length of order token to generate
-    var $token_length = 8;
-
+    /** token by which we identify all orders, a random string of somekind usually */
     var $order_token;
 
     var $statuses = array(CM_ORDER_STATUS_NEW=> 'NEW',
@@ -189,6 +187,10 @@ class cmOrder extends db_container {
         else {
             $vals['tax_total'] = 0;
             $vals['tax_method'] = null;
+        }
+
+        if ($map = $this->cart->get_colmap_shipping_options()) {
+            $vals = array_merge($vals, $this->cart->fetch(array_keys($map))); 
         }
 
         if ($d = $this->cart->get_discount(1)) {
@@ -702,11 +704,12 @@ class cmOrder extends db_container {
      * @return array 
      */
     function fetch_totals() {
-        $shiptax = $this->fetch(array('cart_id', 'amt_billed_to_date', 'ship_total','ship_method','tax_total','tax_method', 'discount_amt', 'discount_descrip'));
+        $shiptax = $this->fetch(array('cart_id', 'amt_quoted', 'amt_billed_to_date', 'ship_total','ship_method','tax_total','tax_method', 'discount_amt', 'discount_descrip'));
 
         extract($shiptax);
 
-        $tots = array('grand_total' => $amt_billed_to_date,
+        $tots = array('grand_total' => $amt_quoted,
+                'billed_to_date' => $amt_billed_to_date,
                 'subtotal' => $this->get_subtotal(),
                 'discount' => array('amt' => $discount_amt, 'descrip'=> $discount_descrip),
                 'shipping' => array('amt' => $ship_total, 'method'=> $ship_method),
@@ -870,17 +873,21 @@ class cmOrder extends db_container {
 
         $recip = sprintf("%s <%s>", $uservals['cust_name'], $uservals['email']);
 
+        if ($orderinfo['orders_status'] == $this->default_order_status)
+            $status = 'CONFIRMATION';
+        else 
+            $status = $this->statuses[$orderinfo['orders_status']];
+
         $headers['From']   = EMAIL_SENDER;
         $headers['Subject'] = sprintf('%s: Order #%s - %s', 
                                       SITE_DOMAIN_NAME, 
                                       $orderinfo['order_token'], 
-                                      ($orderinfo['orders_status'] == 1)? 'CONFIRMATION':'UPDATE');
-        if (defined('CSHOP_ORDER_EMAIL_BCC')) {
+                                      $status);
+                                      
+        if (defined('CSHOP_ORDER_EMAIL_BCC')) 
             $headers['BCC']    = CSHOP_ORDER_EMAIL_BCC;
-        }
-        else {
+        else 
             $headers['BCC']    = ERROR_EMAIL_RECIP;
-        }
 
         $params = "-f".EMAIL_SENDER;
 
