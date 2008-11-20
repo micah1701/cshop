@@ -183,7 +183,7 @@ class cmUser extends db_container {
             }
         }
         /* use the full country name, not ISO code, whenever possible */
-        if ($addr['country'] != 'US' and is_callable(array('formex', 'get_country_opts'))) {
+        if (!empty($this->addr->colmap['country'][3]['iso_codes']) && $addr['country'] != 'US' and is_callable(array('formex', 'get_country_opts'))) {
             $addr['country'] = formex::get_country_opts(true, $addr['country']);
         }
         
