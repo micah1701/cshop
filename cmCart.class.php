@@ -90,7 +90,7 @@ class cmCart extends db_container {
 
     /* probability in percent of garbage collection of old rows from cm_cart 
      * and cm_cart_items table, taken each time emptyCart() is called */
-    var $gc_prob = 3;
+    var $gc_prob = 5;
 
     /* when garbaging old carts, delete those older than this many days */
     var $gc_age = 28;
@@ -151,7 +151,8 @@ class cmCart extends db_container {
      * @return int a user id
      */
     function get_user_id() {
-        $user = new user_container($this->db);
+        $c = CSHOP_CLASSES_USER;
+        $user = new $c($this->db);
         return $user->get_auth_id();
     }
 
@@ -1263,6 +1264,12 @@ class cmCart extends db_container {
     }
 
 
+    /* provides hook for cmOrder, when copying cart contents to create a new 
+     * object. Any colmap array return here will be used to transfer the 
+     * indicated columns to the new order */
+    function get_colmap_shipping_options() { }
+
+
     function get_minicart_values() {
         $subtotal = $this->get_subtotal();
         $mini = $this->fetch(array('ship_total', 'ship_method', 'tax_total', 'tax_method'));
@@ -1274,7 +1281,7 @@ class cmCart extends db_container {
 
 
     function garbage_old_carts() {
-        if (mt_rand(1, 100) < $this->gc_prob) {
+        if (mt_rand(1, 100) <= $this->gc_prob) {
             $sqlwhere = sprintf(" TO_DAYS(NOW()) - TO_DAYS(modified_date) > %d", $this->gc_age);
             $sql1 = "DELETE FROM cm_cart_items WHERE cart_id IN (SELECT id from cm_cart WHERE $sqlwhere)";
             $sql2 = "DELETE FROM cm_cart WHERE $sqlwhere";
