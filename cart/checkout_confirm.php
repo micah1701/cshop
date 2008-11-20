@@ -11,7 +11,7 @@ require_once('formex.class.php');
 require_once(CSHOP_CLASSES_CART.'.class.php');
 require_once(CSHOP_CLASSES_ORDER.'.class.php');
 require_once(CSHOP_CLASSES_USER.'.class.php');
-require_once('cshop/cmPaymentCC.class.php');
+require_once(CSHOP_CLASSES_PAYMETHOD.'.class.php');
 require_once(CSHOP_CLASSES_PAYMENT.'.class.php');
 require_once(CSHOP_CLASSES_GIFTCARD.'.class.php');
 
@@ -45,7 +45,8 @@ if ($cart_total > 0) {
     }
     else {
         /* now what it really is all about is payment */
-        $pay = new cmPaymentCC($pdb);
+        $c = CSHOP_CLASSES_PAYMETHOD;
+        $pay = new $c($pdb);
         $pay->set_id($payid);
         if (!$pay->get_ccno()) {
             trigger_error('payment info cannot be re-used', E_USER_NOTICE);
@@ -131,7 +132,7 @@ if (isset($_POST['op_confirm'])) {
             $PAYMENT_SUCCESS = true;
         }
         else {
-            $pay->kill();  
+            $pay->kill();
             $payment_error = $res->getMessage();
             $payment_error_type = $gate->get_trans_result();
             trigger_error("$payment_error : $payment_error_type", E_USER_NOTICE);

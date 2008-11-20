@@ -1,7 +1,8 @@
 <~ if $address.company ~>
 <~ $address.company ~> 
 <~ if $address.name ~>
-  c/o <~ $address.name ~><~/if~>
+c/o <~ $address.name ~>
+<~/if~>
 <~ else ~>
 <~ $address.name ~>
 <~/if~>

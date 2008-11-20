@@ -21,7 +21,7 @@ ORDER TOTAL: <~ $cart_totals.grand_total|currency_format ~> <~ $currency ~>
 <~/if ~>
 <~/if~>
 
-<~ if $orderinfo.orders_status gt 2 ~>
+<~ if $orderinfo.orders_status gte 3 and $orderinfo.ship_date ~>
 SHIPPING INFORMATION:
   Ship Date: <~ $orderinfo.ship_date ~>
 <~ if $orderinfo.ship_method ~>

@@ -367,7 +367,7 @@ if ($SHOWFORM) {
             $op_new_ship = isset($_GET['op_add_ship']);
 
             $shipclass = CSHOP_CLASSES_SHIPMETHOD;
-            $ship = new $shipclass();
+            $ship = new $shipclass($pdb);
 
             /* limits the country select if need be, depending on the ship method */
             if ($countrylist = $ship->get_avail_countries()) {

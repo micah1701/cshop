@@ -52,16 +52,7 @@
               <~ $numitems ~>
             </td>
          </tr>
-  <~ if $orderinfo.orders_status lt 3 ~>
-        <tr>
-          <td>
-            <strong>Requested Ship Method:</strong>
-          </td>
-          <td>
-            <~ $orderinfo.ship_method ~><br />
-          </td>
-        </tr>
-  <~ else ~>
+  <~ if $orderinfo.orders_status gte 3 and $orderinfo.ship_date ~>
         <tr>
           <td>
             <strong>Ship Method:</strong>
@@ -92,6 +83,15 @@
           </td>
           <td>
             <~ $orderinfo.ship_date|date_format ~><br />
+          </td>
+        </tr>
+  <~ else ~>
+        <tr>
+          <td>
+            <strong>Requested Ship Method:</strong>
+          </td>
+          <td>
+            <~ $orderinfo.ship_method ~><br />
           </td>
         </tr>
   <~/if ~>

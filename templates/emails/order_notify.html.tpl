@@ -95,7 +95,7 @@
               <~ $numitems ~>
             </td>
          </tr>
-  <~ if $orderinfo.orders_status gt 2 ~>
+  <~ if $orderinfo.orders_status gte 3 and $orderinfo.ship_date ~>
         <tr>
           <td>
             <strong>Ship Method:</strong>
