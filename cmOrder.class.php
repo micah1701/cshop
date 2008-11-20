@@ -44,6 +44,9 @@ class cmOrder extends db_container {
                           CM_ORDER_STATUS_CLOSED=> 'CLOSED',
                           CM_ORDER_STATUS_BACKORDER=> 'BACKORDERED');
 
+    /* default initial status for new orders. Usually 'NEW' but you never know (HUB) */
+    var $default_order_status = CM_ORDER_STATUS_NEW;
+
     /** should the subtotal for everything always be equal to zero? because
      * there is a crazy sale? or no charge for this particuar user?  */
     var $sale_zero_all = false; 
@@ -101,10 +104,18 @@ class cmOrder extends db_container {
         return $this->user;
     }
 
-    function create_order_token($len=8) { // 3,234,294,063 different possible
-        if (!$this->order_token) { // 28936HW8
+    /** creates a random string to use as the order ID/token (used in all user 
+     * correspondence, so we try and make it look nice and professional) I 
+     * spent a bit too much time on it but it works. will always start with 5 
+     * numbers then the rest are either numbers or letters e.g., like 27839WG
+     *
+     * @param $len int length of token to create
+     * @return string
+     */
+    function create_order_token($len=7) { // 104,038,844 different possible
+        if (!$this->order_token) { // 28936HW
             $tok = mt_rand(10000, 99999);
-            $chrs = 'QWERTYUPASDFGHJKLZXCVBNM123456789';
+            $chrs = 'QWERTYUPASDFGHJKLZXCVBNM1234567890';
             for ($i=0; $i<$len-5; $i++) {
                 $tok .= $chrs{mt_rand(0, strlen($chrs)-1)};
             }
@@ -142,7 +153,7 @@ class cmOrder extends db_container {
     function create($vals=array()) {
 
         if (!is_array($vals)) {
-            return $this->raiseError(DB_ERROR_NEED_MORE_DATA);
+            return $this->raiseError('cannot create empty order!', DB_ERROR_NEED_MORE_DATA);
         }
 
         $cart_totals = $this->cart->fetch_totals();
@@ -162,7 +173,7 @@ class cmOrder extends db_container {
         }
 
         if ($insuff_inv == false) {
-            $vals['orders_status'] = CM_ORDER_STATUS_NEW; 
+            $vals['orders_status'] = $this->default_order_status; 
         }
         else {
             $vals['orders_status'] = CM_ORDER_STATUS_BACKORDER; 
