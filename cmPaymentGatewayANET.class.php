@@ -55,7 +55,7 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
     var $_anet_password = '';
 
     /** version # of this class */
-    var $_VERSION = '1.2';
+    var $_VERSION = '1.5';
 
     var $does_AVS = true;
 
@@ -67,6 +67,10 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
 
         if ($this->_anet_login === '' && defined('CSHOP_PAYMENT_CONFIG_FILE')) {
             $this->_autoconfigure_from_file(CSHOP_PAYMENT_CONFIG_FILE);
+        }
+
+        if (!isset($this->_default_transaction_type) or $this->_default_transaction_type != 'AUTH_CAPTURE' ) {
+            $this->_default_transaction_type = 'AUTH_ONLY';
         }
     }
 
@@ -94,7 +98,12 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
     function authorize() {
 
         $this->set_trans_amount($this->_order->get_total());
-        $req = $this->construct_request('authorize');
+        if ($this->_default_transaction_type == 'AUTH_CAPTURE') {
+            $req = $this->construct_request('auth_capture');
+        }
+        else {
+            $req = $this->construct_request('authorize');
+        }
         return $this->send($req);
     }
 
