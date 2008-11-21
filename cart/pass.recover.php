@@ -30,7 +30,7 @@ define('OP_RESET_PASS', 'RESET PASSWORD');
 define('OP_RESET_PASS_PROC', 'DO RESET PASSWORD');
 
 
-$user = new user_container($pdb);
+$user = new cmUser($pdb);
 $mosh = new mosh_tool();
 
 

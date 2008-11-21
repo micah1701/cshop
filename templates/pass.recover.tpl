@@ -72,7 +72,7 @@
         </div>
       <~ elseif $CHANGE_SUCCESS ~>
           <h3>Password Changed</h3>
-          Your password was successfully changed. Please <a href="checkout.php">log in</a> using your new credentials.
+          Your password was successfully changed. Please <a href="<~ $smarty.const.CSHOP_HOME_PAGE ~>">log in</a> using your new credentials.
       <~/if~>        
 
 

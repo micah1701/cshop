@@ -327,7 +327,7 @@ $smarty->display('control/header.tpl');
                 :: Addresses ::
             </div>
             <div id="inventoryWrap" class="formWrapper">
-              <iframe id="invFrame" src="store.users.addresses.php?<?= $reqIdKey ?>=<?= $itemid ?>"  frameborder="0" marginwidth="0" marginheight="0" width="590" height="200" scrolling="yes" ></iframe> 
+              <iframe id="invFrame" src="store.users.addresses.php?<?= $reqIdKey ?>=<?= $itemid ?>"  frameborder="0" marginwidth="0" marginheight="0" width="590" height="400" scrolling="yes" ></iframe> 
             </div>
 
           </div>
