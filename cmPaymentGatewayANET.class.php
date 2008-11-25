@@ -55,9 +55,13 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
     var $_anet_password = '';
 
     /** version # of this class */
-    var $_VERSION = '1.5';
+    var $_VERSION = '1.6';
 
     var $does_AVS = true;
+
+    /* if true, will pretend that all authorization requests succeed. For testing, of course. */
+    var $_FAKE_SUCCESS = false;
+
 
     function cmPaymentGatewayANET(&$user, &$pay, &$order) {
         $this->_user =& $user;
@@ -104,7 +108,11 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
         else {
             $req = $this->construct_request('authorize');
         }
-        return $this->send($req);
+
+        if (!empty($this->_FAKE_SUCCESS))
+            return true;
+        else
+            return $this->send($req);
     }
 
     function auth_capture() {

@@ -292,3 +292,11 @@ ALTER TABLE cm_order_transactions ADD has_avs_result bool;
 
 -- Mon Jul 14 16:31:48 EDT 2008
 ALTER TABLE cm_orders ADD UNIQUE uq_tok (order_token);
+
+
+
+-- Tue Nov 25 10:55:19 EST 2008
+-- this was overlooked at somepoint
+ALTER TABLE cm_cart_items_options ADD cm_products_options_id int unsigned AFTER cm_cart_items_id;
+ALTER TABLE cm_cart_items_options ADD INDEX ix_poi (cm_products_options_id);
+
