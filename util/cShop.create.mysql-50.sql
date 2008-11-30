@@ -547,6 +547,9 @@ CREATE TABLE `cm_order_transactions` (
   KEY `ix_uid` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+ALTER TABLE cm_order_transactions ADD trans_auth_code varchar(15) AFTER trans_id;
+ALTER TABLE cm_order_transactions ADD trans_result_msg varchar(255) AFTER trans_result;
+
 --
 -- Table structure for table `cm_order_transactions_seq`
 --

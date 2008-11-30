@@ -558,16 +558,16 @@ class cmOrder extends db_container {
      */
     function record_transaction(&$gate) {
 
+        $xtype = $gate->get_trans_type();
         $th = db_container::factory($this->db, $this->_transaction_history_table);
         $tresult = $gate->get_trans_result();
-        if (!empty($tresult)) { 
-           $tresult .= ': ' . $gate->get_trans_result_msg();
-        }
         $vals = array('cm_orders_id' => $this->get_id(),
                       'user_id' => $this->user->get_id(),
-                      'trans_type' => $gate->get_trans_type(),
+                      'trans_type' => $xtype,
                       'trans_id' => $gate->get_trans_id(),
+                      'trans_auth_code' => $gate->get_auth_code(),
                       'trans_result' => $tresult,
+                      'trans_result_msg' => (!empty($tresult))? $gate->get_trans_result_msg() : '',
                       'trans_amount' => $gate->get_trans_amount(),
                       'trans_request' => $gate->get_trans_request(1),
                       'trans_response' => $gate->get_trans_response(),
@@ -591,7 +591,7 @@ class cmOrder extends db_container {
         $oid = $this->get_id();
         $where = "cm_orders_id = $oid";
         $th = db_container::factory($this->db, $this->_transaction_history_table);
-        if (!$cols) $cols = array('id','UNIX_TIMESTAMP(stamp) AS stamp','trans_type','trans_id','trans_result','trans_amount', 'has_avs_result',
+        if (!$cols) $cols = array('id','UNIX_TIMESTAMP(stamp) AS stamp','trans_type','trans_id','trans_result','trans_result_msg','trans_amount', 'has_avs_result',
                                   'is_voided', 'verify_addr', 'verify_zip', 'verify_name', 'verify_international','verify_csc');
         return $th->fetch_any($cols, 0, 0, 'stamp', $where, 'DESC');
     }
@@ -609,7 +609,19 @@ class cmOrder extends db_container {
         if ( $ids = $this->db->getCol($sql) ) {
             return $ids[0];
         }
+    }
 
+    /**
+     * fetch the last payment gateway authorization code for this order. Used to place CAPTUREs
+     * @return string
+     */
+    function fetch_payment_auth_code()
+    {
+        $sql = "SELECT trans_auth_code FROM {$this->_transaction_history_table}
+                WHERE trans_type = 'AUTH_ONLY' AND cm_orders_id = " . $this->get_id();
+        if ( $ids = $this->db->getCol($sql) ) {
+            return $ids[0];
+        }
     }
 
     /**
@@ -629,7 +641,7 @@ class cmOrder extends db_container {
                       'cc_number' => $ccno,
                       'cc_expires' => $pay->get_ccexp('my'));
 
-        $vals['amt_billed_to_date'] = $gate->get_trans_amount();
+        $vals['amt_billed_to_date'] = $gate->get_captured_amount();
         $vals['currency'] = $gate->currency_code;
         $vals['payment_method'] = $gate->gateway_name;
 
@@ -903,6 +915,23 @@ class cmOrder extends db_container {
         $res = $m->send($recip, $headers, $body);
         return $res;
     }
+
+    /**
+     * increments the amt_billed_to_date column by the given amount. 
+     * @return DB result
+     */
+    function increment_billed_amount($amt) {
+        if (is_numeric($amt)) {
+            $sql = sprintf("UPDATE %s SET amt_billed_to_date = amt_billed_to_date + %s WHERE id = %d",
+                            $this->get_table_name(),
+                            $this->db->quoteSmart($amt),
+                            $this->get_id());
+            return $this->db->query($sql);
+        }
+    }
+
+
+
 
 }
 

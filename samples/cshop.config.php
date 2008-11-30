@@ -158,6 +158,9 @@ define('CSHOP_APPLY_DISCOUNT_TO_LINE_ITEMS', false);
 /** show a list of Merchant Gateway transactions in the control? */
 define('CSHOP_CONTROL_SHOW_TRANSACTIONS', true);
 
+/** show controls to allow admin to place A/net transaction from the order detail page? */
+define('CSHOP_CONTROL_SHOW_TRANSACTION_CONTROLLER', false);
+
 /* make formex use old-style uppercase field keys like TAG, CLASS, etc */
 define('FORMEX_BACK_COMPAT_UC_FIELD_KEYS', true);
 

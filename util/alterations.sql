@@ -300,3 +300,9 @@ ALTER TABLE cm_orders ADD UNIQUE uq_tok (order_token);
 ALTER TABLE cm_cart_items_options ADD cm_products_options_id int unsigned AFTER cm_cart_items_id;
 ALTER TABLE cm_cart_items_options ADD INDEX ix_poi (cm_products_options_id);
 
+
+-- Sat Nov 29 21:45:33 EST 2008
+ALTER TABLE cm_order_transactions ADD trans_auth_code varchar(15) AFTER trans_id;
+ALTER TABLE cm_order_transactions ADD trans_result_msg varchar(255) AFTER trans_result;
+UPDATE cm_order_transactions SET trans_result_msg = SUBSTRING(trans_result FROM LOCATE(':', trans_result)+1), stamp=stamp;
+UPDATE cm_order_transactions SET trans_result = TRIM(SUBSTRING(trans_result, 1, LOCATE(':', trans_result)-1)), stamp=stamp;

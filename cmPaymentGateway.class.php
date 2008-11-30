@@ -67,6 +67,9 @@ class cmPaymentGateway extends PEAR {
      * If true, truncate it to the last 4 digits */
     var $do_truncate_stored_ccno = true;
 
+    /** does this gateway allow transactions based on the original payment info, from the admin console (A.net) */
+    var $enable_admin_transactions = true;
+
     function cmPaymentGateway(&$user, &$pay, &$order) {
         $this->_user =& $user;
         $this->_payment =& $pay;
@@ -228,6 +231,9 @@ class cmPaymentGateway extends PEAR {
             return $ccno;
         }
     }
+
+    function get_transaction_options() { }
+
 
 }
 

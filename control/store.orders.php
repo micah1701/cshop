@@ -8,6 +8,7 @@ require_once(CONFIG_DIR . 'cshop.config.php');
 require_once(CSHOP_CLASSES_USER . '.class.php');
 require_once(CSHOP_CLASSES_ORDER . '.class.php');
 require_once(CSHOP_CLASSES_CART . '.class.php');
+require_once(CSHOP_CLASSES_PAYMENT . '.class.php');
 
 require_once('formex.class.php');
 require_once('mosh_tool.class.php');
@@ -19,6 +20,7 @@ require_once("res_pager.class.php");
 define ('OP_UPDATE', 'UPDATE');
 define ('OP_VIEW', 'VIEW ORDER');
 define ('OP_DUMP', 'CSVDUMP');    
+define ('OP_TRANSACT', 'TRANSACT');    
 define ('OP_EDIT_LINEITEM', 'EDIT ORDER ITEMS');    
 
 $ACTION = null;
@@ -58,6 +60,10 @@ elseif (isset($_POST['op_oiform'])) {
     $ACTION = OP_EDIT_LINEITEM;
     $itemid = $_POST[$reqIdKey];
 }
+elseif (isset($_POST['op_xaction'])) {
+    $ACTION = OP_TRANSACT;
+    $itemid = $_POST[$reqIdKey];
+}
 else {
     $SHOWFORM = false;
 }
@@ -91,6 +97,46 @@ if ($ACTION == OP_EDIT_LINEITEM) {
     // send back to self with messageness
     header("Location: {$_SERVER['PHP_SELF']}?$reqIdKey=$itemid&info=" . base64_encode($msg));
     exit();
+}
+/* run an A.net transaction based on this order. */
+elseif ($ACTION == OP_TRANSACT && defined('CSHOP_CONTROL_SHOW_TRANSACTION_CONTROLLER') && CSHOP_CONTROL_SHOW_TRANSACTION_CONTROLLER) {
+    $order->set_id_by_token($itemid);
+    $user = $order->get_user();
+
+    $pay = cmClassFactory::getInstanceOf(CSHOP_CLASSES_PAYMETHOD, $pdb);
+
+    $gateclass = CSHOP_CLASSES_PAYMENT;
+    $gate = new $gateclass($user, $pay, $order);
+
+    $xtype = $_POST['xtype'];
+    $amt = $_POST['xamt'];
+
+    if (empty($errs)) {
+        try {
+            $res = $gate->run_transaction($xtype, $amt);
+            $order->record_transaction($gate);
+
+            if (PEAR::isError($res)) {
+                $msg = "Could not send transaction to payment gateway: " . $res->getMessage();
+            }
+            else {
+                $msg = "Transaction has been sent to payment gateway. See below for result message";
+                if ($xtype == 'capture') { // <-- todo should the order class know how to do this?
+                    $order->increment_billed_amount($amt);
+                }
+            }
+            // send back to self with messageness
+            header("Location: {$_SERVER['PHP_SELF']}?$reqIdKey=$itemid&info=" . base64_encode($msg));
+            exit();
+        }
+        catch (Exception $e) {
+            if ($gate->get_trans_amount()) $order->record_transaction($gate);
+            $errs[] = $e->getMessage();
+            $ACTION = OP_VIEW;
+            //throw $e;
+        }
+    }
+
 }
 /* update the order status */
 elseif ($ACTION == OP_UPDATE) {
@@ -154,9 +200,7 @@ if ($ACTION == OP_VIEW) {
         trigger_error("The given parameter did not match any order", E_USER_ERROR);
     }
 
-    $c = CSHOP_CLASSES_USER;
-    $user = new $c($pdb);
-    $user->set_id($orderinfo['user_id']);
+    $user = $order->get_user();
     $smarty->assign('user', $user->fetch(array('id','fname','lname','cust_name','company','email')));
     $smarty->assign('user_email', $user->get_email());
 
@@ -198,6 +242,35 @@ if ($ACTION == OP_VIEW) {
     if (defined('CSHOP_CONTROL_SHOW_TRANSACTIONS') && CSHOP_CONTROL_SHOW_TRANSACTIONS) {
         $trans = $order->fetch_transaction_summary();
         $smarty->assign('transactions', $trans);
+
+        /* show form for running financial transactions thru the gateway */
+        if (defined('CSHOP_CONTROL_SHOW_TRANSACTION_CONTROLLER') && CSHOP_CONTROL_SHOW_TRANSACTION_CONTROLLER) {
+
+            $order_totals = $order->fetch_totals();
+
+            // all this to get an instance of CSHOP_CLASSES_PAYMENT
+            $user = $order->get_user();
+            $pay = cmClassFactory::getInstanceOf(CSHOP_CLASSES_PAYMETHOD, $pdb);
+            $gateclass = CSHOP_CLASSES_PAYMENT;
+            $gate = new $gateclass($user, $pay, $order);
+
+            if ($transaction_options = $gate->get_transaction_options()) {
+
+                $fex = new formex();
+                $fex->field_prefix = '';
+                $fex->add_element('xtype', array('Type', 'select', $transaction_options));
+                $fex->add_element('xamt', array('Amount', 'text', '', array('size'=>5)));
+                $fex->add_element('xamt', array('Amount', 'text', '', array('size'=>5)));
+                $fex->add_element('op_xaction', array('RUN', 'submit'));
+                $fex->add_element($reqIdKey, array(null, 'hidden', $itemid)); // important
+
+                if ($order_totals['billed_to_date'] == 0) {
+                    $fex->elem_vals = array('xamt' => $order_totals['grand_total']);
+                }
+
+                $smarty->assign('xform', $fex->get_struct());
+            }
+        }
     }
 
     /* ORDER UPDATE FORM - built in the USA */

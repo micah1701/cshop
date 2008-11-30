@@ -121,10 +121,28 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
         return $this->send($req);
     }
 
-    function capture() {
-    }
 
-    function credit() {
+    function run_transaction($type, $amt=0) {
+        $valid_types = array('credit', 'capture', 'void');
+        if (!in_array($type, $valid_types)) {
+            throw new Exception("invalid transaction type $type");
+        }
+        elseif (!is_numeric($amt) && $type != 'void') {
+            throw new Exception('transaction amount must be a numeric value');
+        }
+        else {
+            $this->set_trans_amount($amt);
+            $req = $this->construct_request($type);
+
+            if (!empty($this->_FAKE_SUCCESS)) {
+                $this->_trans_result = 'APPROVED';
+                $this->_trans_result_msg = 'Faked - not sent to gateway.';
+                return true;
+            }
+            else {
+                return $this->send($req);
+            }
+        }
     }
 
     function get_trans_id() {
@@ -141,6 +159,13 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
 
     function get_trans_amount() {
         return $this->_trans_amount;
+    }
+
+
+    function get_captured_amount() {
+        if ($this->get_trans_type() == 'AUTH_CAPTURE') {
+            return $this->_trans_amount;
+        }
     }
 
     function get_trans_result() {
@@ -178,24 +203,26 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
      * @return bool did AVS return true for the given value
      */
     function get_avs_result($type) {
-        switch ($type) {
-            case 'zip':
-                $res = $this->avs_result_flags & CMPAY_AVS_ZIP;
-                break;
-            case 'addr':
-                $res = $this->avs_result_flags & CMPAY_AVS_ADDR;
-                break;
-            case 'intl':
-                $res = $this->avs_result_flags & CMPAY_AVS_INTL;
-                break;
-            case 'err':
-                $res = $this->avs_result_flags & CMPAY_AVS_ERR;
-                break;
-            default:
-                $res = $this->avs_result_flags & CMPAY_AVS_UNSUP;
-                break;
+        if ($this->avs_result_flags) {
+            switch ($type) {
+                case 'zip':
+                    $res = $this->avs_result_flags & CMPAY_AVS_ZIP;
+                    break;
+                case 'addr':
+                    $res = $this->avs_result_flags & CMPAY_AVS_ADDR;
+                    break;
+                case 'intl':
+                    $res = $this->avs_result_flags & CMPAY_AVS_INTL;
+                    break;
+                case 'err':
+                    $res = $this->avs_result_flags & CMPAY_AVS_ERR;
+                    break;
+                default:
+                    $res = $this->avs_result_flags & CMPAY_AVS_UNSUP;
+                    break;
+            }
+            return $res;
         }
-        return $res;
     }
 
     /** tell whether or not the CSC code was successfully verified
@@ -334,7 +361,6 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
             case 'N':
                 $this->avs_result_flags = CMPAY_AVS_NOMATCH;
                 break;
-            case 'P':
             case 'S':
             case 'U':
                 $this->avs_result_flags = CMPAY_AVS_UNSUP;
@@ -347,6 +373,8 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
             case 'Y':
                 $this->avs_result_flags = CMPAY_AVS_ZIP & CMPAY_AVS_ADDR;
                 break;
+            case 'P':
+                $this->avs_result_flags = null;
         }
 
         /** set CVV response code */
@@ -421,9 +449,6 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
             case 'credit':
                 $xaction_type = 'CREDIT';
                 break;
-            case 'capture_only': // not used
-                $xaction_type = 'CAPTURE_ONLY';
-                break;
             case 'void':
                 $xaction_type = 'VOID';
                 break;
@@ -496,7 +521,7 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
 		$aNetVars["x_merchant_email"]		=	"";
 		
 		//Invoice Information (pg 12)
-		$aNetVars["x_invoice_num"]			=	$this->_order->get_id();
+		$aNetVars["x_invoice_num"]			=	$this->_order->fetch_token();
 		$aNetVars["x_description"]			=	$this->_self_description;
 
 		//Customer Shipping Address (pg 10)	
@@ -517,10 +542,21 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
 		$aNetVars["x_method"]				=	"CC";  // ?
 
 		// credit card information
-		$aNetVars["x_card_num"]			=	$this->_payment->get_ccno();
-		$aNetVars["x_exp_date"]			=	$this->_payment->get_ccexp('m/y');
-		$aNetVars["x_card_code"]		=	$this->_payment->get_csc();
+        if ($type == 'auth_capture' or $type == 'authorize') {
+            $aNetVars["x_card_num"]			=	$this->_payment->get_ccno();
+            $aNetVars["x_exp_date"]			=	$this->_payment->get_ccexp('m/y');
+            $aNetVars["x_card_code"]		=	$this->_payment->get_csc();
+        }
+        else {
+            $aNetVars["x_trans_id"]		    =	$this->_order->fetch_payment_transaction_id();
 
+            if ($type == 'capture') { // anet needs this x_auth_code from the original AUTH_ONLY to process a capture.
+                $aNetVars["x_auth_code"]	=	$this->_order->fetch_payment_auth_code();
+            }
+            if ($type == 'credit') { // anet needs the last 4 of the original cc# to issue a credit
+                $aNetVars["x_card_num"]			=	$this->_order->get_header('cc_number');
+            }
+        }
 
         $req = '';
 		foreach ( $aNetVars as $k=>$v ) {
@@ -545,5 +581,49 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
         }
 		return split(" ", $str, 2);
     }
+
+    /* determine what transactions can be currently run on this order from the order detail page in the control.
+     * if total captured amount is less than the authorized amount, allow 
+     * capture. Allow Void and Credit, unless one of those has been used 
+     * already. In fact, Void and Credit can only be used once - once they are 
+     * used, the admin is shut off, for safety/headache reasons.
+     *
+     * this is called from the order detail page in control, only
+     *
+     * @return assoc array
+     */
+    function get_transaction_options() {
+
+        $gate_opts = array();
+        //
+        // we can only do transactions on a.net
+        if (!$this->enable_admin_transactions) {
+            return false;
+        }
+
+        $amt_authorized = 0;
+        $amt_billed = 0;
+        $x_open = true;
+        foreach ($this->_order->fetch_transaction_summary() as $t) {
+            if ($t['trans_type'] == 'AUTH_ONLY' && $t['trans_result'] == 'APPROVED') {
+                $amt_authorized = $t['trans_amount'];
+            }
+            elseif ($t['trans_type'] == 'PRIOR_AUTH_CAPTURE' && $t['trans_result'] == 'APPROVED') {
+                $amt_billed += $t['trans_amount'];
+            }
+            elseif (($t['trans_type'] == 'VOID' or $t['trans_type'] == 'CREDIT') && $t['trans_result'] == 'APPROVED') {
+                $x_open = false;
+            }
+        }
+        if ($x_open) {
+            if ($amt_billed < $amt_authorized) {
+                $gate_opts['capture'] = 'Capture';
+            }
+            $gate_opts['void'] = 'Void';
+            $gate_opts['credit'] = 'Credit';
+            return $gate_opts;
+        }
+    }
+
 
 }

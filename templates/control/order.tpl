@@ -299,11 +299,29 @@
     <td colspan="2">
       <div class="orderItems">
         <h3 class="order">ORDER TRANSACTIONS</h3>
+
+        <~ if $xform ~>
+            <div class="orderTransactForm" align="right">
+                <~ $xform.FORM ~>
+                <table border="0">
+                    <tr>
+                        <td><strong>Run Transaction:</strong></td>
+                        <td><~ $xform.xtype.TAG ~></td>
+                        <td>amount: <~ $xform.xamt.TAG ~></td>
+                        <td><~ $xform.op_xaction.TAG ~></td>
+                    </tr>
+                </table>
+                <~ $xform.HIDDENS ~>
+                </form>
+            </div>
+        <~/if~>
+
   <table border="0" cellspacing="0" cellpadding="3" class="cart">
       <tr class="cartHeader">
           <th align="left">Type</th>
           <th align="left">Date</th>
           <th align="left">TransID</th>
+          <th align="left">&nbsp;</th>
           <th align="left">Result</th>
           <th align="left">Amount</th>
           <th align="left">verified</th>
@@ -320,7 +338,15 @@
               <~ $trans.trans_id ~>
           </td>
           <td valign="top">
+              <~ if $trans.trans_result eq 'APPROVED' ~>
+                <img src="/control/cshop/img/tick.gif">
+              <~ elseif $trans.trans_result ne '' ~>
+                <img src="/control/cshop/img/cross.gif">
+              <~/if~>
+          </td>
+          <td valign="top">
               <~ $trans.trans_result ~>
+              <~ $trans.trans_result_msg ~>
           </td>
           <td valign="top">
               <~ $trans.trans_amount ~>
