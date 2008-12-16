@@ -31,7 +31,7 @@
               <~ elseif $KEY_ERROR == 'MASH_NO_MATCH' ~>
                 Sorry, the key you passed no longer matches your account. Perhaps your
                 account information has been changed since your email was generated. Please
-                go back to the <a href="pass.recover.php">&quot;Forgot Password&quot; page</a>
+                go back to the <a href="/cart/pass.recover.php">&quot;Forgot Password&quot; page</a>
                 and begin the process again.
               <~/if~>                           
           </div>
