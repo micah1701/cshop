@@ -25,6 +25,12 @@ class cmPaymentGatewayManual extends cmPaymentGateway {
         $this->_trans_type = 'MANUAL';
     }
 
+    // this never captures anything, really.
+    function get_captured_amount() {
+        return 0; 
+    }
+
+
     # add listener to Order->update_status() = truncate cc# on change
 
 }

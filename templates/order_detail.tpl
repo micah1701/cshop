@@ -37,7 +37,7 @@
           <div class="orderHeader"><span>Payment Method:</span> <~ $orderinfo.cc_type ~> <~ $orderinfo.cc_number ~></div>
         <~/if~>
       </div>
-        <table width="90%">
+        <table id="checkoutConfirmAddresses">
             <tr>
                 <td valign="top" class="checkoutAddress">
                     <h4>Billing Address</h4>
@@ -89,6 +89,8 @@
 
 </div>
 
-<a href="<~ $smarty.const.CSHOP_PRODUCT_DETAIL_PAGE ~>" class="cartlink" id="cmContinueShopping">RETURN TO STORE</a>
+<div id="cmContinueShopping">
+<a href="<~ $smarty.const.CSHOP_PRODUCT_DETAIL_PAGE ~>" class="cartlink">RETURN TO STORE</a>
+</div>
 
 <~ include file="cart_footer.tpl" SUPPRESS_COLLAGE=true ~>

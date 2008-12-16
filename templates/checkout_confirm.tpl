@@ -36,7 +36,7 @@
         <~ if $user.telephone ~><div class="custPhone">Phone:&nbsp;<~ $user.telephone ~></div><~/if~>
     </div>
 
-    <table width="90%">
+    <table id="checkoutConfirmAddresses">
         <tr>
             <td valign="top" class="checkoutAddress">
                 <div class="checkoutFormBox">

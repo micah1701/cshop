@@ -20,9 +20,11 @@ define('CMPAY_CSC_ERROR', 8);
  *
  * this really makes no sense until we use PHP5 and autoloading
  *
+ * TODO this should be an abstract class. This makes no sense by itself, it needs to be fleshed out.
+ *
  * $Id: cmPaymentGateway.class.php,v 1.18 2008/07/01 15:39:07 sbeam Exp $
  */
-class cmPaymentGateway extends PEAR {
+abstract class cmPaymentGateway extends PEAR {
 
     /* private class var access via getters */
     var $_trans_type;
@@ -201,6 +203,8 @@ class cmPaymentGateway extends PEAR {
         $req = $this->construct_request('void');
         return $this->send($req);
     }
+
+    public abstract function get_captured_amount();
 
     function send($req) { }
 
