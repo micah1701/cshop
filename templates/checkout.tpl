@@ -4,7 +4,8 @@
 <div id="cartWrapper">
 
     <~ include file="float:cartsteps.tpl" step=1 ~>
-    <div class="userNotice">Please enter shipping information for your order below.</div>
+    <div class="checkoutPageHeader"><strong>Shipping Information</strong>
+        Please enter shipping information for your order below.</div>
 
     <~ if $is_new_user ~>
     <div class="userAcctNotice">
@@ -21,7 +22,7 @@
         &lt;<~ $user.email ~>&gt;
         <~ if $user.phone ~>Phone:<~ $user.phone ~><~/if~>
         <div class="cartYouAreNot">
-            (If you are not <strong><~ $user.cust_name ~></strong>, <a href="logout.php">click here</a>)
+            (<a href="logout.php">Not <strong><~ $user.cust_name ~></strong>?</a>)
         </div>
     </div>
     <~ /if ~>

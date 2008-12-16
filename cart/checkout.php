@@ -17,7 +17,7 @@ require_once(CSHOP_CLASSES_GIFTCARD.'.class.php');
 
 
 // init page auth objects
-page_open(array('sess'=>'jen_Session', 'auth'=>'selfAuth'));
+page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>CSHOP_CLASSES_AUTH_AUTH, 'perm'=>CSHOP_CLASSES_AUTH_PERM));
 
 
 // flag for smarty

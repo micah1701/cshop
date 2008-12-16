@@ -81,9 +81,7 @@
                   <span><label for="email" accesskey="n">e-mail address:</label></span>
                 </td>
                 <td class="formField" colspan="4">
-                  <div class="checkoutFormBox">
                     <~ $cform.email.TAG|tabindex:20 ~>
-                  </div>
                 </td>
               </tr>
           <~/if~>
@@ -93,9 +91,7 @@
               <span><label for="user_comments" accesskey="n">Order Comments:</label></span>
             </td>
             <td class="formField" colspan="4">
-              <div class="checkoutFormBox">
                 <~ $cform.user_comments.TAG|tabindex:21 ~>
-              </div>
             </td>
           </tr>
 

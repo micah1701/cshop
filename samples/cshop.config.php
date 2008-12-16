@@ -17,7 +17,7 @@
  * 1.5.0 : 2008/02/05 new INFINITE CATS (for EXR) - NOT BC
  * 1.4 : 2008/01/15 control product tabs re-done w jQuery; add cmCategory::get_featured_products()
  */
-define ('CSHOP_VERSION', '1.5.2');
+define ('CSHOP_VERSION', '1.5.3');
 
 define ('CSHOP_CLASSES_ADDRESSBOOK', 'cmAddressBook');
 define ('CSHOP_CLASSES_USER', 'cmUser');
@@ -33,6 +33,11 @@ define ('CSHOP_CLASSES_MANUFACTURER', 'cmManufacturer');
 define ('CSHOP_CLASSES_SHIPMETHOD', 'cmShipping');
 define ('CSHOP_CLASSES_TAXCALCULATOR', 'cmTaxCalculator');
 define ('CSHOP_CLASSES_GIFTCARD', 'cmGiftCard');
+
+/* classes used for auth/perm/session management (old-phplib) */
+define ('CSHOP_CLASSES_AUTH_AUTH', 'jen_Auth');
+define ('CSHOP_CLASSES_AUTH_PERM', 'jen_Perm');
+define ('CSHOP_CLASSES_AUTH_SESSION', 'jen_Session');
 
 // destination for uploaded product and category images and such
 define ('CSHOP_MEDIA_URLPATH', '/.uploads/cshop');

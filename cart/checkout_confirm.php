@@ -16,7 +16,7 @@ require_once(CSHOP_CLASSES_PAYMENT.'.class.php');
 require_once(CSHOP_CLASSES_GIFTCARD.'.class.php');
 
 // init page auth objects
-page_open(array('sess'=>'jen_Session', 'auth'=>'defaultAuth'));
+page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>CSHOP_CLASSES_AUTH_AUTH, 'perm'=>CSHOP_CLASSES_AUTH_PERM));
 
 // flag for smarty
 $smarty->assign('page_id', 'checkout_confirm');

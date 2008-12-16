@@ -24,7 +24,7 @@ $c = CSHOP_CLASSES_USER;
 $user = new $c($pdb);
 
 // init page auth objects
-page_open(array('sess'=>'jen_Session', 'auth'=>'defaultAuth'));
+page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>'defaultAuth'));
 
 $product_detail_page = CSHOP_PRODUCT_DETAIL_PAGE;
 $smarty->assign('product_detail_page', $product_detail_page);

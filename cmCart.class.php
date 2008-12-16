@@ -1220,7 +1220,8 @@ class cmCart extends db_container {
             return 0;
         }
         else {
-            $user = new user_container($this->db);
+            $classname = CSHOP_CLASSES_USER;
+            $user = new $classname($this->db);
             $uid = $user->get_auth_id();
             $user->set_id($uid);
 
