@@ -76,7 +76,7 @@ if (isset($_POST['op']) and ($ACTION == OP_ADD or $ACTION == OP_EDIT)) {
 
     $vals = array();
     $img_vals = array();
-    if ($errs = $mosh->check_form($user->colmap)) {
+    if ($errs = $mosh->check_form($user->get_colmap())) {
         // handled below
     }
     else {
@@ -175,13 +175,18 @@ else {
     $table->setAutoGrow(true);
     $table->setAutoFill("n/a");
 
-    $cols = array('cust_name', 'company', 'email');
 
     $header_row = array();
-    foreach ($cols as $k) {
-        if (!empty($user->colmap[$k])) {
-            $header_row[$k] = $user->colmap[$k][0];
+    if (!isset($user->control_header_cols)) {
+        $cols = array('cust_name', 'company', 'email');
+        foreach ($cols as $k) {
+            if (!empty($user->colmap[$k])) {
+                $header_row[$k] = $user->colmap[$k][0];
+            }
         }
+    }
+    else {
+        $header_row =& $user->control_header_cols;
     }
 
     if (isset($_GET['by']) and in_array($_GET['by'], $cols)) {
