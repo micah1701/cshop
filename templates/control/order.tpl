@@ -143,7 +143,6 @@
           <~ if $orderinfo.cc_type ~>
             <~ $orderinfo.cc_type ~>: <~ $orderinfo.cc_number ~><br />
             Exp: <~ $orderinfo.cc_expires ~><br />
-            Amount: <~ $orderinfo.amt_billed_to_date ~>&nbsp;<~ $currency ~>
           <~/if~>
           </td>
         </tr>
