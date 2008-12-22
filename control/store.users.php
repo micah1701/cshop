@@ -9,6 +9,7 @@ require_once("fu_HTML_Table.class.php");
 require_once(CONFIG_DIR.'cshop.config.php');    
 require_once(CSHOP_CLASSES_USER . '.class.php');
 require_once("res_pager.class.php");      
+require_once("filter_form.class.php");      
 
 
 $tablename = 'auth_user';
@@ -187,6 +188,7 @@ else {
     }
     else {
         $header_row =& $user->control_header_cols;
+        $cols = array_keys($user->control_header_cols);
     }
 
     if (isset($_GET['by']) and in_array($_GET['by'], $cols)) {
@@ -200,14 +202,30 @@ else {
     $table->addSortRow($header_row, null, null, 'TH', null);
     $cols = array_keys($header_row);
 
+    /** decide how to filter the results */
+    $where = "perms != 'PUBLIC'"; 
+    if (isset($_GET['op_filter'])) {
+        $w = array();
+        if (!empty($_GET['f_perms'])) {
+            $w[] = sprintf('perms = %s', $pdb->quoteSmart($_GET['f_perms']));
+        }
+        if (!empty($_GET['f_email'])) {
+            $w[] = sprintf('email = %s', $pdb->quoteSmart($_GET['f_email']));
+        }
+        if (count($w)) {
+            $where = join(' AND ', $w);
+        }
+    }
+    /** **/
+
     if (defined('CSHOP_ALLOW_ANON_ACCOUNT')) {
-        $sql = sprintf("SELECT id, %s, IFNULL(email, anon_email) AS email FROM %s ORDER BY %s %s",
+        $sql = sprintf("SELECT id, %s, IFNULL(email, anon_email) AS email FROM %s WHERE $where ORDER BY %s %s",
                         join(',', $cols),
                         $user->get_table_name(),
                         $orderby, $orderdir);
     }
     else {
-        $sql = sprintf("SELECT id, %s FROM %s ORDER BY %s %s",
+        $sql = sprintf("SELECT id, %s FROM %s WHERE $where ORDER BY %s %s",
                         join(',', $cols),
                         $user->get_table_name(),
                         $orderby, $orderdir);
@@ -236,6 +254,18 @@ else {
 
     $pager = new res_pager($offset, $range, $numrows);
     $smarty->assign('pager', $pager);
+
+    /** create filter form **/
+    $filt = new filter_form('GET');
+    $filt->left_td_style = '';
+    $filt->field_prefix = '';
+    $filt->add_element('hdr1', array('<b>Filter by::</b> Permissions:', 'heading'));
+    $filt->add_element('f_perms', array('', 'select', null));
+    $filt->add_element('hdr2', array('email:', 'heading'));
+    $filt->add_element('f_email', array('', 'text', null, array('size'=>20)));
+    $filt->add_element('op_filter', array('GO', 'submit'));
+    $colmap = $user->get_colmap();
+    $filt->set_element_opts('f_perms', array(''=>'[ANY]') + $colmap['perms'][2]);
 }
 
 
@@ -342,12 +372,15 @@ $smarty->display('control/header.tpl');
      </div>
   </div>
 <? } else { ?>
+    <div style="width: 600px; padding: 4px;" align="right">
+      <? $filt->display(); ?>
+    </div>
   <div style="width: 600px; border: 1px solid black; padding: 4px">
     <div align="right" style="width: 600px">
       <a href="<?= $_SERVER['PHP_SELF'] ?>?op_add" class="buttonAddItem">Add New User</a>
     </div>
     <? if (!$numrows) { ?>
-	No customers have signed up yet.
+	No records found.
     <? } else { ?>
       <? $smarty->display('cart/control/res_pager.tpl') ?>
       <br />
