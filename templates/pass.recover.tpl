@@ -1,7 +1,7 @@
 <~ include file="cart_header.tpl" ~>
-<h2 class="productName headline">PASSWORD RECOVERY</h2>
 			  
 <div id="cartWrapper">
+    <h2 class="productName headline">PASSWORD RECOVERY</h2>
 
     <~ include file="cart/user_error_report.tpl" ~>
 
