@@ -95,10 +95,10 @@ $(document).ready(
  * todo: maybe more attribs than size/color (but YAGNI for now)
 */
 function doCheckInventorySelection() {
-    var size = $('#sizes').val();
-    var color = $('#colorid').val();
+    var size = $('#sizes').val() || 0;
+    var color = $('#colorid').val() || 0;
     var msg;
-    if (size && color) {
+    if (size || color) {
         for (var i in allinv) {
             if (allinv[i].sizes_id == size && allinv[i].colorways_id == color) {
                 if (allinv[i].qty > 0) {
@@ -125,7 +125,7 @@ function doCheckInventorySelection() {
 function initAttribSelectors() {
     if (typeof(allinv) != 'undefined') {
         // if the first option in either select has empty value, skip this. There is a placeholder option.
-        if ($('#sizes').get(0).options[0].value != '' && $('#colorid').get(0).options[0].value != '') {
+        if ($('#sizes').length && $('#colorid').length && ($('#sizes').get(0).options[0].value != '' && $('#colorid').get(0).options[0].value != '')) {
             for (var i in allinv) {
                 if (allinv[i].qty > 0) {
                     $('#sizes').val(allinv[i].sizes_id);
