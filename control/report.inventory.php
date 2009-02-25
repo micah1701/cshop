@@ -12,6 +12,7 @@ require_once("filter_form.class.php");
 require_once(CSHOP_CLASSES_ORDER.'.class.php');
 require_once(CSHOP_CLASSES_PRODUCT.'.class.php');
 require_once("store.edit.inc.php");      
+require_once("csv_table.class.php");      
 
 
 $c = CSHOP_CLASSES_PRODUCT;
@@ -40,6 +41,20 @@ if (isset($_GET['by']) and in_array($_GET['by'], array_keys($header_row))) {
 }
 $order_dir = (empty($_GET['dir']) or $_GET['dir'] == 'A')? 'ASC' : 'DESC';
 
+
+if (isset($_GET['op_csv'])) { // this will generate a CSV file to downlaod all of the current inventory items in the system
+
+    // get all of the products joined with the inventory levels, colors, sizes, etc
+    // organized: title, sku, size, color way, qty in stock
+    $inv = $prod->fetch_inventory_report(null, 'title', 'asc', 0, 999000);
+    $cols = array('title','sku','size_code','color_name','qty');
+    $csv = new CSV_Table_Fu();
+    $csv->show_cols = $cols;
+    $csv->print_csv_headers(SITE_DOMAIN_NAME.'-inventory_dump.csv');
+    $csv->dumpall($inv);
+    exit();
+}
+
 $range = 50;
 $offset = (isset($_GET['page']))? (($_GET['page']-1) * $range) : 0;
 
@@ -55,6 +70,8 @@ $table->setAutoFill("-");
 $xgets = $mosh->make_get_params($_GET, array('by','dir'));
 
 $table->addSortRow($header_row, $orby, null, 'TH', $xgets, $order_dir);
+$sep = (strpos($_SERVER['REQUEST_URI'], '?') === false)? '?' : '&';
+$csv_link = $_SERVER['REQUEST_URI'] . $sep . 'op_csv';
 
 foreach ($report as $row) {
     $vals = array();
@@ -115,6 +132,8 @@ Click on a row to edit inventory values for the product.
 <? if (!$numrows) { ?>
     <strong class="userError">No matching items are found.</strong>
 <? } else { ?>
+    <div class="csvVersion"><a href="<?= $csv_link ?>">Download</a></div>
+
     <? echo $table->toHTML() ?>
 <? } ?>
 
