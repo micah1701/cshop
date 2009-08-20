@@ -7,8 +7,10 @@ $table_namecol = 'name'; // column that should be use as the title/name/text to 
 
 $class_opts = array('Flat'=>'Flat',
                     'Zone'=>'Zone',
-                    'UPS'=> 'UPS Auto-calc',
-                    'USPS'=> 'USPS Auto-calc');
+                    'UPS'=> 'UPS Quick Cost Calculator',
+                    'USPS'=> 'USPS Web Tools',
+                    'FedEx'=> 'FedEx Ship Manager Direct'
+                );
 
 /* form definition arrays suitable for formex() */
 $colmap = array('name' =>      array('Ship Class', 'text', null, 1),

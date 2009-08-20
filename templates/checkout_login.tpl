@@ -1,4 +1,4 @@
-<~ include file="cart_header.tpl" heading="checkout/sign on" ~>
+<~ include file="cart_header.tpl" heading="Checkout / sign-up" ~>
 
 <div id="checkoutWrapper">
 
@@ -18,7 +18,7 @@
 
       <~ else ~>
 
-      <strong>I am a returning customer.</strong> 
+        <h2 class="flir">RETURNING CUSTOMERS</h2> 
 
       <~ /if ~>
 

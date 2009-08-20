@@ -73,6 +73,10 @@ if (isset($_REQUEST['op_add_pid'])) {
         }
     }
     $res = $cart->add_item($_REQUEST['op_add_pid'], $qty, $attribs, $options);
+    if (!PEAR::isError($res) or $res->getMessage() == 'warning: 0 rows were changed') {
+        $smarty->assign('op_add_cart_success', true);
+    }
+
 
     if (isset($_REQUEST['op_buy_now']) || isset($_REQUEST['op_buy_now_x'])) {
         header("Location: checkout.php");
@@ -118,6 +122,10 @@ elseif (isset($_POST['op_update'])) {
         exit();
     }
 }
+elseif (isset($_POST['op_remove_item']) and is_numeric($_POST['op_remove_item'])) {
+    $res = $cart->update_qty($_POST['op_remove_item'], 0);
+    $smarty->assign('item_removed', $res); 
+}
 
 if (isset($_GET['discounterr'])) { // didn't like that discount code from earlier
     $smarty->assign('discount_error', 1);
@@ -139,7 +147,7 @@ if (!empty($sess_promo_code)) {
 
 
 $c = CSHOP_CLASSES_PRODUCT;
-$pctr = new $c($pdb);
+$product = new $c($pdb);
 
 $cartitems = $cart->fetch_items();
 
@@ -150,8 +158,8 @@ if (count($cartitems)) {
     if (defined('CSHOP_SHOW_RELATED_PRODUCTS_IN_CART') and CSHOP_SHOW_RELATED_PRODUCTS_IN_CART) {
         if ($related_ids = $cart->fetch_related_products()) {
             foreach ($related_ids as $pid) {
-                $pctr->set_id($pid);
-                $smarty->append('related', $pctr->fetch(array('title','id'),false,true));
+                $product->set_id($pid);
+                $smarty->append('related', $product->fetch(array('title','id'),false,true));
             }
         }
     }
@@ -162,9 +170,17 @@ if (count($cartitems)) {
         $smarty->assign('discount_descrip', $cart->get_discount_descrip());
     }
 
+    if (defined('CSHOP_SHOW_PRODUCT_THUMBNAILS_IN_CART') and CSHOP_SHOW_PRODUCT_THUMBNAILS_IN_CART) {
+        foreach ($cartitems as $k => $item) {
+            $product->set_id($item['product_id']);
+            $cartitems[$k]['product'] = $product->fetch(array('title','description','id'), false, 'cart_thumb');
+        }
+    }
+
     $smarty->assign('cart', $cartitems);
     $smarty->assign('cart_totals', $totals);
     $smarty->assign('subtotal', number_format($cart->get_subtotal(), 2));
+
 }
 $smarty->assign('do_check_coupons', $cart->do_check_coupons);
 
@@ -177,16 +193,25 @@ if (isset($_REQUEST['err']) and isset($_REQUEST['inventoryerror'])) {
     $smarty->assign('msg', base64_decode($_REQUEST['err']));
 }
 
-$cats = $pctr->get_categories();
-$smarty->assign('product_categories', $cats);
+if (!defined('CSHOP_SHOW_CART_CATEGORIES') or CSHOP_SHOW_CART_CATEGORIES) {
+    $cats = $product->get_categories();
+    $smarty->assign('product_categories', $cats);
 
-$products = array();
-foreach ($cats as $catid => $name) {
-   $products[$catid] = $pctr->selectByCategory($catid);
+    $products = array();
+    if ($cats) {
+        foreach ($cats as $catid => $name) {
+           $products[$catid] = $product->selectByCategory($catid);
+        }
+        $smarty->assign('productlist', $products);
+    }
 }
-$smarty->assign('productlist', $products);
 
-$smarty->display('float:cart_display.tpl');
+if (isset($_GET['ajax'])) {
+    $smarty->display('float:cart_contents.tpl');
+}
+else {
+    $smarty->display('float:cart_display.tpl');
+}
 
 
 

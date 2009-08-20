@@ -5,6 +5,11 @@
         <~ $msg|escape ~>
     </div>
 <~/if ~>
+<~if $op_add_cart_success ~>
+    <div id="cart_add_success_msg" class="userIndicator">
+        Items have been added to your cart.
+    </div>
+<~/if ~>
 
 <div id="cartWrapper">
   <~ if !$cart ~>

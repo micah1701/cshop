@@ -49,7 +49,7 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
     var $_mode_password_required = false;
 
     /** are we using A.net AIM (Advanced Integration Method) or SIM? */
-    var $_mode_advanced_itegration = true;
+    var $_mode_AIM = true;
 
     /* holds the anet password if any. */
     var $_anet_password = '';
@@ -235,7 +235,7 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
 
     /** sends the given request string to the payment processor
      * @param $req str a complete GET query
-     * @return the response from Mr. Gateway
+     * @return the response
      */
     function send($req) {
         $url = ($this->testmode)? $this->_transact_url_test : $this->_transact_url;
@@ -245,41 +245,6 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
         }
         $res = $http->getResponseBody();
         return $this->parse_response($res);
-    }
-
-    /** calculates the MD5 fingerprint hash for this transaction per A.net API
-     * @return string */
-    function _calc_fingerprint() {
-        $vals = array($this->_anet_login, $this->_order->get_id(), $this->_trans_time, $this->_order->get_total(), $this->currency_code);
-
-        $str = join('^', $vals);
-
-        $h = $this->_my_hmac($this->_anet_key, $str);
-        return $h;
-    }
-
-    /** ripped from user comments at http://us3.php.net/manual/en/function.mhash.php
-     * because mhash extension to php was causing bizarre behavior
-     * @param $key str key to use from hmac hashing
-     * @param $data data to be hasehed
-     * @return string hex number */
-    function _my_hmac($key, $data) {
-        // RFC 2104 HMAC implementation for php.
-        // Creates an md5 HMAC.
-        // Eliminates the need to install mhash to compute a HMAC
-        // Hacked by Lance Rushing
-
-        $b = 64; // byte length for md5
-        if (strlen($key) > $b) {
-            $key = pack("H*",md5($key));
-        }
-        $key  = str_pad($key, $b, chr(0x00));
-        $ipad = str_pad('', $b, chr(0x36));
-        $opad = str_pad('', $b, chr(0x5c));
-        $k_ipad = $key ^ $ipad ;
-        $k_opad = $key ^ $opad;
-
-        return md5($k_opad  . pack("H*",md5($k_ipad . $data)));
     }
 
 
@@ -473,7 +438,7 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
         }
 
         /* AIM mode just uses the x_tran_key. Not sure how "Advanced" that is, but whatever */
-        if (!empty($this->_anet_key) and $this->_mode_advanced_itegration) {
+        if (!empty($this->_anet_key) and $this->_mode_AIM) {
             $aNetVars["x_tran_key"]	= $this->_anet_key;
         }
         if (!empty($this->_anet_duplicate_window)) {
@@ -490,7 +455,7 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
 		$aNetVars["x_encap_char"]			=	"\"";			//all fields of response enclosed in "
 
         /** these apply only to SIM mode in A/net */
-        if (!$this->_mode_advanced_itegration and $this->_do_md5_fingerprint) {
+        if (!$this->_mode_AIM) {
             // Fingerprint generation params
             $aNetVars['x_fp_timestamp'] = $this->_trans_time;
             $aNetVars['x_fp_sequence'] = $this->_order->get_id();

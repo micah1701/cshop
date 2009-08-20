@@ -85,7 +85,7 @@ class cmProduct extends db_container {
      {
          $info = parent::fetch($cols, $kids);
          if ($get_images) {
-             $info['images'] = $this->get_images();
+             $info['images'] = $this->get_images(null, $get_images);
          }
          return $info;
      }
@@ -398,14 +398,18 @@ class cmProduct extends db_container {
      * images, thumbs and dimensions of each
      * @return array
      */
-    function get_images($pid=null) {
+    function get_images($pid=null, $img_class=null) {
         if (!$pid) $pid = $this->get_id();
+
         $sql = sprintf("SELECT colorways_id, system_location, class
                             , filename_large, dims_large, filename_thumb, dims_thumb, filename_zoom
                         FROM cm_product_images
-                        WHERE cm_products_id = %d
-                        ORDER BY order_weight",
-                        $pid);
+                        WHERE cm_products_id = %d", $pid);
+
+        if ($img_class)
+            $sql .= " AND class = " . $this->db->quote($img_class);
+
+        $sql .= " ORDER BY order_weight";
         $res = $this->db->query($sql);
         $items = array();
         while ($row = $res->fetchRow()) {

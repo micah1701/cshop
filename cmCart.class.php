@@ -1264,6 +1264,23 @@ class cmCart extends db_container {
          }
     }
 
+    function generate_order_token() {
+        if (!$this->get_id()) return;
+
+        $res = $this->fetch(array('order_token'));
+        $tok = $res['order_token'];
+        if (!$tok) {
+            $order = cmClassFactory::getSingletonOf(CSHOP_CLASSES_ORDER, $this->db);
+            $tok = $order->create_order_token();
+            try {
+                $this->store(array('order_token' => $tok));
+            } catch (Exception $e) {
+                $tok = $this->generate_order_token();
+            }
+        }
+        return $tok;
+    }
+
 
     /* provides hook for cmOrder, when copying cart contents to create a new 
      * object. Any colmap array return here will be used to transfer the 
