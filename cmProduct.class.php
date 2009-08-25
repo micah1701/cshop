@@ -256,7 +256,7 @@ class cmProduct extends db_container {
       */
      function fetch_product_categories($level = null)
      {
-         $sql = "SELECT c.id, c.name FROM {$this->_category_map_table} pc, {$this->_category_table} c
+         $sql = "SELECT c.id, c.name, c.urlkey FROM {$this->_category_map_table} pc, {$this->_category_table} c
                  WHERE pc.cm_categories_id = c.id AND pc.cm_products_id = " . $this->get_id();
          if ($level) $sql .= " AND c.level = $level";
          return $this->db->getAll($sql);
