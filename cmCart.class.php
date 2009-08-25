@@ -1275,7 +1275,12 @@ class cmCart extends db_container {
             try {
                 $this->store(array('order_token' => $tok));
             } catch (Exception $e) {
-                $tok = $this->generate_order_token();
+                if ($e->getCode() == DB_ERROR_ALREADY_EXISTS) {
+                    $tok = $this->generate_order_token();
+                }
+                else {
+                    throw $e;
+                }
             }
         }
         return $tok;
