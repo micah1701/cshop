@@ -68,7 +68,9 @@ if (!$productid) {
 
 
 
-$colmap = array('upfile' => array('Image', 'image_upload', null, array('allowed'=>'web_images_nogif',
+$allowed_image_types = (function_exists('imagecreatefromgif'))? 'web_images' : 'web_images_nogif';
+
+$colmap = array('upfile' => array('Image', 'image_upload', null, array('allowed'=>$allowed_image_types,
                                                         'maxdims' => IMG_MAX_DIMS,
                                                         'path'=> CSHOP_MEDIA_FULLPATH,
                                                         'ws_path' => CSHOP_MEDIA_URLPATH), true),
