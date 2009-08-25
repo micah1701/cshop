@@ -6,10 +6,16 @@ class circusMailer {
 
     var $sendmail_path = '/usr/sbin/sendmail';
 
-    function send($recip, $subj, $msg) {
+    function send($recip, $subj, $msg, $enc="") {
 
         $headers['From']   = EMAIL_SENDER;
         $headers['BCC']    = ERROR_EMAIL_RECIP; 
+        if ($enc) {
+            $headers['Content-type'] = 'text/plain; charset=' . $enc;
+            if (strtolower($enc) == 'utf-8') {
+                $subj = "=?UTF-8?B?" . base64_encode($subj) . "?=";
+            }
+        }
 
         // need this for mail(), PEAR::Mail not working
         $hdr = '';
