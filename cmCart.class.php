@@ -1287,6 +1287,20 @@ class cmCart extends db_container {
     }
 
 
+
+
+    function set_id_by_token($tok) {
+        $sql = sprintf("SELECT id FROM %s WHERE order_token = %s",
+                        $this->get_table_name(),
+                        $this->db->quoteSmart(strtoupper($tok)));
+        $res = $this->db->getOne($sql);
+        if ($res and !PEAR::isError($res)) {
+            $this->set_id($res);
+        }
+        return $res;
+    }
+
+
     /* provides hook for cmOrder, when copying cart contents to create a new 
      * object. Any colmap array return here will be used to transfer the 
      * indicated columns to the new order */

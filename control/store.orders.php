@@ -201,7 +201,7 @@ if ($ACTION == OP_VIEW) {
     }
 
     $user = $order->get_user();
-    $smarty->assign('user', $user->fetch(array('id','fname','lname','cust_name','company','email')));
+    $smarty->assign('user', $user->fetch());
     $smarty->assign('user_email', $user->get_email());
 
     // mask the cc#

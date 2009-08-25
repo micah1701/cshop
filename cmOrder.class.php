@@ -163,7 +163,7 @@ class cmOrder extends db_container {
         }
 
         $vals['user_id'] = $this->user->get_id();
-        $vals['order_token'] = $this->create_order_token();
+        if (empty($vals['order_token'])) $vals['order_token'] = $this->create_order_token();
         $vals['amt_quoted'] = $cart_totals['grand_total'];
 
         if ($this->sale_zero_all) { // 100% discount for some reason! (incl tax, shipping)
@@ -836,9 +836,6 @@ class cmOrder extends db_container {
 
         $user = $this->get_user();
         $uservals = $user->fetch();
-        if (!isset($uservals['cust_name'])) {
-            $uservals['cust_name'] = sprintf("%s %s", $uservals['fname'], $uservals['lname']);
-        }
         if (empty($uservals['email'])) $uservals['email'] = $user->get_email();
 
         $smarty->assign('user', $uservals);

@@ -133,7 +133,7 @@ class cmUser extends db_container {
 
     function fetchShippingAddr($cols=null) {
         $sid = $this->fetch(array('shipping_addr_id'));
-        if (!$sid['shipping_addr_id']) {
+        if (empty($sid['shipping_addr_id'])) {
         }
         else {
             $this->addr->set_id($sid['shipping_addr_id']);

@@ -308,83 +308,9 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
         }
 
 
-        /* set AVS Response code into a set of binary flags via the defines set up above */
-        switch ($trans_avs_code) {
-            case 'A':
-                $this->avs_result_flags = CMPAY_AVS_ADDR;
-                break;
-            case 'B':
-                $this->avs_result_flags = CMPAY_AVS_ERR & CMPAY_AVS_UNSUP;
-                break;
-            case 'E':
-            case 'R':
-                $this->avs_result_flags = CMPAY_AVS_ERR;
-                break;
-            case 'G':
-                $this->avs_result_flags = CMPAY_AVS_INTL;
-                break;
-            case 'N':
-                $this->avs_result_flags = CMPAY_AVS_NOMATCH;
-                break;
-            case 'S':
-            case 'U':
-                $this->avs_result_flags = CMPAY_AVS_UNSUP;
-                break;
-            case 'W':
-            case 'Z':
-                $this->avs_result_flags = CMPAY_AVS_ZIP;
-                break;
-            case 'X':
-            case 'Y':
-                $this->avs_result_flags = CMPAY_AVS_ZIP & CMPAY_AVS_ADDR;
-                break;
-            case 'P':
-                $this->avs_result_flags = null;
-        }
+        $this->set_avs_result_flags($trans_avs_code);
+        $this->set_csc_result_flags($trans_csc_code, $rvals[39]);
 
-        /** set CVV response code */
-        if ($trans_csc_code == 'M') { // match OK
-            $this->csc_match = true;
-        }
-        else {
-            if ($trans_csc_code == 'P') { // "not processed"
-                $this->csc_match = true;
-            }
-            else { // either no match or system couldnt process
-                $this->csc_match = null;
-            }
-            switch ($rvals[39]) { // "Cardholder Authentication Verification Value (CAVV) Response Code"
-                case '0':
-                    $this->csc_result = 'CAVV not validated because erroneous data was submitted';
-                    break;
-                case '1':
-                    $this->csc_result = 'CAVV failed validation';
-                    break;
-                case '3':
-                    $this->csc_result = 'CAVV validation could not be performed; issuer attempt incomplete';
-                    break;
-                case '4':
-                    $this->csc_result = 'CAVV validation could not be performed; issuer system error';
-                    break;
-                case '7':
-                    $this->csc_result = 'CAVV attempt - failed validation - issuer available (U.S.-issued card/non-U.S. acquirer)';
-                    break;
-                case '8':
-                    $this->csc_result = 'CAVV attempt - passed validation - issuer available (U.S.-issued card/non-U.S. acquirer)';
-                    break;
-                case '9':
-                    $this->csc_result = 'CAVV attempt - failed validation - issuer unavailable (U.S.-issued card/non-U.S. acquirer)';
-                    break;
-                case 'A':
-                    $this->csc_result = 'CAVV attempt - passed validation - issuer unavailable (U.S.-issued card/non-U.S. acquirer)';
-                    break;
-                case 'B':
-                    $this->csc_result = 'CAVV passed validation, information only, no liability shift';
-                    break;
-                default: 
-                    $this->csc_result = 'CAVV not validated';
-            }
-        }
 
 
         if ($err) {
@@ -587,6 +513,94 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
             $gate_opts['void'] = 'Void';
             $gate_opts['credit'] = 'Credit';
             return $gate_opts;
+        }
+    }
+
+
+    /** 
+     * set AVS Response code into a set of binary flags via the defines set up above
+     * @param $trans_avs_code code returned from a.net api response
+     * @return void
+     */
+    function set_avs_result_flags($trans_avs_code) {
+        switch ($trans_avs_code) {
+            case 'A':
+                $this->avs_result_flags = CMPAY_AVS_ADDR;
+                break;
+            case 'B':
+                $this->avs_result_flags = CMPAY_AVS_ERR & CMPAY_AVS_UNSUP;
+                break;
+            case 'E':
+            case 'R':
+                $this->avs_result_flags = CMPAY_AVS_ERR;
+                break;
+            case 'G':
+                $this->avs_result_flags = CMPAY_AVS_INTL;
+                break;
+            case 'N':
+                $this->avs_result_flags = CMPAY_AVS_NOMATCH;
+                break;
+            case 'S':
+            case 'U':
+                $this->avs_result_flags = CMPAY_AVS_UNSUP;
+                break;
+            case 'W':
+            case 'Z':
+                $this->avs_result_flags = CMPAY_AVS_ZIP;
+                break;
+            case 'X':
+            case 'Y':
+                $this->avs_result_flags = CMPAY_AVS_ZIP & CMPAY_AVS_ADDR;
+                break;
+            case 'P':
+                $this->avs_result_flags = null;
+        }
+    }
+
+
+    /** set CVV response code */
+    function set_csc_result_flags($trans_csc_code, $reason) {
+        if ($trans_csc_code == 'M') { // match OK
+            $this->csc_match = true;
+        }
+        else {
+            if ($trans_csc_code == 'P') { // "not processed"
+                $this->csc_match = true;
+            }
+            else { // either no match or system couldnt process
+                $this->csc_match = null;
+            }
+            switch ($reason) { // "Cardholder Authentication Verification Value (CAVV) Response Code"
+                case '0':
+                    $this->csc_result = 'CAVV not validated because erroneous data was submitted';
+                    break;
+                case '1':
+                    $this->csc_result = 'CAVV failed validation';
+                    break;
+                case '3':
+                    $this->csc_result = 'CAVV validation could not be performed; issuer attempt incomplete';
+                    break;
+                case '4':
+                    $this->csc_result = 'CAVV validation could not be performed; issuer system error';
+                    break;
+                case '7':
+                    $this->csc_result = 'CAVV attempt - failed validation - issuer available (U.S.-issued card/non-U.S. acquirer)';
+                    break;
+                case '8':
+                    $this->csc_result = 'CAVV attempt - passed validation - issuer available (U.S.-issued card/non-U.S. acquirer)';
+                    break;
+                case '9':
+                    $this->csc_result = 'CAVV attempt - failed validation - issuer unavailable (U.S.-issued card/non-U.S. acquirer)';
+                    break;
+                case 'A':
+                    $this->csc_result = 'CAVV attempt - passed validation - issuer unavailable (U.S.-issued card/non-U.S. acquirer)';
+                    break;
+                case 'B':
+                    $this->csc_result = 'CAVV passed validation, information only, no liability shift';
+                    break;
+                default: 
+                    $this->csc_result = 'CAVV not validated';
+            }
         }
     }
 

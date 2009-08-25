@@ -110,6 +110,9 @@ abstract class cmPaymentGateway extends PEAR {
     function get_auth_code() {
         return $this->_gate_auth_code;
     }
+    function set_auth_code($code) {
+        $this->_gate_auth_code = $code;
+    }
 
     function get_trans_type() {
         return $this->_trans_type;
@@ -135,6 +138,11 @@ abstract class cmPaymentGateway extends PEAR {
     function set_trans_amount($amt) {
         $this->_trans_amount = $amt;
     }
+
+    function set_trans_id($id) {
+        $this->_gate_transid = $id;
+    }
+
 
     /** tell whether or not the CSC code was successfully verified
      * @return bool */
