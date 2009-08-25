@@ -12,11 +12,6 @@ require_once("res_pager.class.php");
 require_once("filter_form.class.php");      
 
 
-$tablename = 'auth_user';
-$pagetitle = 'Users';
-$table_title = 'User';
-$table_namecol = 'username';
-
 $SHOWFORM = true; // are we showing a form or not?
 $errs = array();
 $msg = '';
@@ -66,8 +61,11 @@ else {
 /** **/
 
 
-$userclass = CSHOP_CLASSES_USER;
-$user = new $userclass($pdb);
+$user = cmClassFactory::getInstanceOf(CSHOP_CLASSES_USER, $pdb);
+
+$pagetitle = 'Users';
+$table_title = 'User';
+$table_namecol = 'email';
 
 
 /** POST rec'd, check valid, proc. upload and save if OK */
@@ -179,7 +177,7 @@ else {
 
     $header_row = array();
     if (!isset($user->control_header_cols)) {
-        $cols = array('cust_name', 'company', 'email');
+        $cols = array('cust_name', 'last_name', 'first_name', 'company', 'email');
         foreach ($cols as $k) {
             if (!empty($user->colmap[$k])) {
                 $header_row[$k] = $user->colmap[$k][0];
@@ -203,14 +201,14 @@ else {
     $cols = array_keys($header_row);
 
     /** decide how to filter the results */
-    $where = "perms != 'PUBLIC'"; 
+    $where = "1=1"; 
     if (isset($_GET['op_filter'])) {
         $w = array();
         if (!empty($_GET['f_perms'])) {
             $w[] = sprintf('perms = %s', $pdb->quoteSmart($_GET['f_perms']));
         }
         if (!empty($_GET['f_email'])) {
-            $w[] = sprintf('email = %s', $pdb->quoteSmart($_GET['f_email']));
+            $w[] = sprintf('email LIKE %s', preg_replace('/[%*]+/', '%%', $pdb->quoteSmart($_GET['f_email'])));
         }
         if (count($w)) {
             $where = join(' AND ', $w);
@@ -259,13 +257,18 @@ else {
     $filt = new filter_form('GET');
     $filt->left_td_style = '';
     $filt->field_prefix = '';
-    $filt->add_element('hdr1', array('<b>Filter by::</b> Permissions:', 'heading'));
-    $filt->add_element('f_perms', array('', 'select', null));
+    $filt->add_element('hdr1', array('<b>Filter by::</b>', 'heading'));
+    if (isset($colmap['perms'])) {
+        $filt->add_element('hdr1', array('Permissions:', 'heading'));
+        $filt->add_element('f_perms', array('', 'select', null));
+    }
     $filt->add_element('hdr2', array('email:', 'heading'));
     $filt->add_element('f_email', array('', 'text', null, array('size'=>20)));
     $filt->add_element('op_filter', array('GO', 'submit'));
     $colmap = $user->get_colmap();
-    $filt->set_element_opts('f_perms', array(''=>'[ANY]') + $colmap['perms'][2]);
+    if (isset($colmap['perms'])) {
+        $filt->set_element_opts('f_perms', array(''=>'[ANY]') + $colmap['perms'][2]);
+    }
 }
 
 
