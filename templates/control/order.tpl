@@ -280,7 +280,7 @@
           </td>
       </tr>
     <~/foreach ~>
-  <~ include file="float:cart_totals.tpl" colspan=6 ~>
+  <~ include file="cart/cart_totals.tpl" colspan=6 ~>
       <tr class="cartHeader">
           <td colspan="4">&nbsp;</td>
           <td align="center"><input type="submit" name="op_oiform" class="btn" id="op_oiform" value="UPDATE ORDER" /></td>
