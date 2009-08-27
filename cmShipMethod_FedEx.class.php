@@ -15,10 +15,10 @@ class cmShipMethod_FedEx extends cmShipMethod {
     var $debug_log = '/tmp/cmShipMethod_FedEx.log';
 
     /** live **
-    var $fedex_account_number = '471519723';
-    var $fedex_meter_number = '4715-1972-3';
-    var $fedex_webauth_key = '4715-1972-3';
-    var $fedex_webauth_password = '4715-1972-3';
+    var $fedex_account_number = CSHOP_FEDEX_ACCOUNT_NUMBER;
+    var $fedex_meter_number = CSHOP_FEDEX_METER_NUMBER;
+    var $fedex_webauth_key = CSHOP_FEDEX_WEBAUTH_KEY;
+    var $fedex_webauth_password = CSHOP_FEDEX_WEBAUTH_PASS;
     /** **/
 
     /** test **/
