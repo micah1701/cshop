@@ -147,7 +147,7 @@ class cmShipMethod_FedEx extends cmShipMethod {
             error_log("\n{$response->HighestSeverity}\n", 3, $this->debug_log);
         }
 
-        if ($response->HighestSeverity != 'FAILURE' && $response->HighestSeverity != 'ERROR') {
+        if ($response->HighestSeverity == 'SUCCESS') {
             foreach ($response->RateReplyDetails as $rateReply) {           
                 $service = $rateReply->ServiceType;
                 foreach ($rateReply->RatedShipmentDetails as $detail) {
@@ -169,7 +169,10 @@ class cmShipMethod_FedEx extends cmShipMethod {
         }
         else {
             if (is_object($response->Notifications)) {
-                $err = $response->Notifications->Severity . ' processing transaction: ' .  $response->Notifications->Message . ' ';
+                if ($response->Notifications->Code == 556) 
+                    $err = "The Address or Postal/ZIP code was not valid.";
+                else
+                    $err = $response->Notifications->Severity . ': ' .  $response->Notifications->Message . ' ';
             }
             elseif (is_array($response->Notifications)) {
                 foreach ($response->Notifications as $notification) {           
