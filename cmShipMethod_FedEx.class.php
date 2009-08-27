@@ -13,19 +13,20 @@ class cmShipMethod_FedEx extends cmShipMethod {
     /** will log API transactions to debug_log file */
     var $debug = false;
     var $debug_log = '/tmp/cmShipMethod_FedEx.log';
+    var $test_mode = CSHOP_FEDEX_TEST_MODE;
 
-    /** live **
+    /** live **/
     var $fedex_account_number = CSHOP_FEDEX_ACCOUNT_NUMBER;
     var $fedex_meter_number = CSHOP_FEDEX_METER_NUMBER;
     var $fedex_webauth_key = CSHOP_FEDEX_WEBAUTH_KEY;
     var $fedex_webauth_password = CSHOP_FEDEX_WEBAUTH_PASS;
     /** **/
 
-    /** test **/
-    var $fedex_account_number = '510087240';
-    var $fedex_meter_number = '118502131';
-    var $fedex_webauth_key = 'EvvtCGizPC9B0KAQ';
-    var $fedex_webauth_password = 'DQyNTGBQymB30HwcEUogzCzmL';
+    /** test **
+     * var $fedex_account_number = '510087240';
+     * var $fedex_meter_number = '118502131';
+     * var $fedex_webauth_key = 'EvvtCGizPC9B0KAQ';
+     * var $fedex_webauth_password = 'DQyNTGBQymB30HwcEUogzCzmL';
     /** **/
 
     /** types of shipping this shipper provides, CODE => 'Name' - i.e. '2DA' => '2nd Day Air' */
@@ -136,6 +137,9 @@ class cmShipMethod_FedEx extends cmShipMethod {
         }
  
         $wsdl = dirname(__FILE__) . '/' . $this->_path_to_wsdl;
+        if ($this->test_mode) // testing version wsql hacked in, has a one-line difference
+            $wsdl = preg_replace('/\.wsdl$/', '-testing.wsdl', $wsdl);
+
         $client = new SoapClient($wsdl, array('trace' => 1)); // http://us3.php.net/manual/en/ref.soap.php
 
         $quotes = array();
