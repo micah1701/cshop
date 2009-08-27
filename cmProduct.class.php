@@ -406,14 +406,27 @@ class cmProduct extends db_container {
                         FROM cm_product_images
                         WHERE cm_products_id = %d", $pid);
 
-        if ($img_class)
-            $sql .= " AND class = " . $this->db->quote($img_class);
+        if ($img_class and $img_class !== true) {
+            if (is_array($img_class)) {
+                $sql .= " AND class IN ("; // class IN ('x','y','z') - mySQL only
+                foreach ($img_class as $c) {
+                    $sql .= $this->db->quote($c) . ',';
+                }
+                $sql = substr($sql, 0, -1) . ")";
+            }
+            else {
+                $sql .= " AND class = " . $this->db->quote($img_class);
+            }
+        }
 
-        $sql .= " ORDER BY order_weight";
+        $sql .= " ORDER BY order_weight, class";
         $res = $this->db->query($sql);
         $items = array();
         while ($row = $res->fetchRow()) {
-            $items[] = $row;
+            if (is_array($img_class))  // note array is keyed by image class here.
+                $items[$row['class']] = $row;
+            else 
+                $items[] = $row;
         }
         return $items;
     }
