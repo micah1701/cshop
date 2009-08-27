@@ -6,60 +6,64 @@
  */
 require_once("HTTP/Request.php");
 require_once('cshop/cmShipMethod.class.php');
+ini_set("soap.wsdl_cache_enabled", "0");
 
 class cmShipMethod_FedEx extends cmShipMethod {
 
     /** will log API transactions to debug_log file */
-    var $debug = true;
-    var $debug_log = '/tmp/cmShipMethod.log';
+    var $debug = false;
+    var $debug_log = '/tmp/cmShipMethod_FedEx.log';
+
+    /** live **
+    var $fedex_account_number = '471519723';
+    var $fedex_meter_number = '4715-1972-3';
+    var $fedex_webauth_key = '4715-1972-3';
+    var $fedex_webauth_password = '4715-1972-3';
+    /** **/
+
+    /** test **/
+    var $fedex_account_number = '510087240';
+    var $fedex_meter_number = '118502131';
+    var $fedex_webauth_key = 'EvvtCGizPC9B0KAQ';
+    var $fedex_webauth_password = 'DQyNTGBQymB30HwcEUogzCzmL';
+    /** **/
 
     /** types of shipping this shipper provides, CODE => 'Name' - i.e. '2DA' => '2nd Day Air' */
-    var $ship_types = array('1DM' => 'Next Day Air Early AM',
-                       '1DML' => 'Next Day Air Early AM Letter',
-                       '1DA' => 'Next Day Air',
-                       '1DAL' => 'Next Day Air Letter',
-                       '1DAPI' => 'Next Day Air Intra (Puerto Rico)',
-                       '1DP' => 'Next Day Air Saver',
-                       '1DPL' => 'Next Day Air Saver Letter',
-                       '2DM' => '2nd Day Air AM',
-                       '2DML' => '2nd Day Air AM Letter',
-                       '2DA' => '2nd Day Air',
-                       '2DAL' => '2nd Day Air Letter',
-                       '3DS' => '3 Day Select',
-                       'GND' => 'Ground',
-                       'GNDCOM' => 'Ground Commercial',
-                       'GNDRES' => 'Ground Residential',
-                       'STD' => 'Canada Standard',
-                       'XPR' => 'Worldwide Express',
-                       'XPRL' => 'Worldwide Express Letter',
-                       'XDM' => 'Worldwide Express Plus',
-                       'XDML' => 'Worldwide Express Plus Letter',
-                       'XPD' => 'Worldwide Expedited',
-                       'WXS' => 'Worldwide Saver',
+    var $ship_types = array('FIRST_OVERNIGHT' => 'First Overnight',
+                       'PRIORITY_OVERNIGHT' => 'Priority Overnight',
+                       'STANDARD_OVERNIGHT' => 'Standard Overnight',
+                       'FEDEX_2_DAY' => 'FedEx 2-Day',
+                       'FEDEX_EXPRESS_SAVER' => 'FedEx Express Saver',
                     );
 
 
+
     /** keys from the above that we are actually using in this implementation */
-    var $allowed_ship_types = array('1DA', '2DA', '3DS', 'GND', 'GNDCOM', 'GNDRES', 'XPR', 'XDM', 'XPD', 'STD', 'WXS');
-    //var $allowed_ship_types = array('1DM', '1DML', '1DA', '1DAL', '1DAPI', '1DP', '1DPL', '2DM', '2DML', '2DA', '2DAL', '3DS', 'GND', 'GNDCOM', 'GNDRES', 'STD', 'XPR', 'XPRL', 'XDM', 'XDML', 'XPD');
+    var $allowed_ship_types = array('FIRST_OVERNIGHT', 'PRIORITY_OVERNIGHT', 'STANDARD_OVERNIGHT', 'FEDEX_2_DAY', 'FEDEX_EXPRESS_SAVER');
 
-    var $_service_url = 'http://www.ups.com/using/services/rave/qcostcgi.cgi';
+    // location of FedEx RateService_v7.wsdl file, relative to this file location.
+    var $_path_to_wsdl = 'util/RateService_v7.wsdl';
 
-    var $_name = 'UPS';
+    var $_name = 'FedEx';
 
+
+    function set_cart(&$cart) {
+    }
 
 
     /** pulling in quotes from all avail types and putting into a nice array
      */
-    function get_all_quotes(&$cart, $adder=0) {
+    function get_all_quotes(cmCart $cart, $adder=0) {
         $res = array();
+
+        $this->_cart =& $cart;
 
         /* does this look like a PO Box? if so bail, with an error */
         if ($this->_dest['country'] == 'US' && preg_match('/^(P\.?O\.?\s*)?BOX\s+[0-9]+/i', $this->_dest['addr'])) {
-            return $this->raiseError('UPS cannot deliver to P.O. Boxes');
+            return $this->raiseError('FedEx cannot deliver to P.O. Boxes');
         }
 
-        $allquotes = $this->quote('GND');
+        $allquotes = $this->quote();
         if (!is_array($allquotes)) {
             $msg = $this->_name . ": Shipping calculation error! ";
             $msg .= (PEAR::isError($allquotes))? $allquotes->getMessage() : $allquotes;
@@ -78,176 +82,106 @@ class cmShipMethod_FedEx extends cmShipMethod {
 
 
     /* get a quote for the given type */
-    function quote($type) {
-        return $this->send_ups_query($type);
+    public function quote() {
+        $request = $this->_construct_fedex_request();
+        return $this->send_fedex_query($request);
     }
 
 
-
-    function _upsDest($postcode, $country){
-      $postcode = str_replace(' ', '', $postcode);
-
-      if ($country == 'US') {
-        $this->_upsDestPostalCode = substr($postcode, 0, 5);
-      } else {
-        $this->_upsDestPostalCode = $postcode;
-      }
-
-      $this->_upsDestCountryCode = $country;
-      return $this->_upsDestCountryCode;
+    /**
+     * build array that can be passed to the SoapClient per the API.
+     */
+    private function _construct_fedex_request() {
+        
+        $request = array();
+        $request['WebAuthenticationDetail'] = array('UserCredential' =>
+                                              array('Key' => $this->fedex_webauth_key, 'Password' => $this->fedex_webauth_password));
+        $request['ClientDetail'] = array('AccountNumber' => $this->fedex_account_number, 'MeterNumber' => $this->fedex_meter_number);
+        $request['TransactionDetail'] = array('CustomerTransactionId' => $this->_cart->get_id());
+        $request['Version'] = array('ServiceId' => 'crs', 'Major' => '7', 'Intermediate' => '0', 'Minor' => '0');
+        $request['RequestedShipment']['DropoffType'] = 'REGULAR_PICKUP'; // valid values REGULAR_PICKUP, REQUEST_COURIER, ...
+        // $request['RequestedShipment']['ShipTimestamp'] = date('c');
+        // Service Type and Packaging Type are not passed in the request
+        $request['RequestedShipment']['Shipper'] = array('Address' => array(
+                                                  #'StreetLines' => array('10 Fed Ex Pkwy'), // Origin details
+                                                  #'City' => 'Memphis',
+                                                  #'StateOrProvinceCode' => 'TN',
+                                                  'PostalCode' => CSHOP_SHIPPING_ORIGIN_ZIP,
+                                                  'CountryCode' => CSHOP_SHIPPING_ORIGIN_COUNTRY));
+        $request['RequestedShipment']['Recipient'] = array('Address' => array (
+                                                       'StreetLines' => array($this->_dest['addr']), // Destination details
+                                                       #'City' => $this->_dest['addr']'Herndon',
+                                                       #'StateOrProvinceCode' => $this->_dest['addr']'VA',
+                                                       'PostalCode' => $this->_dest['postcode'],
+                                                       'CountryCode' => $this->_dest['country']));
+        $request['RequestedShipment']['ShippingChargesPayment'] = array('PaymentType' => 'SENDER',
+                                                                'Payor' => array('AccountNumber' => $this->fedex_account_number,
+                                                                                 'CountryCode' => 'US'));
+        $request['RequestedShipment']['RateRequestTypes'] = 'ACCOUNT'; 
+        $request['RequestedShipment']['PackageCount'] = '1';// currently only one occurrence of RequestedPackage is supported
+        $request['RequestedShipment']['PackageDetail'] = 'INDIVIDUAL_PACKAGES';
+        $request['RequestedShipment']['RequestedPackageLineItems'] = array('0' => array('Weight' => array('Value' => $this->_weight, 'Units' => 'LB')));
+        return $request;
     }
 
-    function get_upsRate($foo) {
-      switch ($foo) {
-        case 'RDP':
-          $this->_upsRateCode = 'Regular+Daily+Pickup';
-          break;
-        case 'OCA':
-          $this->_upsRateCode = 'On+Call+Air';
-          break;
-        case 'OTP':
-          $this->_upsRateCode = 'One+Time+Pickup';
-          break;
-        case 'LC':
-          $this->_upsRateCode = 'Letter+Center';
-          break;
-        case 'CC':
-          $this->_upsRateCode = 'Customer+Counter';
-          break;
-      }
-      return $this->_upsRateCode;
-    }
 
-    function get_upsContainerCode($foo) {
-      switch ($foo) {
-        case 'CP': // Customer Packaging
-          $this->_upsContainerCode = '00';
-          break;
-        case 'ULE': // UPS Letter Envelope
-          $this->_upsContainerCode = '01';
-          break;
-        case 'UT': // UPS Tube
-          $this->_upsContainerCode = '03';
-          break;
-        case 'UEB': // UPS Express Box
-          $this->_upsContainerCode = '21';
-          break;
-        case 'UW25': // UPS Worldwide 25 kilo
-          $this->_upsContainerCode = '24';
-          break;
-        case 'UW10': // UPS Worldwide 10 kilo
-          $this->_upsContainerCode = '25';
-          break;
-      }
-      return $this->_upsContainerCode ;
-    }
+    /** sends a SOAP request to a FedEx server. see what happens */
+    function send_fedex_query($request) {
 
-    function get_upsRescom($foo) {
-      switch ($foo) {
-        case 'RES': // Residential Address
-          $this->_upsResComCode = '1';
-          break;
-        case 'COM': // Commercial Address
-          $this->_upsResComCode = '2';
-          break;
-      }
-      return $this->_upsResComCode ;
-    }
-
-    function _upsAction($action) {
-      /* 3 - Single Quote
-         4 - All Available Quotes */
-
-      $this->_upsActionCode = $action;
-    }
-
-    /** sends a GET request to a UPS server. see what happends */
-    function send_ups_query($product) {
         if ($this->debug) {
-            $log = "==\n".get_class($this) . "::send_ups_query()\n" . date('r');
+            $log = "==\n".get_class($this) . "::send_fedex_query()\n" . date('r');
             $log .= "\nIP: " . $_SERVER['REMOTE_ADDR'];
+            $log .= "\n". serialize($request);
             error_log($log, 3, $this->debug_log);
         }
-        if (!isset($this->_upsActionCode)) $this->_upsActionCode = '4';
-
-        $rescom = (!empty($this->_dest['company']) && !preg_match('/^(n\?a|none)$/i', $this->_dest['company']))? 'COM':'RES';
-
-        $params = array('accept_UPS_license_agreement' => 'yes',
-                        '10_action' => '4',
-                        '13_product' => $product,
-                        '14_origCountry' => $this->_origin['country'],
-                        '15_origPostal' => $this->_origin['postcode'],
-                        '19_destPostal' => $this->_dest['postcode'],
-                        '22_destCountry' => $this->_dest['country'],
-                        '23_weight' => $this->_weight,
-                        '47_rate_chart' => $this->get_upsRate('RDP'), // todo
-                        '48_container' => $this->get_upsContainerCode('CP'), // todo
-                        '49_residential' => $this->get_upsRescom($rescom),
-                        );
-        $request = '';
-        foreach ($params as $k => $v) {
-            $request .= urlencode($k) . '=' . urlencode($v) . '&';
-        }
-        if ($this->debug) {
-            error_log("\n== REQUEST to {$this->_service_url} ==\n$request", 3, $this->debug_log);
-        }
-
-          $http =& new HTTP_Request($this->_service_url . '?' . $request);
-
-          if (PEAR::isError($http->sendRequest())) {
-              return $http;
-          }
-          $res = $http->getResponseBody();
-          return $this->parse_response($res);
-    }
-
-
-    function parse_response($body) {
-            /*
-            UPSOnLine4%1DA%03801%US%99587%US%124%6%52.31%0.00%52.31%End of Day%
-            4%2DA%03801%US%99587%US%224%6%30.43%0.00%30.43%End of Day%
-            4%GND%03801%US%99587%US%044%6%23.84%0.00%23.84%End of Day%
-            */
-        if ($this->debug) {
-            error_log("\n== RESPONSE ==\n$body", 3, $this->debug_log);
-        }
-
-        $body_array = explode("\n", $body);
+ 
+        $wsdl = dirname(__FILE__) . '/' . $this->_path_to_wsdl;
+        $client = new SoapClient($wsdl, array('trace' => 1)); // http://us3.php.net/manual/en/ref.soap.php
 
         $quotes = array();
-        $err = null;
 
-        $n = sizeof($body_array);
-        for ($i=0; $i<$n; $i++) {
-            $result = explode('%', $body_array[$i]);
-            $errcode = substr($result[0], -1);
-            switch ($errcode) {
-                case 3:
-                case 4:
-                    $quotes[$result[1]] = $result[8];
-                    break;
-                case 5:
-                    $err = $result[1];
-                    break;
-                case 6:
-                    $quotes[$result[3]] = $result[10]; // wha hoppin?!
-                    break;
-            }
-        }
-        if (empty($quotes)) {
-            $msg = ($err)? $err : "Could not parse UPS Server response";
-            return $this->raiseError($msg);
-        }
-
+        $response = $client->getRates($request);
         if ($this->debug) {
-            $log = '';
-            foreach ($quotes as $k => $v) {
-                $log .= "$k => $v\n";
-            }
-            error_log("\n== QUOTES ==\n$log", 3, $this->debug_log);
+            $log = "\n". serialize($response);
+            error_log($log, 3, $this->debug_log);
+            error_log("\n{$response->HighestSeverity}\n", 3, $this->debug_log);
         }
 
-        return $quotes;
+        if ($response->HighestSeverity != 'FAILURE' && $response->HighestSeverity != 'ERROR') {
+            foreach ($response->RateReplyDetails as $rateReply) {           
+                $service = $rateReply->ServiceType;
+                foreach ($rateReply->RatedShipmentDetails as $detail) {
+                    $last_rate = null;
+                    if (isset($detail->ShipmentRateDetail)) {
+                        $rate = $detail->ShipmentRateDetail->TotalNetFedExCharge->Amount;
+                        /* fedex returns multiple rate detail objects for each method, but they are always identical (maybe) */
+                        if (!empty($last_rate) and $rate != $last_rate) {
+                            $msg = "got different rates for the same shipping method $service";
+                            trigger_error($msg, E_USER_WARNING);
+                            if ($this->debug) error_log("$msg\n", 3, $this->debug_log);
+                        }
+                        $last_rate = $rate;
+                    }
+                }
+                $quotes[$service] = $rate;
+            } 
+            return $quotes;
+        }
+        else {
+            if (is_object($response->Notifications)) {
+                $err = $response->Notifications->Severity . ' processing transaction: ' .  $response->Notifications->Message . ' ';
+            }
+            elseif (is_array($response->Notifications)) {
+                foreach ($response->Notifications as $notification) {           
+                    $err .= $notification->Message . ' ';
+                }
+            } 
+            if ($this->debug) error_log("$err\n", 3, $this->debug_log);
+            return $this->raiseError( $err );
+
+        }
+
     }
+
+
 }
-?>

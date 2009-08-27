@@ -63,7 +63,7 @@ $report = $prod->fetch_inventory_report($pid, $orby, $order_dir, $offset, $range
 
 
 /** list all cm_categories in one big ass dump using HTML_Table **/
-$table = new fu_HTML_Table(array('width'=>'90%', 'align'=>'center'));
+$table = new fu_HTML_Table(array('width'=>'90%', 'align'=>'center', 'style'=>'padding-top: 25px'));
 $table->setAutoGrow(true);
 $table->setAutoFill("-");
 

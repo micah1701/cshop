@@ -34,6 +34,9 @@
 
     var $adders = array();
 
+    /** narrow down available shipping methods returned by each api calculator (UPS, Fedex, etc) class=>(type,type2) */
+    var $allowed_ship_types = array();
+
     /**
      * setter for destination addr */
     function set_destination($addr) {
@@ -169,6 +172,10 @@
                 $sm = new $meth();
                 $sm->set_weight($cart->get_weight());
                 $sm->set_item_count($cart->count_item_qty());
+
+                if (isset ($this->allowed_ship_types[$meth])) {
+                    $sm->allowed_ship_types = $this->allowed_ship_types[$meth];
+                }
 
                 $cart_total = $cart->get_shipping_subtotal();
 

@@ -51,7 +51,7 @@ class cmShipMethod_UPS extends cmShipMethod {
 
     /** pulling in quotes from all avail types and putting into a nice array
      */
-    function get_all_quotes(&$cart, $adder=0) {
+    function get_all_quotes(cmCart $cart, $adder=0) {
         $res = array();
 
         /* does this look like a PO Box? if so bail, with an error */
