@@ -144,7 +144,10 @@
     }
 
     function get_tax_name() {
-        return $this->_tax_name;
+        if ($this->_matched_state)
+            return $this->_matched_state . ' ' . $this->_tax_name;
+        else
+            return $this->_tax_name;
     }
 
     function get_tax_code() {
