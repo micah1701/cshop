@@ -116,7 +116,14 @@ class cmPaymentGatewayANET_SIM extends cmPaymentGatewayANET {
         if ($cartitems = $this->_cart->fetch_items()) {
             $aNetVars["x_line_item"] = array();
             foreach ($cartitems as $item) {
-                $line = array($item['product_sku'], $item['product_descrip'], $item['product_descrip'], $item['qty'], $item['price'], 'Y');
+                if (strlen($item['product_descrip']) > 31) {
+                    $this->log('WARNING: cart line item details violate Authorize.net input limits');
+                }
+                $line = array( substr($item['product_sku'], 0, 31),
+                               substr($item['product_descrip'], 0, 31), 
+                               substr($item['product_descrip'], 0, 255), 
+                               $item['qty'], 
+                               $item['price'], 'Y');
                 $aNetVars["x_line_item"][] = join('<|>', $line);
             }
 
