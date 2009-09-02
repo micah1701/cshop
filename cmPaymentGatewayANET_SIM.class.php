@@ -25,7 +25,6 @@ class cmPaymentGatewayANET_SIM extends cmPaymentGatewayANET {
     var $_receipt_link_url = false;
     var $_relay_response_url = '/cart/anet_sim_notify.php';
 
-
     function __construct() {
         if ($this->_anet_login === '' && defined('CSHOP_PAYMENT_CONFIG_FILE')) {
             $this->_autoconfigure_from_file(CSHOP_PAYMENT_CONFIG_FILE);
@@ -136,7 +135,9 @@ class cmPaymentGatewayANET_SIM extends cmPaymentGatewayANET {
         
         //
         $aNetVars['x_fp_hash'] = $this->_calc_fingerprint($aNetVars['x_amount']);
-        return $this->vars_to_html($aNetVars);
+        $vars = $this->vars_to_html($aNetVars);
+        $this->log($vars, __METHOD__);
+        return $vars;
     }
 
     /** calculates the MD5 fingerprint hash for this transaction per A.net API
@@ -179,6 +180,13 @@ class cmPaymentGatewayANET_SIM extends cmPaymentGatewayANET {
      */
     function parse_response($res) {
 
+        if ($this->do_logging) {
+            $msg = "received in parse_response():\n";
+            foreach ($res as $k => $v) {
+                $msg .= "\t$k=>$v\n";
+            }
+            $this->log($msg, __METHOD__);
+        }
         if ($res['x_response_code'] == 1) {
             $this->set_trans_id($res['x_trans_id']);
             $this->set_auth_code($res['x_auth_code']);

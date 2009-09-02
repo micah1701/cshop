@@ -72,6 +72,9 @@ abstract class cmPaymentGateway extends PEAR {
     /** does this gateway allow transactions based on the original payment info, from the admin console (A.net) */
     var $enable_admin_transactions = true;
 
+    /** keep a log of things in CSHOP_LOG_FILE */
+    var $do_logging = false;
+
     function cmPaymentGateway(&$user, &$pay, &$order) {
         $this->_user =& $user;
         $this->_payment =& $pay;
@@ -245,6 +248,14 @@ abstract class cmPaymentGateway extends PEAR {
     }
 
     function get_transaction_options() { }
+
+
+    function log($msg, $method='unknown') {
+        if ($this->do_logging and defined('CSHOP_LOG_FILE')) {
+            $byline = "\n===\n" . get_class($this) . "::$method() - " . date('r') . " [" . $_SERVER['REMOTE_ADDR'] . "]\n";
+            error_log($byline . trim($msg) . "\n", 3, CSHOP_LOG_FILE);
+        }
+    }
 
 
 }
