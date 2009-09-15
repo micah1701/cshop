@@ -25,7 +25,7 @@
         $class = __CLASS__;
         $inst_name = "_INSTANCE_" . strtoupper($class);
         if (isset($_SESSION)) {
-            if (!isset($_SESSION[$inst_name])) {
+            if (!isset($_SESSION[$inst_name]) or strtoupper(get_class($_SESSION[$inst_name])) != strtoupper($class)) {
                 $_SESSION[$inst_name] =& new $class();
             }
             return $_SESSION[$inst_name];
