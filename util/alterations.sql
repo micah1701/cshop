@@ -306,3 +306,8 @@ ALTER TABLE cm_order_transactions ADD trans_auth_code varchar(15) AFTER trans_id
 ALTER TABLE cm_order_transactions ADD trans_result_msg varchar(255) AFTER trans_result;
 UPDATE cm_order_transactions SET trans_result_msg = SUBSTRING(trans_result FROM LOCATE(':', trans_result)+1), stamp=stamp;
 UPDATE cm_order_transactions SET trans_result = TRIM(SUBSTRING(trans_result, 1, LOCATE(':', trans_result)-1)), stamp=stamp;
+
+
+-- Fri Sep 18 19:27:04 EDT 2009
+ALTER TABLE cm_cart MODIFY user_id int unsigned default NULL;
+

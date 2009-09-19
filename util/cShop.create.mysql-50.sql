@@ -99,7 +99,7 @@ CREATE TABLE `cm_address_book_seq` (
 DROP TABLE IF EXISTS `cm_cart`;
 CREATE TABLE `cm_cart` (
   `id` int(10) unsigned NOT NULL default '0',
-  `user_id` int(10) unsigned NOT NULL default '0',
+  `user_id` int(10) unsigned default NULL,
   `ship_total` double(9,2) NOT NULL default '0.00',
   `ship_method` varchar(64) NOT NULL default '',
   `tax_total` double(9,2) NOT NULL default '0.00',

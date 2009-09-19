@@ -12,15 +12,23 @@ class cmPaymentGatewayANET_SIM extends cmPaymentGatewayANET {
     /** A.net transaction key
      @protected */
     #var $_anet_key = '48V258vr55AE8tcg'; # test
+     
+    /** A.net transaction key
+     @protected */
+    #var $_anet_md5 = 'littlebunnyfoofoo'; # test
 
     /** whether we do md5 checks or not
      @protected */
+    /* TODO - get this to work. Refuses to cooperate on test account For 
+     * current implementation not 100% needed as attacker would have to guess a 
+     * correct cart_token (random) and matching user_id (sequntial) */
     var $_do_md5_check = false;
 
     var $_mode_AIM = false;
 
-    # var $_transact_url = 'https://test.authorize.net/gateway/transact.dll'; # test
     var $_transact_url = "https://secure.authorize.net/gateway/transact.dll";
+
+    var $_transact_url_test = 'https://test.authorize.net/gateway/transact.dll';  # test
 
     var $_receipt_link_url = false;
     var $_relay_response_url = '/cart/anet_sim_notify.php';
@@ -28,6 +36,9 @@ class cmPaymentGatewayANET_SIM extends cmPaymentGatewayANET {
     function __construct() {
         if ($this->_anet_login === '' && defined('CSHOP_PAYMENT_CONFIG_FILE')) {
             $this->_autoconfigure_from_file(CSHOP_PAYMENT_CONFIG_FILE);
+        }
+        if (CSHOP_PAYMENT_TESTMODE) {
+            $this->_transact_url  = $this->_transact_url_test;
         }
     }
 
@@ -194,17 +205,28 @@ class cmPaymentGatewayANET_SIM extends cmPaymentGatewayANET {
             }
             $this->log($msg, __METHOD__);
         }
-        if ($res['x_response_code'] == 1) {
+        if ($res['x_response_code'] == "1") {
+            $this->_trans_result = 'APPROVED';
             $this->set_trans_id($res['x_trans_id']);
             $this->set_auth_code($res['x_auth_code']);
-            $this->_trans_result = 'APPROVED';
             $this->_trans_type = $res['x_type'];
             $this->_trans_amount = $res['x_amount'];
-            $this->_trans_response = serialize($res);
-            $this->set_avs_result_flags($res['x_avs_code']);
-            $this->set_csc_result_flags($res['x_cvv2_resp_code'], $res['x_cavv_response']);
         }
+        elseif ($res['x_response_code'] == "2") {
+            $this->_trans_result = 'DECLINED';
+        }
+        elseif ($res['x_response_code'] == "3") {
+            $this->_trans_result = 'ERROR';
+        }
+        elseif ($res['x_response_code'] == "4") {
+            $this->_trans_result = 'HELD FOR REVIEW';
+        }
+        $this->_trans_response = serialize($res);
+        if (!empty($res['x_avs_code'])) $this->set_avs_result_flags($res['x_avs_code']);
+        if (!empty($res['x_cvv2_resp_code'])) $this->set_csc_result_flags($res['x_cvv2_resp_code'], $res['x_cavv_response']);
+        $this->_trans_result_msg = $res['x_response_reason_text'];
 
+        return ($res['x_response_code'] == "1");
     }
 
 
@@ -214,8 +236,11 @@ class cmPaymentGatewayANET_SIM extends cmPaymentGatewayANET {
         }
         else {
             if ($res['x_MD5_Hash']) {
-                $str = $this->_anet_md5 . $this->_anet_login . $res['x_trans_id'] . number_format($res['x_amount'], 2);
-                return strtolower(md5($str)) == strtolower($res['x_MD5_Hash']);
+                $str = $this->_anet_md5 . $this->_anet_login . $res['x_trans_id']  . number_format($res['x_amount'], 2);
+                $hash = md5($str);
+                $this->log("MD5 check: $str / $hash", __METHOD__);
+                return strtolower($hash) == strtolower($res['x_MD5_Hash']);
+
             }
 
         }

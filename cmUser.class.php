@@ -73,9 +73,8 @@ class cmUser extends db_container {
         }
         else {
             if (empty($_SESSION[$this->_sesskey])) {
-                // get next id from the this table sequence and lets use that
-                $uid = $this->db->nextId($this->get_table_name());
-                $_SESSION[$this->_sesskey] = $uid;
+                // generate random unique temp user id, that never actually gets saved anyway
+                $_SESSION[$this->_sesskey] = 'ANON-'.uniqid(mt_rand(), true);
             }
             return $_SESSION[$this->_sesskey];
         }

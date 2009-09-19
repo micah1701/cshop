@@ -139,8 +139,7 @@ class cmCart extends db_container {
      * @return id of new row
      */
     function create_stub() {
-        $this->store(array('user_id'=>$this->get_user_id(),
-                           'create_date'=>$this->db->getOne('select now()')));
+        $this->store(array('user_id'=>NULL, 'create_date'=>$this->db->getOne('select now()')));
         return $this->get_id();
     }
 
@@ -151,8 +150,7 @@ class cmCart extends db_container {
      * @return int a user id
      */
     function get_user_id() {
-        $c = CSHOP_CLASSES_USER;
-        $user = new $c($this->db);
+        $user = cmClassFactory::getSingletonOf(CSHOP_CLASSES_USER, $this->db);
         return $user->get_auth_id();
     }
 
@@ -163,8 +161,11 @@ class cmCart extends db_container {
      * @todo actually merge with any cart they have leftover from previous login
      */
     function merge_user($uid) {
-        $cid = $this->get_id();
-        return $this->store(array('user_id'=>$uid));
+        if (!empty($uid) && is_numeric($uid) && (!isset($this->header['user_id']) || $this->header['user_id'] != $uid)) {
+            if ($cid = $this->get_id()) {
+                return $this->store(array('user_id'=>$uid));
+            }
+        }
     }
 
 
