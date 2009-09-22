@@ -211,12 +211,6 @@ if ($ACTION == OP_VIEW) {
 
     $orderitems = $order->fetch_items();
 
-    foreach ($orderitems as $oi) {
-        if (isset($oi['product_attribs']['design_url'])) {
-            $smarty->assign('has_custom_designs', true);
-            break;
-        }
-    }
     $smarty->assign('orderinfo', $orderinfo);
     $smarty->assign('suppress_update', true);
 

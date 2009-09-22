@@ -178,8 +178,7 @@ class cmCart extends db_container {
      * @return true on success, error if no find it
      */
      function add_item($pid, $qty, $attribs=array(), $options=array()) {
-         $pc_class = $this->_product_container_class;
-         $pctr =& new $pc_class($this->db);
+         $pctr =& cmClassFactory::getSingletonOf($this->_product_container_class, $this->db);
          $pctr->set_id($pid);
          $product_price = $pctr->fetch_baseprice();
 

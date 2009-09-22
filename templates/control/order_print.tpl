@@ -187,7 +187,7 @@
     <div style="text-align: left; border-bottom: 1px solid #555">
         <h3>ORDER ITEMS</h3>
         <div class="orderItems">
-        <~ include file="float:cart_contents.tpl" suppress_update=1 ~>
+        <~ include file="cart/cart_contents.tpl" suppress_update=1 ~>
         </div>
     </div>
     </td>
