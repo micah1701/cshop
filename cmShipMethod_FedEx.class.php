@@ -11,8 +11,8 @@ ini_set("soap.wsdl_cache_enabled", "0");
 class cmShipMethod_FedEx extends cmShipMethod {
 
     /** will log API transactions to debug_log file */
-    var $debug = false;
-    var $debug_log = '/tmp/cmShipMethod_FedEx.log';
+    var $debug = true;
+    var $debug_log = CSHOP_LOG_FILE;
     var $test_mode = CSHOP_FEDEX_TEST_MODE;
 
     /** live **/
@@ -66,7 +66,7 @@ class cmShipMethod_FedEx extends cmShipMethod {
 
         $allquotes = $this->quote();
         if (!is_array($allquotes)) {
-            $msg = $this->_name . ": Shipping calculation error! ";
+            $msg = $this->_name . ": Shipping calculation error >> ";
             $msg .= (PEAR::isError($allquotes))? $allquotes->getMessage() : $allquotes;
             return $this->raiseError($msg);
         }
@@ -130,9 +130,8 @@ class cmShipMethod_FedEx extends cmShipMethod {
     function send_fedex_query($request) {
 
         if ($this->debug) {
-            $log = "==\n".get_class($this) . "::send_fedex_query()\n" . date('r');
+            $log = "\n\n==\n".get_class($this) . "::send_fedex_query()\n" . date('r');
             $log .= "\nIP: " . $_SERVER['REMOTE_ADDR'];
-            $log .= "\n". serialize($request);
             error_log($log, 3, $this->debug_log);
         }
  
@@ -140,15 +139,27 @@ class cmShipMethod_FedEx extends cmShipMethod {
         if ($this->test_mode) // testing version wsql hacked in, has a one-line difference
             $wsdl = preg_replace('/\.wsdl$/', '-testing.wsdl', $wsdl);
 
-        $client = new SoapClient($wsdl, array('trace' => 1)); // http://us3.php.net/manual/en/ref.soap.php
+        $client = new SoapClient($wsdl, array('trace' => $this->debug)); // http://us3.php.net/manual/en/ref.soap.php
 
         $quotes = array();
 
-        $response = $client->getRates($request);
+        try {
+            $response = $client->getRates($request);
+        } catch (SoapFault $e) {
+            if ($this->debug) {
+                $log = "\n\n==== EXCEPTION CAUGHT : SoapFault Exception ====\n";
+                $log .= "====REQUEST====: \n".$client->__getLastRequestHeaders(). "\n";
+                $log .= $client->__getLastRequest(). "\n\n";
+                $log .= "====RESPONSE===: \n".$client->__getLastResponseHeaders(). "\n";
+                $log .= $client->__getLastResponse(). "\n\n";
+                error_log($log, 3, $this->debug_log);
+            }
+            return $this->raiseError( $e->getMessage() );
+        }
         if ($this->debug) {
-            $log = "\n". serialize($response);
+            $log = "\n====REQUEST==== \n".$client->__getLastRequest(). "\n\n";
             error_log($log, 3, $this->debug_log);
-            error_log("\n{$response->HighestSeverity}\n", 3, $this->debug_log);
+            error_log("\nHighestSeverity: {$response->HighestSeverity}\n", 3, $this->debug_log);
         }
 
         if ($response->HighestSeverity == 'SUCCESS') {
@@ -183,7 +194,12 @@ class cmShipMethod_FedEx extends cmShipMethod {
                     $err .= $notification->Message . ' ';
                 }
             } 
-            if ($this->debug) error_log("$err\n", 3, $this->debug_log);
+            if ($this->debug) {
+                error_log("Notification: $err\n", 3, $this->debug_log);
+                $log = "====RESPONSE===: \n".$client->__getLastResponse(). "\n";
+                $log .= $client->__getLastResponse(). "\n\n";
+                error_log($log, 3, $this->debug_log);
+            }
             return $this->raiseError( $err );
 
         }
