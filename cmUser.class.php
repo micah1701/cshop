@@ -295,7 +295,7 @@ class cmUser extends db_container {
         $site = SITE_DOMAIN_NAME;
         $user = $this->fetch();
         $mash = $user['token'];
-        $recip = sprintf('%s %s <%s>', $user['fname'], $user['lname'], $user['email']);
+        $recip = sprintf('%s <%s>', $this->get_full_name(), $user['email']);
         $bcc = $this->order_confirm_bcc;
         $link = sprintf('http://%s'.CSHOP_PASS_RECOVER_LINK_FMT,  
                         $_SERVER['HTTP_HOST'], 
@@ -386,6 +386,17 @@ EOM;
             $items[] = $row;
         }
         return $items;
+    }
+
+
+    /**
+      * return the user's full name. 
+     */
+    function get_full_name() {
+        if ($this->_id && empty($this->header['fname'])) {
+            $this->fetch(array('fname', 'lname'));
+        }
+        return sprintf('%s %s', $this->header['fname'], $this->header['lname']);
     }
 
 }
