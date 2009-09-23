@@ -15,14 +15,11 @@ class cmPaymentGatewayANET_SIM extends cmPaymentGatewayANET {
      
     /** A.net transaction key
      @protected */
-    #var $_anet_md5 = 'littlebunnyfoofoo'; # test
+    #var $_anet_md5 = ''; # test
 
     /** whether we do md5 checks or not
      @protected */
-    /* TODO - get this to work. Refuses to cooperate on test account For 
-     * current implementation not 100% needed as attacker would have to guess a 
-     * correct cart_token (random) and matching user_id (sequntial) */
-    var $_do_md5_check = false;
+    var $_do_md5_check = true;
 
     var $_mode_AIM = false;
 
