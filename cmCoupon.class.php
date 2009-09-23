@@ -42,7 +42,7 @@ class cmCoupon extends db_container {
                         );
 
     var $colmap_help = array('code' => 'Enter any desired combination of numbers and letters, up to 10 characters. Must be unique',
-                             'descrip' => 'Optional description of the coupon/discount. Will be shown to users',
+                             'descrip' => 'Description of the coupon/discount. Will be shown to customers in the cart and order detail pages. Required',
                              'percent_off' => 'Percentage to deduct from subtotal',
                              'amt_off' => 'Fixed amount to deduct from subtotal',
                              'is_active' => 'Check to activate this discount code for use',
