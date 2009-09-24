@@ -31,7 +31,7 @@
       <div id="chkConfirmOrderHeader">
         <h2 class="checkoutSectionHeader">Order Information</h2>
         <div class="orderHeader"><span>Order ID:</span> <~ $orderinfo.order_token ~></div>
-        <div class="orderHeader"><span>Order Date:</span> <~ $orderinfo.order_create_date|date_format:"%A, %B %e, %Y %I:%M %p" ~></div>
+        <div class="orderHeader"><span>Order Date:</span> <~ $orderinfo.order_create_date|date_format:$smarty.const.CSHOP_DATE_FMT_DISPLAY ~></div>
             <div class="orderHeader"><span>Order Status:</span> <~ $order_status ~></div>
         <~ if $orderinfo.cc_type ~>
           <div class="orderHeader"><span>Payment Method:</span> <~ $orderinfo.cc_type ~> <~ $orderinfo.cc_number ~></div>
@@ -76,7 +76,7 @@
               <~ foreach from=$history item=h ~>
                 <~ if $h.user_notify ~>
                     <tr>
-                      <td><~ $h.stamp|date_format:"%e %b %Y %I:%M %p" ~></td>
+                      <td><~ $h.stamp|date_format:$smarty.const.CSHOP_DATE_FMT_DISPLAY ~></td>
                       <td><~ $h.order_status ~></td>
                       <td><~ $h.comments|escape:"html" ~>&nbsp;</td>
                     </tr>

@@ -17,7 +17,7 @@
  * 1.5.0 : 2008/02/05 new INFINITE CATS (for EXR) - NOT BC
  * 1.4 : 2008/01/15 control product tabs re-done w jQuery; add cmCategory::get_featured_products()
  */
-define ('CSHOP_VERSION', '1.5.3');
+define ('CSHOP_VERSION', '1.5.4');
 
 define ('CSHOP_CLASSES_ADDRESSBOOK', 'cmAddressBook');
 define ('CSHOP_CLASSES_USER', 'cmUser');
@@ -43,6 +43,16 @@ define ('CSHOP_CLASSES_AUTH_SESSION', 'jen_Session');
 define ('CSHOP_MEDIA_URLPATH', '/.uploads/cshop');
 define ('CSHOP_MEDIA_FULLPATH', SITE_ROOT_DIR . '/web' . CSHOP_MEDIA_URLPATH);
 
+# cmPaymentGatewayANET* keeps a log here.
+define('CSHOP_LOG_FILE', CSHOP_MEDIA_FULLPATH . '/cshop.log');
+
+/** time zone identifier to make sure all timestamps are saved 
+ * with this offset built in, adjusted for DST. And PHP to use it for display purposes. */
+define ('CSHOP_DISPLAY_TZ', 'US/Eastern');
+
+/* * date format for smarty usage */
+define ('CSHOP_DATE_FMT_DISPLAY', '%e %b %Y %R %Z');
+
 /** use ON_LIVE_SERVER to determine if testmode. */
 define('CSHOP_PAYMENT_TESTMODE', !(ON_LIVE_SERVER));
 
@@ -63,6 +73,12 @@ define('CSHOP_SHIPPING_FREESHIP_THRESHOLD', 0);
 
 /* fetch and show any related products in cart? if non-false, use integer to limit # of results */
 define('CSHOP_SHOW_RELATED_PRODUCTS_IN_CART', false);
+
+/* fetch and show thumbnail images and descriptions for all products in the cart view? */
+define('CSHOP_SHOW_PRODUCT_THUMBNAILS_IN_CART', false);
+
+/* fetch complete list of categories in cart (for navigation or otherwise) */
+define('CSHOP_SHOW_CART_CATEGORIES', false);
 
 /* should the Cart obj check inventory levels before adding items to cart and placing orders? */
 define('CSHOP_DO_INVENTORY_CHECK', true);
