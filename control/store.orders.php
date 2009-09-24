@@ -311,7 +311,7 @@ else {
     /** **/
 
     /** decide how to order the results */
-    $orderable = array('id','order_create_date', 'email', 'orders_status', 'amt_quoted', 'ship_date');
+    $orderable = array('id', 'orderdate', 'order_create_date', 'email', 'orders_status', 'amt_quoted', 'ship_date');
     if (isset($_GET['by']) and in_array($_GET['by'], $orderable)) {
         $orby = $_GET['by'];
         $orderdir = (isset($_GET['dir']) and $_GET['dir'] == 'D')? 'DESC' : 'ASC';
@@ -345,11 +345,11 @@ else {
     }
     /** **/
 
-    $cols = array('cust_name','company','email','order_create_date', 'orders_status', 'currency', 'ship_date', 'amt_quoted','order_token');
+    $cols = array('cust_name','company','email','DATE_FORMAT(order_create_date, \'%d %b %Y\') AS orderdate','order_create_date', 'orders_status', 'currency', 'ship_date', 'amt_quoted','order_token');
     if (defined('CSHOP_ALLOW_ANON_ACCOUNT')) {
         $cols[] = 'anon_email';
     }
-    $header_row = array('id'=>'Order ID','order_token'=>'Order Number','email'=>'User', 'orders_status'=>'Status', 'order_create_date'=>'Order Date', 'amt_quoted'=>'Total', 'ship_date'=>'Ship Date');
+    $header_row = array('id'=>'Order ID','order_token'=>'Order Number','email'=>'User', 'orders_status'=>'Status', 'orderdate'=>'Order Date', 'amt_quoted'=>'Total', 'ship_date'=>'Ship Date');
 
     if ($orders = $order->fetch_any($cols, $offset, $range, $orby, $where, $orderdir)) {
         
@@ -368,7 +368,7 @@ else {
                           $o['order_token'],
                           "$name &lt;{$email}&gt;",
                           $order->statuses[$o['orders_status']],
-                          $o['order_create_date'],
+                          $o['orderdate'],
                           $o['amt_quoted'],
                           $o['ship_date']);
             $link = sprintf('%s?%s=%s',

@@ -338,6 +338,7 @@ class cmOrder extends db_container {
          $vals = array('order_id' => $this->get_id(),
                        'order_status' => $this->get_status(),
                        'user_notify' => $do_notify,
+                       'stamp' => date('Y-m-d H:i:s'),
                        'comments' => $comment);
 
          $hist = db_container::factory($this->db, $this->_history_table);
@@ -576,6 +577,7 @@ class cmOrder extends db_container {
                       'verify_addr' => $gate->get_avs_result('addr'),
                       'verify_international' => $gate->get_avs_result('intl'),
                       'verify_csc' => $gate->get_csc_result(),
+                      'stamp' => date('Y-m-d H:i:s'),
                       'has_avs_result' => ($gate->does_AVS && $gate->avs_result_flags != null));
         return $th->store($vals);
     }
@@ -591,7 +593,7 @@ class cmOrder extends db_container {
         $oid = $this->get_id();
         $where = "cm_orders_id = $oid";
         $th = db_container::factory($this->db, $this->_transaction_history_table);
-        if (!$cols) $cols = array('id','UNIX_TIMESTAMP(stamp) AS stamp','trans_type','trans_id','trans_result','trans_result_msg','trans_amount', 'has_avs_result',
+        if (!$cols) $cols = array('id','stamp','trans_type','trans_id','trans_result','trans_result_msg','trans_amount', 'has_avs_result',
                                   'is_voided', 'verify_addr', 'verify_zip', 'verify_name', 'verify_international','verify_csc');
         return $th->fetch_any($cols, 0, 0, 'stamp', $where, 'DESC');
     }

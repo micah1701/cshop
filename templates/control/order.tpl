@@ -24,7 +24,7 @@
             <strong>Submitted on:</strong>
           </td>
           <td>
-            <~ $orderinfo.order_create_date|date_format:"%c" ~>
+              <~ $orderinfo.order_create_date|date_format:$smarty.const.CSHOP_DATE_FMT_DISPLAY ~>
           </td>
         </tr>
         <tr>
@@ -82,7 +82,7 @@
             <strong>Ship Date:</strong>
           </td>
           <td>
-            <~ $orderinfo.ship_date|date_format ~><br />
+            <~ $orderinfo.ship_date|date_format:$smarty.const.CSHOP_DATE_FMT_DISPLAY  ~><br />
           </td>
         </tr>
   <~ else ~>
@@ -101,7 +101,7 @@
             <strong>Delivery Date:</strong>
           </td>
           <td>
-            <~ $orderinfo.delivery_date|date_format ~>
+            <~ $orderinfo.delivery_date|date_format:$smarty.const.CSHOP_DATE_FMT_DISPLAY  ~>
           </td>
         </tr>
   <~/if ~>
@@ -179,7 +179,7 @@
       <~ foreach from=$history item=h ~>
         <~ cycle assign=bg values=#e0e0e0,#e8e8e8 ~>
         <tr style="background: <~ $bg ~>">
-          <td><~ $h.stamp|date_format:"%e %b %Y %I:%M %p" ~></td>
+          <td><~ $h.stamp|date_format:$smarty.const.CSHOP_DATE_FMT_DISPLAY ~></td>
           <td align="center"><~ if $h.user_notify ~><img src="/control/cshop/img/tick.gif" /><~else~><img src="/control/cshop/img/cross.gif" /><~/if~></td>
           <td><~ $h.order_status ~></td>
         </tr>
@@ -331,7 +331,7 @@
               <~ $trans.trans_type ~>
           </td>
           <td valign="top">
-              <~ $trans.stamp|date_format:"%e %b %y %H:%M:%S" ~>
+              <~ $trans.stamp|date_format:$smarty.const.CSHOP_DATE_FMT_DISPLAY ~>
           </td>
           <td valign="top">
               <~ $trans.trans_id ~>

@@ -48,7 +48,7 @@
             <strong>Submitted on:</strong>
           </td>
           <td>
-            <~ $orderinfo.order_create_date|date_format:"%b %e, %Y %I:%M %p" ~>
+            <~ $orderinfo.order_create_date|date_format:$smarty.const.CSHOP_DATE_FMT_DISPLAY ~>
           </td>
         </tr>
         <tr>
@@ -106,7 +106,7 @@
             <strong>Ship Date:</strong>
           </td>
           <td>
-            <~ $orderinfo.ship_date|date_format ~><br />
+            <~ $orderinfo.ship_date|date_format:$smarty.const.CSHOP_DATE_FMT_DISPLAY ~><br />
           </td>
         </tr>
   <~/if ~>
@@ -116,7 +116,7 @@
             <strong>Delivery Date:</strong>
           </td>
           <td>
-            <~ $orderinfo.delivery_date|date_format ~>
+            <~ $orderinfo.delivery_date|date_format:$smarty.const.CSHOP_DATE_FMT_DISPLAY ~>
           </td>
         </tr>
   <~/if ~>
@@ -209,7 +209,7 @@
               <~ foreach from=$history item=h ~>
                 <~ if $h.user_notify ~>
                     <tr>
-                      <td><~ $h.stamp|date_format:"%e %b %Y %I:%M %p" ~></td>
+                      <td><~ $h.stamp|date_format:$smarty.const.CSHOP_DATE_FMT_DISPLAY ~></td>
                       <td><~ $h.order_status ~></td>
                       <td><~ $h.comments|escape:"html" ~>&nbsp;</td>
                     </tr>

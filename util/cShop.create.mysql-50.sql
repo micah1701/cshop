@@ -390,54 +390,6 @@ CREATE TABLE `cm_media_files` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `cm_news`
---
-
-DROP TABLE IF EXISTS `cm_news`;
-CREATE TABLE `cm_news` (
-  `id` int(11) NOT NULL default '0',
-  `title` varchar(255) NOT NULL default '',
-  `body` text,
-  `caption` varchar(255) NOT NULL default '',
-  `img_system_path` varchar(255) default NULL,
-  `img_basename` varchar(90) default NULL,
-  `img_dims` varchar(63) default NULL,
-  `date` date NOT NULL default '0000-00-00',
-  `active` tinyint(1) default NULL,
-  `stamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='functional news table';
-
---
--- Table structure for table `cm_news_pics`
---
-
-DROP TABLE IF EXISTS `cm_news_pics`;
-CREATE TABLE `cm_news_pics` (
-  `id` int(11) NOT NULL default '0',
-  `newsid` int(11) NOT NULL default '0',
-  `system_path` varchar(255) default NULL,
-  `filename` varchar(255) default NULL,
-  `img_dims` varchar(90) default NULL,
-  `filename_thumb` varchar(255) default NULL,
-  `img_dims_thumb` varchar(90) default NULL,
-  `stamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `order_weight` int(9) NOT NULL default '0',
-  `caption` varchar(255) default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `ix_xid` (`newsid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `cm_news_seq`
---
-
-DROP TABLE IF EXISTS `cm_news_seq`;
-CREATE TABLE `cm_news_seq` (
-  `id` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Table structure for table `cm_order_history`
@@ -448,7 +400,7 @@ CREATE TABLE `cm_order_history` (
   `id` int(10) unsigned NOT NULL default '0',
   `order_id` int(10) unsigned NOT NULL default '0',
   `order_status` varchar(32) NOT NULL default '',
-  `stamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `stamp` datetime NOT NULL,
   `user_notify` tinyint(1) default NULL,
   `comments` varchar(255) default NULL,
   PRIMARY KEY  (`id`),
@@ -527,7 +479,7 @@ CREATE TABLE `cm_order_transactions` (
   `id` int(10) unsigned NOT NULL default '0',
   `cm_orders_id` int(10) unsigned NOT NULL default '0',
   `user_id` int(10) unsigned default NULL,
-  `stamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `stamp` datetime NOT NULL,
   `trans_type` varchar(32) NOT NULL default '',
   `trans_result` varchar(255) default NULL,
   `trans_amount` double(9,2) default NULL,
@@ -945,154 +897,6 @@ CREATE TABLE `cm_sizes_seq` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Table structure for table `netjet_gift_order_history`
---
-
-DROP TABLE IF EXISTS `netjet_gift_order_history`;
-CREATE TABLE `netjet_gift_order_history` (
-  `id` int(10) unsigned NOT NULL default '0',
-  `order_id` int(10) unsigned NOT NULL default '0',
-  `order_status` varchar(32) NOT NULL default '',
-  `stamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `user_notify` tinyint(1) default NULL,
-  `comments` varchar(255) default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `ix_oid` (`order_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `netjet_gift_order_history_seq`
---
-
-DROP TABLE IF EXISTS `netjet_gift_order_history_seq`;
-CREATE TABLE `netjet_gift_order_history_seq` (
-  `id` int(10) unsigned NOT NULL auto_increment,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=56 DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `netjet_gift_order_items`
---
-
-DROP TABLE IF EXISTS `netjet_gift_order_items`;
-CREATE TABLE `netjet_gift_order_items` (
-  `id` int(10) unsigned NOT NULL default '0',
-  `order_id` int(10) unsigned NOT NULL default '0',
-  `product_id` int(10) unsigned NOT NULL default '0',
-  `inventory_id` int(10) unsigned NOT NULL default '0',
-  `stock_status` int(1) NOT NULL default '1',
-  `qty` int(11) NOT NULL default '0',
-  `price` double(9,2) NOT NULL default '0.00',
-  `discount` double(9,2) NOT NULL default '0.00',
-  `tax` double(7,4) NOT NULL default '0.0000',
-  `product_sku` varchar(64) default NULL,
-  `product_descrip` varchar(255) default NULL,
-  `product_attribs` text,
-  `normalized_attribs` text,
-  `has_item_options` tinyint(1) default NULL,
-  `backorder_qty` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`id`),
-  KEY `ix_oid` (`order_id`),
-  KEY `ix_pid` (`product_id`),
-  KEY `ix_iid` (`inventory_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `netjet_gift_order_items_seq`
---
-
-DROP TABLE IF EXISTS `netjet_gift_order_items_seq`;
-CREATE TABLE `netjet_gift_order_items_seq` (
-  `id` int(10) unsigned NOT NULL auto_increment,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=33 DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `netjet_gift_orders`
---
-
-DROP TABLE IF EXISTS `netjet_gift_orders`;
-CREATE TABLE `netjet_gift_orders` (
-  `id` int(11) NOT NULL default '0',
-  `user_id` int(11) NOT NULL default '0',
-  `cart_id` int(10) unsigned default NULL,
-  `billing_name` varchar(255) NOT NULL default '',
-  `billing_company` varchar(32) default NULL,
-  `billing_street_addr` varchar(127) NOT NULL default '',
-  `billing_addr2` varchar(127) default NULL,
-  `billing_city` varchar(64) NOT NULL default '',
-  `billing_state` varchar(64) default NULL,
-  `billing_postcode` varchar(16) NOT NULL default '',
-  `billing_country` varchar(32) NOT NULL default '',
-  `billing_addr_format_id` int(5) NOT NULL default '0',
-  `billing_addr_code` varchar(8) default NULL,
-  `billing_fax` varchar(64) default NULL,
-  `billing_phone` varchar(64) default NULL,
-  `billing_email` varchar(128) default NULL,
-  `shipping_name` varchar(255) NOT NULL default '',
-  `shipping_company` varchar(32) default NULL,
-  `shipping_street_addr` varchar(127) NOT NULL default '',
-  `shipping_addr2` varchar(127) default NULL,
-  `shipping_city` varchar(64) NOT NULL default '',
-  `shipping_state` varchar(64) default NULL,
-  `shipping_postcode` varchar(16) NOT NULL default '',
-  `shipping_country` varchar(32) NOT NULL default '',
-  `shipping_addr_format_id` int(5) NOT NULL default '0',
-  `shipping_addr_code` varchar(8) default NULL,
-  `shipping_fax` varchar(64) default NULL,
-  `shipping_phone` varchar(64) default NULL,
-  `shipping_email` varchar(128) default NULL,
-  `payment_method` varchar(32) NOT NULL default '',
-  `ship_total` double(15,2) NOT NULL default '0.00',
-  `ship_method_id` int(10) unsigned default NULL,
-  `ship_method` varchar(64) default NULL,
-  `order_create_date` datetime default NULL,
-  `last_modified` datetime default NULL,
-  `orders_status` int(5) NOT NULL default '0',
-  `orders_date_finished` datetime default NULL,
-  `currency` char(3) default NULL,
-  `currency_value` decimal(14,6) default NULL,
-  `coupon_code` varchar(10) default NULL,
-  `tracking_no` varchar(255) default NULL,
-  `ship_date` varchar(63) default NULL,
-  `delivery_date` varchar(63) default NULL,
-  `amt_quoted` decimal(15,2) NOT NULL default '0.00',
-  `amt_billed_to_date` decimal(15,2) NOT NULL default '0.00',
-  `order_token` varchar(32) default NULL,
-  `discount_descrip` varchar(32) default NULL,
-  `tax_total` double(15,2) NOT NULL default '0.00',
-  `is_gift` tinyint(1) default NULL,
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `uq_tok` (`order_token`),
-  KEY `ix_uid` (`user_id`),
-  KEY `ix_shp` (`ship_method_id`),
-  KEY `ix_cid` (`cart_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `netjet_gift_orders_seq`
---
-
-DROP TABLE IF EXISTS `netjet_gift_orders_seq`;
-CREATE TABLE `netjet_gift_orders_seq` (
-  `id` int(10) unsigned NOT NULL auto_increment,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=58 DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `nj_gift_codes`
---
-
-DROP TABLE IF EXISTS `nj_gift_codes`;
-CREATE TABLE `nj_gift_codes` (
-  `code` char(7) NOT NULL,
-  `gift_class` varchar(15) default NULL,
-  `used` tinyint(1) default NULL,
-  `order_id` int(10) unsigned default NULL,
-  PRIMARY KEY  (`code`),
-  KEY `order_id` (`order_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

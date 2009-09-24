@@ -15,6 +15,23 @@ if (!function_exists('__autoload')) {
     }
 }
 
+/** magically cause all PHP date functions to default to the given timezone. 
+ * but will work only in php >= 5.1
+ *
+ * cause mysql to store all dates with the current UTC offset built-in, as 
+ * well. So
+ * when we get them out later, PHP can just display whatever it is, and put the 
+ * DST offset (EST/EDT or +4:00/+5:00, according to the format needed) for the 
+ * given date, which should be correct
+ */
+if (defined('CSHOP_DISPLAY_TZ') && function_exists('date_default_timezone_set')) {
+    date_default_timezone_set (CSHOP_DISPLAY_TZ);
+    #$DEFAULT_TZ = new DateTimeZone(CSHOP_DISPLAY_TZ);
+
+    $pdb->query("SET time_zone = " . $pdb->quote(date('P')));
+}
+
+
 /**
  * a class factory ;)
  *

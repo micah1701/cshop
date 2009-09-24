@@ -311,3 +311,8 @@ UPDATE cm_order_transactions SET trans_result = TRIM(SUBSTRING(trans_result, 1, 
 -- Fri Sep 18 19:27:04 EDT 2009
 ALTER TABLE cm_cart MODIFY user_id int unsigned default NULL;
 
+
+-- Wed Sep 23 22:53:30 EDT 2009
+ALTER TABLE cm_order_history MODIFY `stamp` datetime NOT NULL;
+ALTER TABLE cm_order_transactions MODIFY `stamp` datetime NOT NULL;
+
