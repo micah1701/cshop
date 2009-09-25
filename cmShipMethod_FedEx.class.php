@@ -164,6 +164,8 @@ class cmShipMethod_FedEx extends cmShipMethod {
 
         if ($response->HighestSeverity == 'SUCCESS') {
             foreach ($response->RateReplyDetails as $rateReply) {           
+                if (!is_object($rateReply) || !isset($rateReply->ServiceType)) continue;
+
                 $service = $rateReply->ServiceType;
                 foreach ($rateReply->RatedShipmentDetails as $detail) {
                     $last_rate = null;
@@ -180,6 +182,15 @@ class cmShipMethod_FedEx extends cmShipMethod {
                 }
                 $quotes[$service] = $rate;
             } 
+            if (empty($quotes)) {
+                $err = "No ship methods are available for this destination at this time. Please try again.";
+                if ($this->debug) {
+                    error_log("ERROR: $err\n", 3, $this->debug_log);
+                    $log = "====RESPONSE===: \n".$client->__getLastResponse(). "\n\n";
+                    error_log($log, 3, $this->debug_log);
+                }
+                return $this->raiseError( $err );
+            }
             return $quotes;
         }
         else {
@@ -196,8 +207,7 @@ class cmShipMethod_FedEx extends cmShipMethod {
             } 
             if ($this->debug) {
                 error_log("Notification: $err\n", 3, $this->debug_log);
-                $log = "====RESPONSE===: \n".$client->__getLastResponse(). "\n";
-                $log .= $client->__getLastResponse(). "\n\n";
+                $log = "====RESPONSE===: \n".$client->__getLastResponse(). "\n\n";
                 error_log($log, 3, $this->debug_log);
             }
             return $this->raiseError( $err );
