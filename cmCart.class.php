@@ -715,6 +715,7 @@ class cmCart extends db_container {
                 $sql = "UPDATE " . $this->_items_table . " SET discount = 0 WHERE cart_id = ".$this->get_id();
                 $res = $this->db->query($sql);
             }
+            $this->_coupon = null;
             return $this->store($vals);
         }
     }
