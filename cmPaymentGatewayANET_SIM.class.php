@@ -5,6 +5,8 @@ class cmPaymentGatewayANET_SIM extends cmPaymentGatewayANET {
     /** are we in test mode? */
     var $testmode = CSHOP_PAYMENT_TESTMODE;
 
+    var $gateway_name = 'Authorize.net SIM';
+
     /** A.net login name
      @protected */
     #var $_anet_login = '54PB5egZ'; # test

@@ -65,7 +65,7 @@
             </td>
             <td><~ $user.cust_name ~><br />
                  <~ if $user.company ~><~ $user.company ~><br /><~/if~>
-                 &lt;<~ $user.email ~>&gt;
+                 &lt;<~ $user_email ~>&gt;
             </td>
          </tr>
         <tr>

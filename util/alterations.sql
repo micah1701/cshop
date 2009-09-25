@@ -316,3 +316,7 @@ ALTER TABLE cm_cart MODIFY user_id int unsigned default NULL;
 ALTER TABLE cm_order_history MODIFY `stamp` datetime NOT NULL;
 ALTER TABLE cm_order_transactions MODIFY `stamp` datetime NOT NULL;
 
+
+-- Fri Sep 25 14:22:38 EDT 2009
+ALTER TABLE cm_orders ADD billing_phone varchar(64) AFTER billing_country;
+ALTER TABLE cm_orders ADD billing_email varchar(128) AFTER billing_phone;

@@ -29,7 +29,7 @@ class cmOrder extends db_container {
 
 
     // names of columns in address table we can deal with
-    var $_addr_cols = array('name','company','street_addr','addr2','city','state','postcode','country');
+    var $_addr_cols = array('name','company','street_addr','addr2','city','state','postcode','country','phone','email');
 
     /** token by which we identify all orders, a random string of somekind usually */
     var $order_token;

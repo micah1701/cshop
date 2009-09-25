@@ -12,3 +12,6 @@ c/o <~ $address.name ~>
 <~ $address.city ~>, <~ $address.state ~> <~ $address.postcode ~>
 <~ $address.country ~>
 <~ if $address.telephone ~>Phone: <~ $address.telephone ~><~/if~>
+<~ if $address.phone ~>Phone: <~ $address.phone ~><~/if~>
+<~ if $address.fax ~>FAX: <~ $address.fax ~><~/if~>
+<~ if $address.email ~>email: <~ $address.email ~><~/if~>

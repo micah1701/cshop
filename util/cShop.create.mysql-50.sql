@@ -542,6 +542,8 @@ CREATE TABLE `cm_orders` (
   `billing_state` varchar(64) default NULL,
   `billing_postcode` varchar(16) NOT NULL default '',
   `billing_country` varchar(32) NOT NULL default '',
+  `billing_phone` varchar(64) default NULL,
+  `billing_email` varchar(128) default NULL,
   `billing_addr_format_id` int(5) NOT NULL default '0',
   `payment_method` varchar(32) NOT NULL default '',
   `cc_type` varchar(20) default NULL,

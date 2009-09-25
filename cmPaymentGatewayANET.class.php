@@ -163,7 +163,7 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
 
 
     function get_captured_amount() {
-        if ($this->get_trans_type() == 'AUTH_CAPTURE') {
+        if (strtoupper($this->get_trans_type()) == 'AUTH_CAPTURE') {
             return $this->_trans_amount;
         }
     }
