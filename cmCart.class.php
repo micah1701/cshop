@@ -769,8 +769,7 @@ class cmCart extends db_container {
       */
      function get_coupon_object() {
          if (!$this->_coupon) { // we have not looked yet
-             $coup_class = $this->_coupon_container_class; // init new DBC for coupons
-             $this->_coupon =& new $coup_class($this->db);
+             $this->_coupon =& cmClassFactory::getInstanceOf($this->_coupon_container_class, $this->db);
              if (method_exists($this->_coupon, 'set_owner_cart')) {
                  $this->_coupon->set_owner_cart($this);
              }
