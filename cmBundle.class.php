@@ -74,13 +74,7 @@ class cmBundle extends cmProduct {
     /* normal fetch but get bundle categories afterwards and append */
     function fetch($cols = '', $kids=false, $get_images=false) {
         if ($vals = parent::fetch($cols, $kids, $get_images)) {
-            $vals['required_cats'] = array();
-            $db_cat_map =& $this->_get_category_map_singleton();
-            if ($res = $db_cat_map->fetch_any(array('cm_categories_id', 'required'), 0, 0, null, "cm_bundles_id = " . $this->get_id())) {
-                foreach ($res as $row) {
-                    $vals['required_cats'][$row['cm_categories_id']] = $row['required'];
-                }
-            }
+            $vals['required_cats'] = $this->get_required_cats();
             return $vals;
         }
     }
@@ -98,17 +92,43 @@ class cmBundle extends cmProduct {
         return $this->db->query($sql);
     }
 
-    function create_bundle() {
-    }
 
-    function get_categories() {
-    }
-
-    function get_products() {
+    function get_required_cats() {
+        $required_cats = array();
+        $db_cat_map =& $this->_get_category_map_singleton();
+        if ($res = $db_cat_map->fetch_any(array('cm_categories_id', 'required'), 0, 0, null, "cm_bundles_id = " . $this->get_id())) {
+            foreach ($res as $row) {
+                $required_cats[$row['cm_categories_id']] = $row['required'];
+            }
+        }
+        return $required_cats;
     }
 
     function store_user_bundle() {
     }
 
+    function validate_product_selection($product_ids) {
+        $req_cats = $this->get_required_cats();
+        $picked = array();
+        $product = cmClassFactory::getSingletonOf(CSHOP_CLASSES_PRODUCT, $this->db);
+
+        foreach ($product_ids as $pid) { 
+            $product->set_id($pid);
+            $pinfo = $product->fetch(array('title', 'display_weight'));
+            foreach ($product->fetch_product_categories() as $cat) { // list of all cats this product is in
+                if (!isset($picked[$cat['id']])) $picked[$cat['id']] = array();
+                $picked[$cat['id']][] = $pinfo;
+            }
+            $product->reset();
+        }
+        foreach ($req_cats as $cat_id => $qty) {
+            if (!isset($picked[$cat_id]) or count($picked[$cat_id]) != $qty) {
+                return false;
+            }
+        }
+        $this->product_selection = $picked;
+        // passed validation. has proper number of products from each category.
+        return true;
+    }
 
 }

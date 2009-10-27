@@ -402,8 +402,8 @@ $smarty->display('control/header.tpl');
           <a href="<?= $_SERVER['PHP_SELF'] ?>?op_add" class="buttonAddItem">Add New Bundle</a>
         </div>
         <br />
-        <? $smarty->display('cart/control/res_pager.tpl') ?>
         <? if ($have_table) { ?>
+            <? $smarty->display('cart/control/res_pager.tpl') ?>
             <? echo $table->toHTML() ?>
         <? } else { ?>
             No Bundles are set up yet.
