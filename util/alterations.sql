@@ -320,3 +320,74 @@ ALTER TABLE cm_order_transactions MODIFY `stamp` datetime NOT NULL;
 -- Fri Sep 25 14:22:38 EDT 2009
 ALTER TABLE cm_orders ADD billing_phone varchar(64) AFTER billing_country;
 ALTER TABLE cm_orders ADD billing_email varchar(128) AFTER billing_phone;
+
+
+-- Mon Oct 26 15:43:10 EDT 2009
+CREATE TABLE cm_bundles (
+    id int unsigned not null AUTO_INCREMENT,
+    title varchar(255) not null,
+    base_price double (9,2) not null,
+    assembly_fee double (9,2) not null,
+    description varchar(1023) not null,
+    PRIMARY KEY (`id`)
+) Engine=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `cm_bundles_categories` (
+  id int unsigned not null AUTO_INCREMENT,
+  `cm_bundles_id` int(10) unsigned NOT NULL,
+  `cm_categories_id` int(10) unsigned NOT NULL,
+  `required` int(4) unsigned,
+  PRIMARY KEY (`id`),
+  UNIQUE (`cm_bundles_id`, `cm_categories_id`),
+  CONSTRAINT `cm_bc_ibfk_1` FOREIGN KEY (`cm_categories_id`) REFERENCES `cm_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `cm_bc_ibfk_2` FOREIGN KEY (`cm_bundles_id`) REFERENCES `cm_bundles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) Engine=InnoDB AUTO_INCREMENT=2;
+
+CREATE TABLE cm_bundles_products (
+    id int unsigned not null AUTO_INCREMENT,
+    cm_products_id int unsigned not null,
+    cm_bundles_id int unsigned not null,
+    adder double(9,2) not null,
+    UNIQUE KEY (cm_products_id, cm_bundles_id),
+    CONSTRAINT `cm_bp_ibfk_1` FOREIGN KEY (`cm_products_id`) REFERENCES `cm_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `cm_bp_ibfk_2` FOREIGN KEY (`cm_bundles_id`) REFERENCES `cm_bundles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY (`id`)
+) Engine=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+
+
+ CREATE TABLE `cm_bundles_users` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `cm_users_id` int(11) NOT NULL default '0',
+  `cm_bundles_id` int unsigned NOT NULL default '0',
+  `total_cost` double(9,2) NOT NULL default '0.00',
+  `assembly` tinyint(1) default NULL,
+  `assembly_fee` double(9,2) NOT NULL default '0.00',
+  `start_date` datetime default NULL,
+  `purch_date` datetime default NULL,
+  `descrip` text,
+  PRIMARY KEY  (`id`),
+  KEY `ix_b` (`cm_users_id`),
+  KEY `ix_u` (`cm_bundles_id`),
+  -- CONSTRAINT `cm_bu_ibfk_1` FOREIGN KEY (`cm_users_id`) REFERENCES `cm_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `cm_bu_ibfk_2` FOREIGN KEY (`cm_bundles_id`) REFERENCES `cm_bundles` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+) Engine=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `cm_bundles_users_products` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `cm_bundles_users_id` int unsigned NOT NULL default '0',
+  `cm_categories_id` int unsigned NOT NULL default '0',
+  `cm_products_id` int unsigned NOT NULL default '0',
+  `adder` double(9,2) NOT NULL default '0.00',
+  `qty` int(10) unsigned NOT NULL default '1',
+  PRIMARY KEY  (`id`),
+  KEY  `ix_b` (`cm_bundles_users_id`),
+  KEY  `ix_c` (`cm_categories_id`),
+  KEY `ix_p` (`cm_products_id`),
+  CONSTRAINT `cm_bup_ibfk_1` FOREIGN KEY (`cm_categories_id`) REFERENCES `cm_categories` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `cm_bup_ibfk_2` FOREIGN KEY (`cm_bundles_users_id`) REFERENCES `cm_bundles_users` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `cm_bup_ibfk_3` FOREIGN KEY (`cm_products_id`) REFERENCES `cm_products` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+) Engine=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+ALTER TABLE cm_categories ADD is_used_in_bundle bool;
+

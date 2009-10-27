@@ -13,11 +13,14 @@
 
 /*
  * @changelog:
+ * 1.5.5 : 2009/10/28 add product bundles (puredark)
+ * 1.5.4 : 2009/09/12 puredark changes and additions
+ * 1.5.3 : 2009/01/02 
  * 1.5.2 : 2008/06/12 break categories and related products control into their own tabs
  * 1.5.0 : 2008/02/05 new INFINITE CATS (for EXR) - NOT BC
  * 1.4 : 2008/01/15 control product tabs re-done w jQuery; add cmCategory::get_featured_products()
  */
-define ('CSHOP_VERSION', '1.5.4');
+define ('CSHOP_VERSION', '1.5.5');
 
 define ('CSHOP_CLASSES_ADDRESSBOOK', 'cmAddressBook');
 define ('CSHOP_CLASSES_USER', 'cmUser');
@@ -33,6 +36,7 @@ define ('CSHOP_CLASSES_MANUFACTURER', 'cmManufacturer');
 define ('CSHOP_CLASSES_SHIPMETHOD', 'cmShipping');
 define ('CSHOP_CLASSES_TAXCALCULATOR', 'cmTaxCalculator');
 define ('CSHOP_CLASSES_GIFTCARD', 'cmGiftCard');
+define ('CSHOP_CLASSES_BUNDLE', 'cmBundle');
 
 /* classes used for auth/perm/session management (old-phplib) */
 define ('CSHOP_CLASSES_AUTH_AUTH', 'jen_Auth');
@@ -97,6 +101,9 @@ define('CSHOP_INVENTORY_WARNING_RECIP', 'debug@circusmedia.com');
 
 /** comma-separated list of Credit Card types we accept - default = VISA,MC,AMEX,DISC */
 define('CSHOP_CC_ACCEPTED', 'VISA,MC,AMEX,DISC');
+
+/** use the Bundle/Custom/Build-a-kit functionality? */
+define('CSHOP_USE_BUNDLES', false);
 
 // max dims allowed for product images. Larger than this will be resized to fit
 define('MAX_W', 480);

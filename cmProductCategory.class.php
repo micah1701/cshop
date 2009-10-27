@@ -42,6 +42,7 @@ class cmProductCategory extends db_container {
                     'feature_rank' =>   array('Feature Rank', 'select', array(0,1,2,3,4,5), false),
                     'order_weight' =>   array('Order Weight', 'text', null, array('size'=>4,'maxlength'=>4),null),
                     'is_active' =>      array('Is Active?', 'toggle', false),
+                    'is_used_in_bundle' => array('Used in Product Bundles?', 'toggle', false),
                    );
 
     var $control_header_cols = array('concat_name'=>'Name', 'urlkey' => 'URL key', 'ship_class'=>'Shipping Class', 'is_taxable'=>'Taxable?', 'is_active'=>'Enabled/Active?', 'feature_rank'=>'Feature Rank', 'product_count'=>'# Products', 'order_weight' => 'Order Weight');
@@ -49,7 +50,10 @@ class cmProductCategory extends db_container {
 
     var $colmap_help = array('urlkey' => 'key for links (URLs) to this category. Letters or numbers only, no spaces or punctuation. Max 16 characters. NOTE: changing this value may break existing links.',
                              'cat_photo' => 'Category Image. Max 800x800',
-                             'order_weight' => 'value to order this category by against other categories. Numeric value. Does not need to be sequential');
+                             'order_weight' => 'value to order this category by against other categories. Numeric value. Does not need to be sequential',
+                             'is_active' => 'Show this category in storefront navigation and menus',
+                             'is_used_in_bundle' => 'Show this category in bundle configuration tool',
+                         );
 
     function get_colmap()
     {
@@ -57,6 +61,10 @@ class cmProductCategory extends db_container {
             $this->colmap['parent_cat_id'][2] = $this->get_categories_for_select();
             $this->colmap['ship_class_id'][2] = cmShipping::fetch_ship_class_opts($this->db);
         }
+
+        if (!defined('CSHOP_USE_BUNDLES') or !CSHOP_USE_BUNDLES)
+            unset($this->colmap['is_used_in_bundle']);
+
         return $this->colmap;
     }
 
@@ -385,6 +393,28 @@ class cmProductCategory extends db_container {
             array_push($parent_cat_ids, $cat['id']);
         }
         return $parent_cat_ids;
+    }
+
+
+    /**
+     * get list of all categories which can be used in bundles
+     * @return array of category objects */
+    function get_categories_for_bundles($cols=null, $orderby=null) {
+        if (!is_array($cols)) {
+            $cols = array_keys($this->colmap);
+        }
+        if (!$orderby) $orderby = 'order_weight';
+
+        $col_list = join(',', $cols);
+
+        $sql = "SELECT $col_list,parent_cat_id,id FROM ".$this->get_table_name()."
+                WHERE is_used_in_bundle = 1 ORDER BY $orderby, name";
+        $res = $this->db->query($sql);
+        $items = array();
+        while ($row = $res->fetchRow()) {
+            array_push($items, $row);
+        }
+        return $items;
     }
 
 }
