@@ -33,6 +33,13 @@ define ('OP_EDIT', 'EDIT BUNDLE');
 define ('OP_KILL', 'REMOVE BUNDLE');
 define ('OP_PICK', 'ALLOW PRODUCTS IN BUNDLE');
 
+$req_id = null;
+$errs = array();
+$msg = '';
+$base_get_vars = '';
+
+
+
 /* decide on a course of action... **//*{{{*/
 if (isset($_POST['op']) and $_POST['op'] == OP_EDIT) {
     $ACTION = OP_EDIT;
@@ -59,18 +66,16 @@ elseif (isset($_GET['op_product_pick'])) {
     $categoryid = $_GET['catid'];
     $ACTION = OP_PICK;
 }
+elseif (isset($_GET['op_edit'])) {
+    $ACTION = OP_EDIT;
+    $req_id = $_GET['op_edit'];
+}
 elseif (isset($_GET['op_add'])) {
     $ACTION = OP_ADD;
 }
 /** **//*}}}*/
 
 $pagetitle .= strtolower($ACTION); // make a nice title
-
-
-$errs = array();
-$msg = '';
-$req_id = null;
-$base_get_vars = '';
 
 // in table, how many rows per page set?
 $rows_per_page = 50;
@@ -214,25 +219,7 @@ if ($msg and !count($errs) and ($ACTION)) {
 }/*}}}*/
 
 
-/** we didn't have a post? maybe we need to show the form... */
-if (isset($_GET['op_add'])) $ACTION = OP_ADD;
-elseif (isset($_GET['op_edit'])) {
-    $ACTION = OP_EDIT;
-    $req_id = $_GET['op_edit'];
-}
-
 if ($ACTION) $SHOWFORM = true;
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* either show an adding/editing form **************************************************//*{{{*/
@@ -312,6 +299,17 @@ else {
 
 
 
+/* decide which tab to show based on GET param 'win' */
+$tabs = array('product','inventory','media','options');
+if ($ACTION == OP_EDIT && isset($_GET['win']) && in_array($_GET['win'], $tabs)) {
+    $tab = $_GET['win'];
+}
+else {
+    $tab = $tabs[0];
+}
+
+
+
 
 ##############################################################################
 # output template
@@ -342,18 +340,59 @@ $smarty->display('control/header.tpl');
     <br />
 <? } ?>
 
+<? if (count($errs)) { ?>
+   <div class="userError">
+   Please correct the following errors:
+   <ul>
+   <? foreach ($errs as $e) { ?>
+     <li><?= htmlentities($e) ?></li>
+   <? } ?>
+   </ul>
+   </div>
+<? } ?>
 
-<? if ($SHOWFORM) { ?>
+<? if ($ACTION) { ?>
 
-    <? if (isset($msg)) { ?>
-       <strong><?= htmlentities($msg) ?></strong>
-          <br />
+    <div id="tabContentContainer" style="border: 0">
+      <div id="tabContainer">
+        <div class="tabLabel<?= ($tab == 'product')? ' tabSelected' : '' ?>" id="tabdet" rel="detContainer">Bundle Setup</a></div>
+    <? if ($ACTION == OP_EDIT) { ?>
+        <div class="tabLabel<?= ($tab == 'media')? ' tabSelected' : '' ?>" id="tabmed" rel="medContainer">Media</div>
     <? } ?>
-    <div style="width: 600px" class="container">
+      </div>
 
-       <?= $fex->render_form(); ?>
+    <div id="tabActiveContent">
+    <? if ($SHOWFORM) { ?>
+        <div class="formContainer" id="detContainer"<? if (!isset($tab) or $tab == 'product') { ?> style="display: block"<? } ?>>
+              <div class="heading">
+                  :: Bundle Setup ::
+              </div>
+              <div id="productForm" class="formWrapper">
 
-    </div>
+            <? if (isset($msg)) { ?>
+               <strong><?= htmlentities($msg) ?></strong>
+                  <br />
+            <? } ?>
+
+               <?= $fex->render_form(); ?>
+
+            </div>
+        </div>
+
+        <? if ($ACTION == OP_EDIT) { ?>
+          <div class="formContainer" id="medContainer"<? if ($tab == 'media') { ?> style="display: block"<? } ?>>
+            <div class="heading">
+                :: Media Manager ::
+            </div>
+            <div id="mediaWrap" class="formWrapper">
+              <iframe id="mediaFrame" src="store.media.php?nid=<?=$bundle->get_id()?>&phase=bundle"  frameborder="0" marginwidth="0" marginheight="0" width="590" height="400" scrolling="yes" ></iframe> 
+            </div>
+          </div>
+        <? } ?>
+      </div>
+   <? } ?>
+
+
 
 <? } elseif (isset($table) and is_object($table)) { ?>
 

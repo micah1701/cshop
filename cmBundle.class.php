@@ -41,6 +41,13 @@ class cmBundle extends cmProduct {
                         );
 
 
+
+    /* override to use same db seq as the products table (the parent). This is why sequences are nice sometimes */
+    function get_sequence() {
+        return 'cm_products';
+    }
+
+
     // normal store() but reset and then store bundle category info
     function store(&$vals) {
         $required_cats = array();
@@ -65,8 +72,8 @@ class cmBundle extends cmProduct {
 
 
     /* normal fetch but get bundle categories afterwards and append */
-    function fetch($cols = '', $kids=false) {
-        if ($vals = parent::fetch($cols, $kids)) {
+    function fetch($cols = '', $kids=false, $get_images=false) {
+        if ($vals = parent::fetch($cols, $kids, $get_images)) {
             $vals['required_cats'] = array();
             $db_cat_map =& $this->_get_category_map_singleton();
             if ($res = $db_cat_map->fetch_any(array('cm_categories_id', 'required'), 0, 0, null, "cm_bundles_id = " . $this->get_id())) {
@@ -76,8 +83,8 @@ class cmBundle extends cmProduct {
             }
             return $vals;
         }
-        
     }
+
 
     private function _get_category_map_singleton() {
         if (!isset($this->db_cat_map))
