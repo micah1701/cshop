@@ -1126,7 +1126,9 @@ class cmCart extends db_container {
                         $this->get_id());
         $res = $this->db->query($sql);
         while ($row = $res->fetchRow()) {
-            $inv[$row['inventory_id']] = $row['qty'];
+            if ($row['inventory_id']) {
+                $inv[$row['inventory_id']] = $row['qty'];
+            }
         }
         return $inv;
     }

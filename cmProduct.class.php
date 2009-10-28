@@ -252,13 +252,16 @@ class cmProduct extends db_container {
 
      /**
       * get a list of all categories this product is in 
+      * @param $level int fetch categories AT this nesting level (obsolete, will always be 0 now)
+      * @param $only_active bool fetch only categories marked as 'active'
       * @return array
       */
-     function fetch_product_categories($level = null)
+     function fetch_product_categories($level = null, $only_active=true)
      {
          $sql = "SELECT c.id, c.name, c.urlkey FROM {$this->_category_map_table} pc, {$this->_category_table} c
                  WHERE pc.cm_categories_id = c.id AND pc.cm_products_id = " . $this->get_id();
          if ($level) $sql .= " AND c.level = $level";
+         if ($only_active) $sql .= " AND c.is_active=1 ";
          return $this->db->getAll($sql);
      }
 
