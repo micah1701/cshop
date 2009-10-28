@@ -173,14 +173,23 @@ $fex->add_element($bundle->get_colmap());
 if (isset($_POST['op']) and ($ACTION == OP_ADD or $ACTION == OP_EDIT)) {
     
     $errs = $fex->validate($_POST);
-    if (!$errs) {
+    $req_id = $_POST['id'];
+
+    if (empty($_POST['pcat_req_vals']) or !is_array($_POST['pcat_req_vals'])) {
+        $errs[] = "Bundle selection was missing!";
+    }
+    else {
+        $catquants = join('', array_values($_POST['pcat_req_vals']));
+        if (empty($catquants))
+            $errs[] = "Bundle must contain one or more categories of products to select from.";
+    }
+
+    if (empty($errs)) {
         $vals = $fex->get_submitted_vals($_POST);
-        if (!empty($_POST['pcat_req_vals']) and is_array($_POST['pcat_req_vals'])) {
-            $vals['required'] = $_POST['pcat_req_vals'];
-        }
+        $vals['required'] = $_POST['pcat_req_vals'];
         try {
             if ($ACTION == OP_EDIT) {
-                $bundle->set_id($_POST['id']);
+                $bundle->set_id($req_id);
                 $req_id = $_POST['id'];
                 if ($bundle->store($vals)) {
                     $msg .= sprintf('Bundle "%s" was updated', $vals['title']);
