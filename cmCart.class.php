@@ -557,16 +557,17 @@ class cmCart extends db_container {
          if ($qty < 1) {
              return $this->remove_item($item_id);
          }
-         elseif ($this->stock_block and $this->fetch_item_inventory_qty($item_id) < $qty) {
-             return $this->raiseError("There is not sufficent inventory", ERR_CART_NO_STOCK);
+         elseif ($this->stock_block) {
+             $curr_inv_count = $this->fetch_item_inventory_qty($item_id);
+             if (!is_null($curr_inv_count) and $curr_inv_count < $qty) // yes we have no bananas
+                 return $this->raiseError("There is not sufficent inventory", ERR_CART_NO_STOCK);
          }
-         else {
-             $sql = sprintf("UPDATE %s SET qty = %d WHERE id = %d",
-                             $this->_items_table,
-                             $qty,
-                             $item_id);
-             return $this->db->query($sql);
-         }
+
+         $sql = sprintf("UPDATE %s SET qty = %d WHERE id = %d",
+                         $this->_items_table,
+                         $qty,
+                         $item_id);
+         return $this->db->query($sql);
      }
 
 
@@ -577,7 +578,7 @@ class cmCart extends db_container {
      function fetch_item_inventory_qty($item_id)
      {
          $sql = "SELECT inv.qty FROM {$this->_inventory_table} inv, {$this->_items_table} items
-                 WHERE items.id = " . intval($item_id) . " AND inv.id = items.inventory_id";
+                 WHERE items.id = " . intval($item_id) . " AND inv.id = items.inventory_id AND items.inventory_id IS NOT NULL";
          return $this->db->getOne($sql);
      }
 
