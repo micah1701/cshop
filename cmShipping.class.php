@@ -92,16 +92,19 @@
             $res = $cart->db->query($sql);
         }
 
-        while ($row = $res->fetchRow()) {
-            if (!$row['is_free']) {
-                $free = false;
-            }
-            $these = split(',', $row['class_map']); // can be a commasep set of methods?
-            foreach ($these as $m) {
-                if (!in_array($m, $methods)) $methods[] = $m;
-                $this->adders[$row['id']] = $row['adder'];
+        if (!PEAR::isError($res)) {
+            while ($row = $res->fetchRow()) {
+                if (!$row['is_free']) {
+                    $free = false;
+                }
+                $these = split(',', $row['class_map']); // can be a commasep set of methods?
+                foreach ($these as $m) {
+                    if (!in_array($m, $methods)) $methods[] = $m;
+                    $this->adders[$row['id']] = $row['adder'];
+                }
             }
         }
+
 
         #if ($free) { return 'FREE'; } // everything in the cart was free!
         if ($free) {

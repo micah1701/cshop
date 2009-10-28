@@ -148,8 +148,7 @@ class cmBundle extends cmProduct {
      * TODO handle adders for certain products and optional items
      */
     function get_price() {
-        if ($this->product_selection)
-            return $this->fetch_baseprice();
+        return $this->fetch_baseprice();
     }
 
 }
