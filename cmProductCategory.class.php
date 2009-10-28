@@ -259,8 +259,8 @@ class cmProductCategory extends db_container {
 
             $col_list = join(',', $cols);
 
-            $sql = "SELECT $col_list,parent_cat_id,id FROM ".$this->get_table_name()."
-                    WHERE parent_cat_id = ? AND is_active = 1 ORDER BY $orderby, name";
+            $sql = "SELECT $col_list,parent_cat_id,id,is_active FROM ".$this->get_table_name()."
+                    WHERE parent_cat_id = ? ORDER BY $orderby, name";
             $this->_sth_category_tree = $this->db->prepare($sql);
         }
         return $this->_sth_category_tree;
@@ -272,9 +272,10 @@ class cmProductCategory extends db_container {
      * each key is the catid and the value is the catname, indented by a certain amount to indicate the nesting level and parentage 
      * @param $startwith int optional node to use as the root
      * @param $currlevel int the current nesting level - for recursion, don't set this.
+     * @param $get_inactives bool if true, also include categories marked as 'inactive'
      * @return array k=>v pairs
      */
-    function get_categories_for_select($startwith=0, $currlevel=0) {
+    function get_categories_for_select($startwith=0, $currlevel=0, $get_inactives=false) {
         $cols = array('name','urlkey');
         $sth =& $this->_sth_category_tree_singleton($cols, 'parent_cat_id,order_weight');
 
@@ -282,9 +283,10 @@ class cmProductCategory extends db_container {
 
         $options = array();
         while ($row = $res->fetchRow()) {
+            if (!$row['is_active'] && !$get_inactives) continue;
             $options[$row['id']] = str_repeat('---', $currlevel) . $row['name'];
             if (!empty($row['urlkey'])) $options[$row['id']] .= sprintf('[%s]', $row['urlkey']);
-            if ($kids = $this->get_categories_for_select($row['id'], $currlevel+1)) {
+            if ($kids = $this->get_categories_for_select($row['id'], $currlevel+1, $get_inactives)) {
                 $options = $options + $kids;
             }
         }

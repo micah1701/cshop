@@ -127,7 +127,7 @@ if ($msg and !count($errs)) { /** redir on success **/
 
 $fex = new formex('POST');
 
-$allcats = $pcat->get_categories_for_select();
+$allcats = $pcat->get_categories_for_select(0, 0, true);
 
 $fex->js_src_inline = true;
 $fex->add_element($colmap);

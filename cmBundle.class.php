@@ -36,6 +36,7 @@ class cmBundle extends cmProduct {
     var $_related_products_table = 'cm_products_relations';
 
     var $colmap = array('title' => array('Title', 'text', null, true),
+                        'sku' => array('SKU', 'text', null, 1),
                         'base_price' => array('Base Price', 'numeric', null, true),
                         'description' => array('Description', 'textarea', null, array('rows'=>4), false),
                         );
@@ -114,8 +115,10 @@ class cmBundle extends cmProduct {
 
         foreach ($product_ids as $pid) { 
             $product->set_id($pid);
-            $pinfo = $product->fetch(array('title', 'display_weight'));
+            $pinfo = $product->fetch(array('id', 'title', 'display_weight'));
             foreach ($product->fetch_product_categories() as $cat) { // list of all cats this product is in
+                if (!isset($req_cats[$cat['id']])) continue;
+
                 if (!isset($picked[$cat['id']])) $picked[$cat['id']] = array();
                 $picked[$cat['id']][] = $pinfo;
             }
@@ -129,6 +132,24 @@ class cmBundle extends cmProduct {
         $this->product_selection = $picked;
         // passed validation. has proper number of products from each category.
         return true;
+    }
+
+
+    /** get the baseprice for the product from the DB (no adders from attribs...)
+     * @return float */
+    function fetch_baseprice() {
+        return $this->get_header('base_price');
+    }
+
+    /**
+     * get the total price for this bundle including any adders or optional items
+     * @return float
+     *
+     * TODO handle adders for certain products and optional items
+     */
+    function get_price() {
+        if ($this->product_selection)
+            return $this->fetch_baseprice();
     }
 
 }

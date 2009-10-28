@@ -253,6 +253,57 @@ class cmCart extends db_container {
      }
 
 
+    /**
+     * similar to add_item(), but add a bundle to the cart, using the legacy 
+     * product_attribs column to store a serialized representation of the 
+     * products contained in the bundle.  
+     *
+     * @param $bundle a fully hydrated cmBundle object
+     * @param $qty int
+     * @returns trueness on success
+     */
+     function add_bundle(&$bundle, $qty) {
+
+        if (! $bundle_info = $bundle->fetch()) {
+            return $this->raiseError("Bundle failed to exist.");
+        }
+        if (!is_numeric($qty) or $qty<=0) {
+            return $this->raiseError("Quantity must be a positive integer ($qty)");
+        }
+
+        $bundle_products = array();
+        foreach ($bundle->product_selection as $cat_id => $products) {
+            foreach ($products as $p) {
+                $bundle_products[$p['id']] = $p['title'] . ' (' . $p['display_weight'] . ')';
+            }
+        }
+
+        $citem = $this->create_cart_item();
+
+        $product_price = $bundle->get_price();
+
+        $vals = array('cart_id' => $this->get_id(),
+                      'product_id' => $bundle->get_id(),
+                      'qty' => $qty,
+                      'price' => $product_price,
+                      'product_sku' => $bundle->get_header('sku'),
+                      'inventory_id' => null,
+                      'product_descrip' => $bundle->get_title(),
+                      'product_attribs' => serialize($bundle_products), 
+                      'has_item_options' => false);
+
+        if ($this->do_apply_discount_to_lineitems()) {
+            $vals['discount'] = $this->get_discount($product_price, $pid);
+        }
+
+         $this->_subtotal = null; // force recalc on next access
+
+         if ($res = $citem->store($vals)) { // putt............... yes
+             return $res;
+         }
+     }
+
+
      /** check whether an item identified by the given inventoryid is in the
       * cart already or not. For swipeit we also loop thru each of
       * cm_cart_items_options for each item, matching only if all options for a
@@ -444,12 +495,7 @@ class cmCart extends db_container {
       * @return a $db_container object
       */
      function create_cart_item() {
-         $citem =& new db_container($this->db);
-         $citem->set_table($this->_items_table);
-         /* we have a real id in cart_items now... so ? 
-          * $citem->numeric_pk = false;
-          * $citem->set_pk_col(array('cart_id','inventory_id'));
-          */
+         $citem =& $this->factory($this->db, $this->_items_table);
          return $citem;
      }
 
