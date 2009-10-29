@@ -486,7 +486,16 @@ class cmCart extends db_container {
                          $this->_items_table,
                          $this->_products_table,
                          $this->get_id());
-         return $this->db->getOne($sql);
+         $weight = $this->db->getOne($sql);
+         if (defined('CSHOP_USE_BUNDLES') and CSHOP_USE_BUNDLES) {
+             $sql = sprintf("SELECT SUM(p.weight * ci.qty) as weight FROM %s ci, %s p
+                             WHERE cart_id = %d AND ci.product_id = p.id",
+                             $this->_items_table,
+                             'cm_bundles',
+                             $this->get_id());
+             $weight += $this->db->getOne($sql);
+         }
+         return $weight;
      }
 
 

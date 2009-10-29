@@ -37,6 +37,7 @@ class cmBundle extends cmProduct {
 
     var $colmap = array('title' => array('Title', 'text', null, true),
                         'sku' => array('SKU', 'text', null, 1),
+                        'weight' => array('Weight (lbs)', 'numeric', null, array('size'=>8), 1),
                         'base_price' => array('Base Price', 'numeric', null, true),
                         'description' => array('Description', 'textarea', null, array('rows'=>4), false),
                         );

@@ -394,3 +394,6 @@ ALTER TABLE cm_categories ADD is_used_in_bundle bool;
 -- Tue Oct 27 20:03:07 EDT 2009
 ALTER TABLE cm_bundles ADD sku varchar(63) not null;
 
+
+-- Thu Oct 29 00:33:58 EDT 2009
+ALTER TABLE cm_bundles ADD weight double(5,2) not null;
