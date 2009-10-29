@@ -108,6 +108,10 @@ class cmBundle extends cmProduct {
     function store_user_bundle() {
     }
 
+    /**
+     * given a list of product ids, go over each and make sure they match up to 
+     * the required categories for this bundle
+     */
     function validate_product_selection($product_ids) {
         $req_cats = $this->get_required_cats();
         $picked = array();
@@ -116,7 +120,7 @@ class cmBundle extends cmProduct {
         foreach ($product_ids as $pid) { 
             $product->set_id($pid);
             $pinfo = $product->fetch(array('id', 'title', 'display_weight'));
-            foreach ($product->fetch_product_categories() as $cat) { // list of all cats this product is in
+            foreach ($product->fetch_product_categories(null, false) as $cat) { // list of all cats this product is in, even the inactive ones
                 if (!isset($req_cats[$cat['id']])) continue;
 
                 if (!isset($picked[$cat['id']])) $picked[$cat['id']] = array();
