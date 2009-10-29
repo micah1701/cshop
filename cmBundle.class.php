@@ -39,7 +39,8 @@ class cmBundle extends cmProduct {
                         'sku' => array('SKU', 'text', null, 1),
                         'weight' => array('Weight (lbs)', 'numeric', null, array('size'=>8), 1),
                         'base_price' => array('Base Price', 'numeric', null, true),
-                        'description' => array('Description', 'textarea', null, array('rows'=>4), false),
+                        'description' => array('Description', 'textarea', null, array('rows'=>2), false),
+                        'long_description' => array('Additional Info', 'textarea', null, array('rows'=>8), false),
                         );
 
 

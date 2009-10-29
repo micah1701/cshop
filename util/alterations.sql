@@ -343,51 +343,17 @@ CREATE TABLE `cm_bundles_categories` (
   CONSTRAINT `cm_bc_ibfk_2` FOREIGN KEY (`cm_bundles_id`) REFERENCES `cm_bundles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) Engine=InnoDB AUTO_INCREMENT=2;
 
-CREATE TABLE cm_bundles_products (
-    id int unsigned not null AUTO_INCREMENT,
-    cm_products_id int unsigned not null,
-    cm_bundles_id int unsigned not null,
-    adder double(9,2) not null,
-    UNIQUE KEY (cm_products_id, cm_bundles_id),
-    CONSTRAINT `cm_bp_ibfk_1` FOREIGN KEY (`cm_products_id`) REFERENCES `cm_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT `cm_bp_ibfk_2` FOREIGN KEY (`cm_bundles_id`) REFERENCES `cm_bundles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-    PRIMARY KEY (`id`)
-) Engine=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-
-
-
- CREATE TABLE `cm_bundles_users` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `cm_users_id` int(11) NOT NULL default '0',
-  `cm_bundles_id` int unsigned NOT NULL default '0',
-  `total_cost` double(9,2) NOT NULL default '0.00',
-  `assembly` tinyint(1) default NULL,
-  `assembly_fee` double(9,2) NOT NULL default '0.00',
-  `start_date` datetime default NULL,
-  `purch_date` datetime default NULL,
-  `descrip` text,
-  PRIMARY KEY  (`id`),
-  KEY `ix_b` (`cm_users_id`),
-  KEY `ix_u` (`cm_bundles_id`),
-  -- CONSTRAINT `cm_bu_ibfk_1` FOREIGN KEY (`cm_users_id`) REFERENCES `cm_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `cm_bu_ibfk_2` FOREIGN KEY (`cm_bundles_id`) REFERENCES `cm_bundles` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) Engine=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-
-CREATE TABLE `cm_bundles_users_products` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `cm_bundles_users_id` int unsigned NOT NULL default '0',
-  `cm_categories_id` int unsigned NOT NULL default '0',
-  `cm_products_id` int unsigned NOT NULL default '0',
-  `adder` double(9,2) NOT NULL default '0.00',
-  `qty` int(10) unsigned NOT NULL default '1',
-  PRIMARY KEY  (`id`),
-  KEY  `ix_b` (`cm_bundles_users_id`),
-  KEY  `ix_c` (`cm_categories_id`),
-  KEY `ix_p` (`cm_products_id`),
-  CONSTRAINT `cm_bup_ibfk_1` FOREIGN KEY (`cm_categories_id`) REFERENCES `cm_categories` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `cm_bup_ibfk_2` FOREIGN KEY (`cm_bundles_users_id`) REFERENCES `cm_bundles_users` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `cm_bup_ibfk_3` FOREIGN KEY (`cm_products_id`) REFERENCES `cm_products` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) Engine=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+-- this isn't used and won't be for the forseeable future.
+-- CREATE TABLE cm_bundles_products (
+    -- id int unsigned not null AUTO_INCREMENT,
+    -- cm_products_id int unsigned not null,
+    -- cm_bundles_id int unsigned not null,
+    -- adder double(9,2) not null,
+    -- UNIQUE KEY (cm_products_id, cm_bundles_id),
+    -- CONSTRAINT `cm_bp_ibfk_1` FOREIGN KEY (`cm_products_id`) REFERENCES `cm_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    -- CONSTRAINT `cm_bp_ibfk_2` FOREIGN KEY (`cm_bundles_id`) REFERENCES `cm_bundles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    -- PRIMARY KEY (`id`)
+-- ) Engine=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 ALTER TABLE cm_categories ADD is_used_in_bundle bool;
 
@@ -397,3 +363,6 @@ ALTER TABLE cm_bundles ADD sku varchar(63) not null;
 
 -- Thu Oct 29 00:33:58 EDT 2009
 ALTER TABLE cm_bundles ADD weight double(5,2) not null;
+
+-- Thu Oct 29 11:18:55 EDT 2009
+ALTER TABLE cm_bundles ADD long_description text;
