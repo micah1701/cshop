@@ -418,7 +418,8 @@ class cmCart extends db_container {
             $items[] = $row;
         }
         $res->free();
-        return $items;
+        $this->_items = $items;
+        return $this->_items;
 
      }
 
@@ -1001,8 +1002,9 @@ class cmCart extends db_container {
                $tots['discount'] = -1 * $discount;
            }
 
+           $this->check_for_special_item_discounts();   // do we have weird discounts based on what items are in the cart
 
-           if (!empty($this->check_for_extra_totals)) { // we have weird charges
+           if (!empty($this->check_for_extra_totals)) { // we have weird/unusual/fancy/clever charges and/or discounts
                $tots['other'] = array(); // becomes sort of a sub-array
                $sql = sprintf("SELECT total, method FROM %s WHERE cart_id = %d",
                               $this->_totals_table,
@@ -1013,6 +1015,7 @@ class cmCart extends db_container {
                    $grand += $row['total']; // add to the "grand"!
                }
            }
+
 
            $tots['grand_total'] = $grand;
            return $tots;
@@ -1031,10 +1034,10 @@ class cmCart extends db_container {
            $cid = $this->get_id();
 
            /* decide if we have seen this charge before (by id). If so, overwrite, if not, add */
-           $sql = sprintf("SELECT COUNT(*) FROM %s WHERE cart_id = %d AND id = '%s'",
+           $sql = sprintf("SELECT COUNT(*) FROM %s WHERE cart_id = %d AND id = %s",
                           $this->_totals_table, 
                           $this->get_id(),
-                          addslashes($id));
+                          $this->db->quoteSmart($id));
            $has_already = $this->db->getOne($sql);
 
            $vals = array('id' => $id,
@@ -1043,9 +1046,9 @@ class cmCart extends db_container {
                          'cart_id' => $this->get_id());
 
            if ($has_already) {
-               $where = sprintf("cart_id = %d AND id = '%s'",
+               $where = sprintf("cart_id = %d AND id = %s",
                               $this->get_id(),
-                              addslashes($id));
+                              $this->db->quoteSmart($id));
                $res = $this->db->autoExecute($this->_totals_table, $vals, DB_AUTOQUERY_UPDATE, $where);
            }
            else {
@@ -1053,6 +1056,34 @@ class cmCart extends db_container {
            }
            return $res;
        }
+
+
+       /**
+        * get rid of one of the rows in extra_totals table, associated with this cart and identified by the token
+        * @param $id str a unique id for this type of charge (ie giftwrap, handling, federal, whatver)
+        * @return DB::query result
+        */
+       function remove_extra_total($id) {
+           $sql = sprintf("DELETE FROM %s WHERE cart_id = %d AND id = %s",
+                          $this->_totals_table, 
+                          $this->get_id(),
+                          $this->db->quoteSmart($id));
+           $res = $this->db->query($sql);
+           return $res;
+       }
+
+
+       /**
+        * stub function, called above in fetch_totals(), meant to see if there 
+        * are any special discounts happening based solely on the contents of 
+        * the cart (2 for 1 special, 10% off 4 or more widgets, $5 assembly fee 
+        * for all skateboards, etc)
+        *
+        * should call store_extra_total to attach the discount if needed
+        *
+        * @return void
+        */
+       function check_for_special_item_discounts() { }
 
 
     /** remove the items in the cart from the inventory (tracked by
