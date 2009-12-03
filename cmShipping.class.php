@@ -237,7 +237,7 @@
         }
 
         /* check if the cart total exceeds the free shipping threshold. If so, add an option for that. */
-        if ($this->get_freeship_threshold() and $cart->get_subtotal() > $this->get_freeship_threshold()) {
+        if ($this->get_freeship_threshold() and $cart->get_subtotal() >= $this->get_freeship_threshold()) {
             $this->qualifies_freeship = true; // set the flag so the user gets a nice message or whatever.
             $this->quotes = $this->freeship_token() + $this->quotes;
         }
