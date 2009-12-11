@@ -398,14 +398,15 @@ input.trBasisInput {
 
 
 /* for tooltips in form help */
-a.formexHelpToolTip{
+.formexHelpToolTip{
     position:relative; /*this is the key*/
     z-index:24; 
     font-weight: normal;
-    text-decoration: none; }
-a.formexHelpToolTip:hover { z-index:25; background-color:#ccc }
-a.formexHelpToolTip span{ display: none }
-a.formexHelpToolTip:hover span{ /*the span will display just on :hover state*/
+    text-decoration: none;
+ }
+.formexHelpToolTip:hover { z-index:25; background-color:#ccc }
+.formexHelpToolTip span{ display: none }
+.formexHelpToolTip:hover span{ /*the span will display just on :hover state*/
     display:block;
     position:absolute;
     top:1.5em; left:1.5em; 

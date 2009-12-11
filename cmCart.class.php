@@ -290,17 +290,18 @@ class cmCart extends db_container {
                       'inventory_id' => null,
                       'product_descrip' => $bundle->get_title(),
                       'product_attribs' => serialize($bundle_products), 
+                      'is_bundle' => true,
                       'has_item_options' => false);
 
         if ($this->do_apply_discount_to_lineitems()) {
             $vals['discount'] = $this->get_discount($product_price, $pid);
         }
 
-         $this->_subtotal = null; // force recalc on next access
+        $this->_subtotal = null; // force recalc on next access
 
-         if ($res = $citem->store($vals)) { // putt............... yes
-             return $res;
-         }
+        if ($res = $citem->store($vals)) { // putt............... yes
+            return $res;
+        }
      }
 
 

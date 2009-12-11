@@ -167,6 +167,9 @@ $fex->js_src_inline = true;
 $fex->left_td_style = '';
 $fex->field_prefix = '';
 $fex->add_element($bundle->get_colmap()); 
+foreach ($bundle->colmap_help as $elem => $txt) {
+    $fex->set_elem_helptext($elem, $txt);
+}
 
 
 // handle ADD and EDIT/*{{{*/
@@ -276,7 +279,7 @@ else {
     $table->setAutoGrow(true);
     $table->setAutoFill("&mdash;");
 
-    $header_row = array('title'=>'Bundle Name', 'base_price' => 'Base');
+    $header_row = array('title'=>'Bundle Name', 'base_price' => 'Base', 'qty_inventory' => 'On hand');
     $table_ordercol = (isset($_GET['by']))? $_GET['by'] : 'title';
     $order_dir =  (!isset($_GET['dir']) or $_GET['dir'] == 'A')? 'ASC' : 'DESC';
 

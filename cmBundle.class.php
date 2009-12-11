@@ -41,8 +41,15 @@ class cmBundle extends cmProduct {
                         'base_price' => array('Base Price', 'numeric', null, true),
                         'description' => array('Description', 'textarea', null, array('rows'=>2), false),
                         'long_description' => array('Additional Info', 'textarea', null, array('rows'=>8), false),
+                        'qty_inventory' => array('Inventory (Qty. on Hand)', 'numeric', null, array('size'=>4), false),
+                        'do_inventory' => array('Manage Inventory', 'toggle', true, false),
                         );
 
+    var $colmap_help = array(
+                             'weight' => 'Shipping calculation to be based on this weight, not individual items',
+                             'qty_inventory' => 'Quantity on hand and available for purchase',
+                             'do_inventory' => 'Deduct both bundle and individual product items from inventory when purchased.',
+                         );
 
 
     /* override to use same db seq as the products table (the parent). This is why sequences are nice sometimes */
@@ -156,5 +163,16 @@ class cmBundle extends cmProduct {
     function get_price() {
         return $this->fetch_baseprice();
     }
+
+
+    /**
+     * get the most qty from all inventory recs for this product. Used for select qty in storefront I think.
+     * @param $pid a productid
+     * @return int
+     */
+    function fetch_max_qty_avail($pid) {
+        return $this->get_header('qty_inventory');
+    }
+
 
 }
