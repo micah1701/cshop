@@ -61,10 +61,23 @@ class cmGiftCard extends db_container {
         $dom =& $this->_create_dom_obj($xmlresp);
         if (!is_object($dom)) { return $this->raiseError("Could not parse gateway response"); }
 
-        if ( $node_balance =& $this->_dom_get_node($dom, 'Amount_Balance') ) {
-            $bal = floatval($this->_dom_get_node_content($node_balance));
-            if ($bal > 0) { // Amount_Balance is in "cents"
-                return sprintf("%.02f", $bal/100);
+        if (! ($node_code =& $this->_dom_get_node($dom, 'Response_Code'))) {
+            return $this->raiseError('Could not understand giftcard gateway response');
+        }
+        else {
+            if ($this->_dom_get_node_content($node_code) != '00') { // that means its bad
+                $node_res =& $this->_dom_get_node($dom, 'Response_Text');
+                return $this->raiseError('Failed to get gift card balance: '. $this->_dom_get_node_content($node_res));
+            }
+            else {
+                if ( $node_balance =& $this->_dom_get_node($dom, 'Amount_Balance') ) {
+                    $bal = floatval($this->_dom_get_node_content($node_balance));
+                    if ($bal > 0) { 
+                        return $bal;
+                        // foster 19 nov 2009 - no it is not in cents, it is in real dollars
+                        // sprintf("%.02f", $bal/100);// Amount_Balance is in "cents"
+                    }
+                }
             }
         }
     }
@@ -207,6 +220,10 @@ class cmGiftCard extends db_container {
      * utility to create some sort of DOM object. On PHP4 gives back a dom_xml
      * object, on PHP5+ a DOMDocument
      *
+     * 13 Nov 2009 // foster
+     * According to docs, PHP4 gives back a DomDocument. Differs from PHP5 by the 
+     * casing.
+     *
      * @private
      * @return dom_xml or DOMDocument object
      */
@@ -230,11 +247,11 @@ class cmGiftCard extends db_container {
      * @return string the value of node, or false if not found
      */
     function _dom_get_node(&$dom, $tag) {
-        if (strtolower(get_class($dom)) == 'domdocument') {
+        if (get_class($dom) == 'DomDocument') {     // php 4 DomDocument
             $coll = $dom->get_elements_by_tagname($tag);
             if (!empty($coll)) return $coll[0];
         }
-        else {
+        else {                                      // php 5 DOMDocument
             $coll = $dom->getElementsByTagName($tag);
             if ($coll->length > 1) {
                 trigger_error("found multiple nodes named $tag", E_USER_NOTICE);
@@ -254,10 +271,10 @@ class cmGiftCard extends db_container {
      * @return string the value of node, or false if not found
      */
      function _dom_get_node_content(&$node) {
-        if (strtolower(get_class($node)) == 'domelement') {
+        if (get_class($node) == 'DomElement') {     // php 4 DomElement
             return $node->get_content();
         }
-        else {
+        else {                                      // php 5 DOMElement
             $kid = $node->firstChild;
             if ($kid->nodeType == XML_TEXT_NODE) {
                 return $kid->nodeValue;
