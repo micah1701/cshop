@@ -265,7 +265,7 @@ class cmCoupon extends db_container {
 
         $recip = sprintf("%s <%s>", $name, $email);
         
-        $mm =& new Mail_mime("\n");
+        $mm = new Mail_mime("\n");
         $mm->setTXTBody($msg);
         $mm->setHTMLBody($msg_html);
 

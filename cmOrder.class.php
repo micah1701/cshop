@@ -93,7 +93,7 @@ class cmOrder extends db_container {
     function get_user() {
         if (!isset($this->user)) {
             $class = CSHOP_CLASSES_USER;
-            $this->user =& new $class($this->db);
+            $this->user = new $class($this->db);
             if (!$this->header or !isset($this->header['user_id'])) {
                 $this->fetch(array('user_id'));
             }
@@ -902,7 +902,7 @@ class cmOrder extends db_container {
 
         $params = "-f".EMAIL_SENDER;
 
-        $mm =& new Mail_mime("\n");
+        $mm = new Mail_mime("\n");
         $mm->setTXTBody($msg);
         $mm->setHTMLBody($msg_html);
 

@@ -32,7 +32,7 @@ else {
 require_once($className. '.class.php');
 
 /** create an instance of that class, whatever it may be */
-$dbc =& new $className($pdb);
+$dbc = new $className($pdb);
 
 /** grab useful params out of the class */
 $table_title = $dbc->class_descrip;

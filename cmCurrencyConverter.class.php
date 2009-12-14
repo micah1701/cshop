@@ -26,13 +26,13 @@
         $inst_name = "_INSTANCE_" . strtoupper($class);
         if (isset($_SESSION)) {
             if (!isset($_SESSION[$inst_name]) or strtoupper(get_class($_SESSION[$inst_name])) != strtoupper($class)) {
-                $_SESSION[$inst_name] =& new $class();
+                $_SESSION[$inst_name] = new $class();
             }
             return $_SESSION[$inst_name];
         }
         else {
             if (!isset($GLOBALS[$inst_name])) {
-                $GLOBALS[$inst_name] =& new $class();
+                $GLOBALS[$inst_name] = new $class();
             }
             return $GLOBALS[$inst_name];
         }

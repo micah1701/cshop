@@ -225,7 +225,7 @@ class cmProduct extends db_container {
     {
         if (!isset($this->cmCategory)) {
             $c = CSHOP_CLASSES_PRODUCT_CATEGORY;
-            $this->cmCategory =& new $c($this->db);
+            $this->cmCategory = new $c($this->db);
         }
         return $this->cmCategory;
     }

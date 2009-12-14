@@ -232,7 +232,7 @@ class cmShipMethod_USPS extends cmShipMethod {
         }
         $url .= '&XML=' . urlencode($xml);
 
-        $http =& new HTTP_Request($url);
+        $http = new HTTP_Request($url);
 
         if (PEAR::isError($http->sendRequest())) {
             return $http;

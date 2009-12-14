@@ -76,10 +76,15 @@ abstract class cmPaymentGateway extends PEAR {
     var $do_logging = false;
 
     function cmPaymentGateway(&$user, &$pay, &$order) {
+        echo 'self!?';
         $this->_user =& $user;
+        echo 'self!?';
         $this->_payment =& $pay;
+        echo 'self!?';
         $this->_order =& $order;
+        echo 'self!?';
         $this->_self_description = $this->get_self_description();
+        echo 'self!?';
     }
 
 

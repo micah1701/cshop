@@ -143,7 +143,7 @@ class cmGiftCard extends db_container {
     function _send_request($xmlstr) {
 
         if ($this->do_log) { error_log(date('r') . "> _send_request(): $xmlstr\n", 3, CSHOP_GIFTCARD_LOG); }
-        $hr =& new HTTP_Request(CSHOP_GIFTCARD_POST_URL);
+        $hr = new HTTP_Request(CSHOP_GIFTCARD_POST_URL);
         $hr->setMethod(HTTP_REQUEST_METHOD_POST);
         $hr->addPostData('Auth_Request', $xmlstr, true);
         $req =& $hr->sendRequest();

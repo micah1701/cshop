@@ -100,7 +100,7 @@ error_reporting(E_ALL);
 /*** init the Smarty template engine ***/
 define("SMARTY_DIR", INCL_DIR . "/Smarty/");             // Smarty likes this
 require_once(SMARTY_DIR . "Smarty.class.php");
-$smarty =& new Smarty;
+$smarty = new Smarty;
 $smarty->compile_check = true;
 $smarty->debugging = false;
 $smarty->template_dir = SITE_ROOT_DIR . "/templates";

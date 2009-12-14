@@ -388,7 +388,7 @@ class cmCart extends db_container {
         $res = $this->db->query($sql);
 
         $pc_class = $this->_product_container_class;
-        $pctr =& new $pc_class($this->db);
+        $pctr = new $pc_class($this->db);
 
         if ($insuff_inv = $this->check_inventory()) {
             $insuff_inv = array_keys($insuff_inv);
@@ -533,6 +533,7 @@ class cmCart extends db_container {
                  $sql = sprintf("SELECT id, opt_descr, opt_value FROM cm_products_options
                                  WHERE id = %d", $v);
 
+                 $opt_id = null;
                  if ($row = $this->db->getRow($sql)) {
                      $opt_id = $row['id'];
                      $v = $row['opt_value'];
@@ -540,7 +541,6 @@ class cmCart extends db_container {
                  }
                  elseif (isset($this->item_custom_options[$optkey])) {
                      $opt_descr = $this->item_custom_options[$optkey];
-                     $opt_id = null;
                  }
 
                  $res = $this->db->execute($sth, array($item_id, $opt_id, $optkey, $opt_descr, $v));

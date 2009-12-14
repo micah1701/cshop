@@ -31,7 +31,7 @@ $page_parent_id = (isset($_REQUEST['parent_id']))? $_REQUEST['parent_id'] : null
 
 $dbc = null;
 if (@include_once($page_id . '.class.php')) {
-    $dbc =& new $page_id($pdb); // will asplode on invalid $page_id, TODO use exceptions
+    $dbc = new $page_id($pdb); // will asplode on invalid $page_id, TODO use exceptions
 }
 if (!$dbc) {
     trigger_error("Resource '$page_id' not found", E_USER_ERROR);

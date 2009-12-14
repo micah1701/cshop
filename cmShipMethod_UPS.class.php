@@ -192,7 +192,7 @@ class cmShipMethod_UPS extends cmShipMethod {
             error_log("\n== REQUEST to {$this->_service_url} ==\n$request", 3, $this->debug_log);
         }
 
-          $http =& new HTTP_Request($this->_service_url . '?' . $request);
+          $http = new HTTP_Request($this->_service_url . '?' . $request);
 
           if (PEAR::isError($http->sendRequest())) {
               return $http;
