@@ -306,7 +306,7 @@ $smarty->display('control/header.tpl');
 
 <? if (isset($_GET['info'])) { ?>
     <div class="indicator">
-      <?= htmlentities($_GET['info']) ?>
+      <?= htmlspecialchars($_GET['info']) ?>
     </div>
     <br />
 <? } ?>

@@ -5,8 +5,7 @@
 // http://us2.php.net/manual/en/language.oop5.autoload.php
 if (!function_exists('__autoload')) {
     function __autoload($class_name) {
-        echo "$class_name:";
-        include_once "$class_name.class.php";
+        @include_once "$class_name.class.php";
         if (!class_exists($class_name, false)) {
             @include_once $class_name . '.php';
             if (!class_exists($class_name, false)) {
