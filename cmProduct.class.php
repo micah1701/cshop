@@ -262,6 +262,7 @@ class cmProduct extends db_container {
                  WHERE pc.cm_categories_id = c.id AND pc.cm_products_id = " . $this->get_id();
          if ($level) $sql .= " AND c.level = $level";
          if ($only_active) $sql .= " AND c.is_active=1 ";
+         $sql .= " ORDER BY c.order_weight";
          return $this->db->getAll($sql);
      }
 
