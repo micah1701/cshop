@@ -5,6 +5,10 @@
  * utility class with static methods to get various selection/menu choices for
  * editing product attribs and stuff. 
  *
+ * @DEPRECATED
+ * TODO wow this is bad organization of function. shuffle everything over to the appropriate classes, 
+ * most of these methods are already duplicated.
+ *
  * $Id: store.edit.inc.php,v 1.6 2006/10/05 23:05:26 sbeam Exp $
  */
 class cshopUtils {

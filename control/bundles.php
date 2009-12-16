@@ -171,7 +171,6 @@ foreach ($bundle->colmap_help as $elem => $txt) {
     $fex->set_elem_helptext($elem, $txt);
 }
 
-
 // handle ADD and EDIT/*{{{*/
 if (isset($_POST['op']) and ($ACTION == OP_ADD or $ACTION == OP_EDIT)) {
     

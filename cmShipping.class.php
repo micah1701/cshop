@@ -62,20 +62,29 @@
      * @todo figure out how to offer the INTERSECTION of all methods
      */
     function get_available_methods(&$cart) {
-        $pids = array();
         $methods = array();
-        $free = true;
-        foreach ($cart->fetch_items() as $item) { // TODO - too expensive.
-            $pids[] = $item['product_id'];
+        $has_bundles = false;
+
+        /* for optimization, look for any cart items which are bundles */
+        foreach ($cart->fetch_items() as $item) {
+            if (!empty($item['is_bundle'])) 
+                $has_bundles = true;
         }
 
-        if (count($pids) == 0) return $pids;
+        $cart_id = $cart->get_id();
+        $cols = "ship.id, ship.class_map, ship.is_free, ship.adder";
+        if ($has_bundles) { // we have to use the more complex query to look in both cm_products and cm_bundles at the same time
+            $sql = "SELECT $cols FROM cm_ship_class ship
+                        LEFT JOIN cm_products p ON (p.cm_ship_class_id = ship.id)
+                        LEFT JOIN cm_bundles b ON (b.cm_ship_class_id = ship.id)
+                    WHERE (p.id in ( SELECT product_id from cm_cart_items where cart_id = $cart_id AND is_bundle IS NULL)
+                        OR b.id IN ( SELECT product_id from cm_cart_items where cart_id = $cart_id AND is_bundle = 1) )";
+        }
+        else {
+            $sql = "SELECT $cols FROM cm_ship_class ship JOIN cm_products p ON (p.cm_ship_class_id = ship.id)
+                    WHERE p.id in ( SELECT product_id from cm_cart_items where cart_id = $cart_id AND is_bundle IS NULL)";
+        }
 
-        /* get list of ship classes defined for each product in the cart. */
-        $sql = sprintf("SELECT ship.id, ship.class_map, ship.is_free, ship.adder 
-                        FROM cm_ship_class ship, cm_products p 
-                        WHERE p.cm_ship_class_id = ship.id AND p.id in (%s)",
-                        join(',', $pids));
         $res = $cart->db->query($sql);
 
         // TODO should this take place regardless of whether products shipclass matched?
@@ -92,22 +101,23 @@
             $res = $cart->db->query($sql);
         }
 
+        $free = true;
+
         if (!PEAR::isError($res)) {
             while ($row = $res->fetchRow()) {
                 if (!$row['is_free']) {
-                    $free = false;
+                    $free = false; // too bad, gotta pay.
                 }
-                $these = split(',', $row['class_map']); // can be a commasep set of methods?
+                $these = split(',', $row['class_map']); // legacy code, could be a commasep set of methods? *gag*
                 foreach ($these as $m) {
                     if (!in_array($m, $methods)) $methods[] = $m;
-                    $this->adders[$row['id']] = $row['adder'];
+                    $this->adders[$row['id']] = $row['adder']; // each cm_ship_class.id => adder, for later use by subclass... 
                 }
             }
         }
 
 
-        #if ($free) { return 'FREE'; } // everything in the cart was free!
-        if ($free) {
+        if ($free) {  // everything in the cart was free shipping!
             $this->all_cartitems_qualify_freeship = true;
         }
 
@@ -164,7 +174,6 @@
                 $adder += $amt;
             }
         }
-
 
         foreach ($shipmethods as $meth) {
             include_once("$meth.class.php");

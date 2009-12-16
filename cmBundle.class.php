@@ -39,6 +39,7 @@ class cmBundle extends cmProduct {
                         'sku' => array('SKU', 'text', null, 1),
                         'weight' => array('Weight (lbs)', 'numeric', null, array('size'=>8), 1),
                         'base_price' => array('Base Price', 'numeric', null, true),
+                        'cm_ship_class_id' => array('Shipping Class', 'select', array(), null, 1),
                         'description' => array('Description', 'textarea', null, array('rows'=>2), false),
                         'long_description' => array('Additional Info', 'textarea', null, array('rows'=>8), false),
                         'qty_inventory' => array('Inventory (Qty. on Hand)', 'numeric', null, array('size'=>4), false),
@@ -50,6 +51,19 @@ class cmBundle extends cmProduct {
                              'qty_inventory' => 'Quantity on hand and available for purchase',
                              'do_inventory' => 'Deduct both bundle and individual product items from inventory when purchased.',
                          );
+
+
+    /* auto fetch options from subclasses */
+    function get_colmap() {
+        $colmap = parent::get_colmap();
+
+        if (isset($colmap['cm_ship_class_id']) and !count($colmap['cm_ship_class_id'][2])) {
+            $colmap['cm_ship_class_id'][2] = cmShipping::fetch_ship_class_opts($this->db);
+        }
+        return $colmap;
+    }
+
+
 
 
     /* override to use same db seq as the products table (the parent). This is why sequences are nice sometimes */

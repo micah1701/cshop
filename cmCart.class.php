@@ -364,62 +364,64 @@ class cmCart extends db_container {
       */
      function fetch_items($get_thumbs=false) {
 
-         $items = array();
-         $cols = array('id', 'inventory_id', 'product_id', 'qty', 'price', 'discount'
-                       , 'product_sku', 'product_descrip', 'product_attribs', 'has_item_options');
-         if (!$get_thumbs) {
-             $sql = sprintf("SELECT %s
-                             FROM %s
-                             WHERE cart_id = %d
-                             ORDER BY modified_date DESC",
-                             join(',', $cols),
-                             $this->_items_table,
-                             $this->get_id());
-         }
-         else {
-             $sql = sprintf("SELECT %s, pi.system_location, pi.filename_thumb, pi.dims_thumb
-                             FROM %s ci LEFT JOIN cm_product_images pi ON pi.cm_products_id = ci.product_id
-                             WHERE cart_id = %d
-                             ORDER BY modified_date DESC",
-                             join(',', $cols),
-                             $this->_items_table,
-                             $this->get_id());
-         }
-        $res = $this->db->query($sql);
+         if (empty($this->_items)) {
+             $items = array();
+             $cols = array('id', 'inventory_id', 'product_id', 'qty', 'price', 'discount', 'is_bundle', 
+                           'product_sku', 'product_descrip', 'product_attribs', 'has_item_options');
+             if (!$get_thumbs) {
+                 $sql = sprintf("SELECT %s
+                                 FROM %s
+                                 WHERE cart_id = %d
+                                 ORDER BY modified_date DESC",
+                                 join(',', $cols),
+                                 $this->_items_table,
+                                 $this->get_id());
+             }
+             else {
+                 $sql = sprintf("SELECT %s, pi.system_location, pi.filename_thumb, pi.dims_thumb
+                                 FROM %s ci LEFT JOIN cm_product_images pi ON pi.cm_products_id = ci.product_id
+                                 WHERE cart_id = %d
+                                 ORDER BY modified_date DESC",
+                                 join(',', $cols),
+                                 $this->_items_table,
+                                 $this->get_id());
+             }
+            $res = $this->db->query($sql);
 
-        $pc_class = $this->_product_container_class;
-        $pctr = new $pc_class($this->db);
+            $pc_class = $this->_product_container_class;
+            $pctr = new $pc_class($this->db);
 
-        if ($insuff_inv = $this->check_inventory()) {
-            $insuff_inv = array_keys($insuff_inv);
+            if ($insuff_inv = $this->check_inventory()) {
+                $insuff_inv = array_keys($insuff_inv);
+            }
+
+            while ($row = $res->fetchRow()) {
+                if (!empty($row['product_attribs'])) {
+                    $row['product_attribs'] = unserialize($row['product_attribs']); 
+                }
+
+                /* find any optional options for this line item */
+                if (!empty($row['has_item_options'])) {
+                    $row['item_options'] = $this->_fetch_item_options($row['id'], false);
+                }
+
+                // TODO get_attrib_array is expensive, we shouldnt be doing this on each view...
+                $row['normalized_attribs'] = $pctr->get_attrib_array($row['inventory_id']);
+
+                if ($row['discount'] != 0 && $this->do_apply_discount_to_lineitems()) {
+                    $row['full_price'] = $row['price'];
+                    $row['price'] -= abs($row['discount']);
+                }
+                $row['line_price'] = sprintf('%.02f', ($row['qty'] * $row['price']));
+
+                /* if there is no enough inventory for the current inventory item, we set a flag */
+                $row['out_of_stock'] = ($insuff_inv and in_array($row['inventory_id'], $insuff_inv));
+
+                $items[] = $row;
+            }
+            $res->free();
+            $this->_items = $items;
         }
-
-        while ($row = $res->fetchRow()) {
-            if (!empty($row['product_attribs'])) {
-                $row['product_attribs'] = unserialize($row['product_attribs']); 
-            }
-
-            /* find any optional options for this line item */
-            if (!empty($row['has_item_options'])) {
-                $row['item_options'] = $this->_fetch_item_options($row['id'], false);
-            }
-
-            // TODO get_attrib_array is expensive, we shouldnt be doing this on each view...
-            $row['normalized_attribs'] = $pctr->get_attrib_array($row['inventory_id']);
-
-            if ($row['discount'] != 0 && $this->do_apply_discount_to_lineitems()) {
-                $row['full_price'] = $row['price'];
-                $row['price'] -= abs($row['discount']);
-            }
-            $row['line_price'] = sprintf('%.02f', ($row['qty'] * $row['price']));
-
-            /* if there is no enough inventory for the current inventory item, we set a flag */
-            $row['out_of_stock'] = ($insuff_inv and in_array($row['inventory_id'], $insuff_inv));
-
-            $items[] = $row;
-        }
-        $res->free();
-        $this->_items = $items;
         return $this->_items;
 
      }

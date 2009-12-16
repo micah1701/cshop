@@ -78,6 +78,10 @@ class cmShipMethod_FedEx extends cmShipMethod {
                 $res[$opt] = $opt;
             }
         }
+        if ($this->debug) {
+            $log = "\n==> QUOTES: (adder=$adder) " . join(";", array_keys($res)) . "\n";
+            error_log($log, 3, $this->debug_log);
+        }
         return $res;
     }
 

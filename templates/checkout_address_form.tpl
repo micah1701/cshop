@@ -92,7 +92,42 @@
             </td>
             <td class="formField" colspan="4">
                 <~ $cform.user_comments.TAG|tabindex:21 ~>
+                <br />
+                <div id="max_comments">Characters remaining: <span>255</span></div>
             </td>
           </tr>
 
         </table>
+
+        <script type="text/javascript">
+
+            /** check and verify length of comment according to max length found in html */
+            var max_comment_length = 2000;
+            $(document).ready( function() { 
+                    max_comment_length = parseInt($('#max_comments span').text());
+                    $('#f_user_comments').trigger('keyup');
+           });
+
+            $('#f_user_comments').bind('keyup', function() {
+                    var len = $(this).val().length;
+                    if (len > max_comment_length) {
+                        $('#max_comments').addClass('checkoutCommentError');
+                    }
+                    else {
+                        $('#max_comments').removeClass('checkoutCommentError');
+                    }
+                    $('#max_comments span').text( max_comment_length - len );
+            });
+
+            $('form').bind('submit', function() {
+                    var comments = $(this).find('#f_user_comments');
+                    if ($(comments).length) {
+                        if ($(comments).val().length > max_comment_length) {
+                            alert('Comment field cannot exceed ' +max_comment_length+ ' characters. Please edit to proceed');
+                            return false;
+                        }
+                        return true;
+                    }
+            });
+
+        </script>
