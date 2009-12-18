@@ -895,26 +895,22 @@ class cmCart extends db_container {
       * @return float */
      function get_taxable_amount() {
 
-         /* we have to use DISTINCT bc this goes on mySQL3 - LAME - otherwise I
-          * would do
-          * SELECT SUM(qty * price) FROM cm_cart_items ci
-          * WHERE EXISTS 
-          *      (SELECT NULL FROM cm_products_categories pc, cm_categories c
-          *       WHERE ci.product_id = pc.cm_products_id AND c.is_taxable = 1)
-          * AND cart_id = %d
-         */
-
-         $sql = sprintf("SELECT DISTINCT ci.id, (qty * price) as linetotal
-                         FROM cm_cart_items ci, cm_products_categories pc, cm_categories c       
-                         WHERE pc.cm_products_id = product_id
-                             AND pc.cm_categories_id = c.id
-                             AND c.is_taxable = 1
-                             AND cart_id = %d",
+         // a correlated sub-select does the trick
+         $sql = sprintf("SELECT SUM(qty * price) FROM cm_cart_items ci
+                         WHERE EXISTS 
+                                (SELECT NULL FROM cm_products_categories pc, cm_categories c
+                                 WHERE ci.product_id = pc.cm_products_id AND c.is_taxable = 1)
+                         AND cart_id = %d",
                          $this->get_id());
-         $amt = 0;
-         $res = $this->db->query($sql);
-         while ($row = $res->fetchRow()) {
-             $amt += $row['linetotal'];
+         $amt = intval($this->db->getOne($sql));
+
+         if (defined('CSHOP_USE_BUNDLES') && CSHOP_USE_BUNDLES) { // bundles are always taxable.
+             $sql = sprintf("SELECT SUM(qty * base_price) FROM cm_cart_items ci, cm_bundles b 
+                             WHERE b.id = ci.product_id AND ci.is_bundle=1 AND cart_id = %d",
+                             $this->get_id());
+             if ($bundle_amt = $this->db->getOne($sql)) {
+                 $amt += $bundle_amt;
+             }
          }
          return $amt;
      }
