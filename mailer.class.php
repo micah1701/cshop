@@ -36,9 +36,8 @@ class circusMailer {
             $subj = "=?UTF-8?B?" . base64_encode($subj) . "?=";
         }
 
-        $params['sendmail_path'] = $this->sendmail_path;
-
         // Create the mail object using the Mail::factory method
+        // $params['sendmail_path'] = $this->sendmail_path;
         // $m =& Mail::factory('sendmail', $params); // it dont work right now
 
         $res = mail($recip, $subj, $msg, $this->get_headers());

@@ -134,6 +134,7 @@ class cmPaymentGatewayANET_SIM extends cmPaymentGatewayANET {
                                substr($item['product_descrip'], 0, 255), 
                                $item['qty'], 
                                $item['price'], 'Y');
+                $line = preg_replace('/[^(\x20-\x7F)]*/','', $line); // A.net errors if non-ascii chars are in the input :{
                 $aNetVars["x_line_item"][] = join('<|>', $line);
             }
 

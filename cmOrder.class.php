@@ -684,7 +684,9 @@ class cmOrder extends db_container {
      * @param $pay obj a cmPayment object
      * @param $gate obj a cmGateway object
      * @param $cart obj a cmCart object 
-     * @return nothing [my left nut for try/catch!] */
+     * @return void
+     * @throws Exception
+     */
     function finalize(&$pay, &$gate, &$cart) {
         $this->db->autoCommit(false);
         try {

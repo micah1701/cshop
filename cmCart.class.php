@@ -274,7 +274,7 @@ class cmCart extends db_container {
         $bundle_products = array();
         foreach ($bundle->product_selection as $cat_id => $products) {
             foreach ($products as $p) {
-                $bundle_products[$p['id']] = $p['title'] . ' (' . $p['display_weight'] . ')';
+                $bundle_products[$p['sku']] = $p['title'] . ' (' . $p['display_weight'] . ')';
             }
         }
 
@@ -1093,20 +1093,25 @@ class cmCart extends db_container {
      * products_inventory items, i.e. SKU's 
      * @return true on success
      */
-    function pull_inventory()
-    {
-        $inv = $this->_get_cart_inventory();
-        if (count($inv)) {
-            $sql = "UPDATE {$this->_inventory_table} SET qty = (qty - ?) WHERE id = ?";
-            $sth = $this->db->prepare($sql);
-            foreach ($inv as $inv_id => $qty) {
-                $res = $this->db->execute($sth, array($qty, $inv_id));
-                if (PEAR::isError($res)) {
-                    return $res;
+    function pull_inventory() {
+        $cart_items = $this->fetch_items();
+        if (count($cart_items)) {
+
+            $product = cmClassFactory::getSingletonOf(CSHOP_CLASSES_PRODUCT, $this->db);
+
+            foreach ($cart_items as $item) {
+                if (defined('CSHOP_USE_BUNDLES') && CSHOP_USE_BUNDLES && $item['is_bundle']) {
+                    $bundle = cmClassFactory::getInstanceOf(CSHOP_CLASSES_BUNDLE, $this->db);
+                    $bundle->set_id($item['product_id']);
+                    $skus = array_keys($item['product_attribs']);
+                    $res = $bundle->pull_inventory($skus, $item['qty']);
                 }
-                $this->_inventory_monitor($inv_id);
+                else {
+                    $res = $product->pull_inventory($item['inventory_id'], $item['qty']);
+                }
+                if (PEAR::isError($res)) // sux
+                    trigger_error("Error in cmCart::pull_inventory() for line item {$item['id']}: " . $res->getMessage(), E_USER_WARNING);
             }
-            return true;
         }
     }
 
@@ -1175,19 +1180,6 @@ class cmCart extends db_container {
             }
         }
         return $inv;
-    }
-
-
-    /** if configured, instant. a cmProduct obj and have it check the inventory
-     * on the given inv, item 
-     * @param $inv_id int inventory id
-     */
-    function _inventory_monitor($inv_id) {
-        if (defined('CSHOP_INVENTORY_WARNING_LEVEL') && CSHOP_INVENTORY_WARNING_LEVEL > 0) {
-            $c = CSHOP_CLASSES_PRODUCT;
-            $pr = new $c($this->db);
-            return $pr->check_inventory_level($inv_id);
-        }
     }
 
 
@@ -1359,22 +1351,20 @@ class cmCart extends db_container {
     function generate_order_token() {
         if (!$this->get_id()) return;
 
-        $res = $this->fetch(array('order_token'));
-        $tok = $res['order_token'];
-        if (!$tok) {
-            $order = cmClassFactory::getSingletonOf(CSHOP_CLASSES_ORDER, $this->db);
-            $tok = $order->create_order_token();
-            try {
-                $this->store(array('order_token' => $tok));
-            } catch (Exception $e) {
-                if ($e->getCode() == DB_ERROR_ALREADY_EXISTS) {
-                    $tok = $this->generate_order_token();
-                }
-                else {
-                    throw $e;
-                }
+        $order = cmClassFactory::getSingletonOf(CSHOP_CLASSES_ORDER, $this->db);
+        $tok = $order->create_order_token();
+
+        try {
+            $this->store(array('order_token' => $tok));
+        } catch (Exception $e) {
+            if ($e->getCode() == DB_ERROR_ALREADY_EXISTS) {
+                $tok = $this->generate_order_token();
+            }
+            else {
+                throw $e;
             }
         }
+
         return $tok;
     }
 

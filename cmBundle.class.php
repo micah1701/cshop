@@ -1,20 +1,37 @@
 <?php
-require_once('db_container.class.php');
-require_once(CSHOP_CLASSES_PRODUCT. '.class.php');
-require_once(CSHOP_CLASSES_PRODUCT_CATEGORY . '.class.php');
-
-
 /**
  * 
  * Class to represent cmProduct 'bundles', ie build-a-kit, build-a-skate, 'pick-yer-own' etc
  *
- * Each bundle contains one or more components. Each component may be composed of one or more products, and may or may not be required.
+ * Each bundle can be configured to be made up of selections from certain categories (cmCategories).
+ *
+ * If the category is tagged as 'use in bundles' (via admin), it will show up in the admin tool
+ * for the bundles. Then the quantity of individual products from that category that are required 
+ * can be entered. 
+ *
+ * If a category is not flagged as 'live', then it shouldn't show up on the 
+ * front-end. However these hidden Categories can
+ * still be used to provide a range of products for use in Bundle 
+ * configuration.
+ *
+ * Bundles are sort of 'meta' products and therefore are kept in their own table seperate from cm_products.
+ *
+ * inventory can be managed on a bundle-as-a-whole basis only. This is a simple qty field in the admin for the bundle.
+ *
+ * User's bundle selections are saved to the cart as a serialized array in cm_cart_items.product_attribs. 
+ * This all is handled by cmCart
+ *
+ * TODO
+ *   - make a category 'optional' within a bundle
+ *   - allow a bundle colorways or other options, like normal products
+ *   - create adders for certain premium product selections over the base cost
+ *   - allow sub-selection of only certain products within each category
  *
  * for instance:
  *   "Skate" bundle - 
- *      Component "wheels" - 2 required from products X, Y or Z 
- *      Component "deck" - 1 required
- *      Component "trucks" - 1 required
+ *      Component "wheels" - 2 required from category 'Wheels'
+ *      Component "deck" - 1 required from category 'Deck'
+ *      Component "trucks" - 1 required from category 'Special Trucks'
  *      component "hardware" - 1 optional
  *      component "grip tape" - 1 optional
  *
@@ -24,11 +41,9 @@ require_once(CSHOP_CLASSES_PRODUCT_CATEGORY . '.class.php');
  *      Component "Sausages" - 1 required
  *      Component "Cheeze Spread" - 3 required
  *
- * components can be created within cm_bundle_components table
- *
- * valid products from each category can be dropped in via admin.
- *
  */
+
+
 class cmBundle extends cmProduct {
 
     var $_table = 'cm_bundles';
@@ -135,18 +150,19 @@ class cmBundle extends cmProduct {
      * given a list of product ids, go over each and make sure they match up to 
      * the required categories for this bundle
      */
-    function validate_product_selection($product_ids) {
+    function validate_product_selection($product_skus) {
         $req_cats = $this->get_required_cats();
         $picked = array();
         $product = cmClassFactory::getSingletonOf(CSHOP_CLASSES_PRODUCT, $this->db);
 
-        foreach ($product_ids as $pid) { 
-            $product->set_id($pid);
+        foreach ($product_skus as $sku) { 
+            $product->set_id_by_sku($sku);
             $pinfo = $product->fetch(array('id', 'title', 'display_weight'));
             foreach ($product->fetch_product_categories(null, false) as $cat) { // list of all cats this product is in, even the inactive ones
                 if (!isset($req_cats[$cat['id']])) continue;
 
                 if (!isset($picked[$cat['id']])) $picked[$cat['id']] = array();
+                $pinfo['sku'] = $sku;
                 $picked[$cat['id']][] = $pinfo;
             }
             $product->reset();
@@ -186,6 +202,35 @@ class cmBundle extends cmProduct {
      */
     function fetch_max_qty_avail($pid) {
         return $this->get_header('qty_inventory');
+    }
+
+    /**
+     * Bundle does some acrobatics to pull the inventory for each contained product, as well as itself.
+     * @param $skus array of product skus contained in the bundle
+     * @param $qty how many to pull (applies to Bundle and all products)
+     */
+    function pull_inventory($skus, $qty) {
+        $do_inventory = $this->get_header('do_inventory');
+        if ($do_inventory) {
+
+            $product = cmClassFactory::getSingletonOf(CSHOP_CLASSES_PRODUCT, $this->db);
+            $sth = $this->db->prepare("SELECT id FROM {$this->_inventory_table} WHERE sku = ?");
+
+            foreach ($skus as $sku) {
+                $res = $this->db->execute($sth, $sku);
+                if ($row = $res->fetchRow()) {
+                    $res = $product->pull_inventory($row['id'], $qty);
+                    if (!$res or PEAR::isError($res)) {
+                        trigger_error("No effect when deducting inventory qty '$qty' for sku '$sku' ($res)", E_USER_WARNING);
+                    }
+                }
+                else {
+                    trigger_error("Unknown SKU '$sku' found in bundle items", E_USER_WARNING);
+                }
+            }
+            $sql = sprintf("UPDATE cm_bundles SET qty_inventory = (qty_inventory - %d) WHERE id = %d", $qty, $this->get_id());
+            return $this->db->query($sql);
+        }
     }
 
 

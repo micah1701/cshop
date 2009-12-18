@@ -1050,7 +1050,7 @@ class cmProduct extends db_container {
      */
     function _send_inventory_warning_notice($inv_id, $qty) {
         if (defined('CSHOP_INVENTORY_WARNING_RECIP')) {
-            $recip = CSHOP_INVENTORY_WARNING_RECIP;
+            $recip = (ON_LIVE_SERVER)? CSHOP_INVENTORY_WARNING_RECIP : ERROR_EMAIL_RECIP;
 
             $cmail = new circusMailer();
 
@@ -1069,6 +1069,22 @@ class cmProduct extends db_container {
 
             return $cmail->send($recip, $subj, $msg);
         }
+    }
+
+
+    /**
+     * decrement specified inventory quantity
+     * @param $inv_id cm_inventory.id key
+     * @param $qty how many
+     */
+    function pull_inventory($inv_id, $qty) {
+        if (!isset($this->_sth_pull_inv)) {
+            $sql = "UPDATE {$this->_inventory_table} SET qty = (qty - ?) WHERE id = ?";
+            $this->_sth_pull_inv= $this->db->prepare($sql);
+        }
+        $res = $this->db->execute($this->_sth_pull_inv, array($qty, $inv_id));
+        $this->check_inventory_level($inv_id);
+        return $res;
     }
 
 

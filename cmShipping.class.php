@@ -66,14 +66,16 @@
         $has_bundles = false;
 
         /* for optimization, look for any cart items which are bundles */
-        foreach ($cart->fetch_items() as $item) {
-            if (!empty($item['is_bundle'])) 
-                $has_bundles = true;
+        if (defined('CSHOP_USE_BUNDLES') and CSHOP_USE_BUNDLES) {
+            foreach ($cart->fetch_items() as $item) {
+                if (!empty($item['is_bundle'])) 
+                    $has_bundles = true;
+            }
         }
 
         $cart_id = $cart->get_id();
         $cols = "ship.id, ship.class_map, ship.is_free, ship.adder";
-        if ($has_bundles) { // we have to use the more complex query to look in both cm_products and cm_bundles at the same time
+        if ($has_bundles) { // use the more complex query to look in both cm_products and cm_bundles at the same time
             $sql = "SELECT $cols FROM cm_ship_class ship
                         LEFT JOIN cm_products p ON (p.cm_ship_class_id = ship.id)
                         LEFT JOIN cm_bundles b ON (b.cm_ship_class_id = ship.id)
