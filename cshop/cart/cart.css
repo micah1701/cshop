@@ -1,0 +1,191 @@
+
+/* cart.css
+ * default CSS rules common to ALL cshops.
+ *
+ * if you modify this file, the changes should be applicable to
+ * ANY future cshop, and back-compat with all the existing ones.
+ * 
+ * to make site-specific changes, create a XXX_cart.css file in the
+ * root dir of the site. Then put any overrides or extensions of these
+ * definitions there. Include this file at the top with an @import rule, e.g.:
+ *
+ * @import url(/cart/cart.css);
+ *
+ * enjoy and good luck.
+ */
+input,textarea,select{
+}
+
+.userNotice {
+    font-weight: bold;
+}
+.userIndicator {
+    font-weight: bold;
+    background-color: #dedede;
+    color: #000;
+}
+
+.carttotal{
+	background-color:#ffffff;
+	font-size:10px;
+	font-weight:bold;
+}
+
+input.cartQty {
+    background-color: #fff;
+    padding: 1px;
+}
+
+input#opCartQtyUp {
+    visibility: visible;
+    cursor: pointer;
+}
+tr.cartHeader {
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #fff;
+    background: #000;
+}
+tr.cartHeader td {
+    padding: 0;
+}
+div#cartwrapper {
+  margin: 10px;
+}
+
+.userCartControl {
+    padding: 5px;
+    text-align: right;
+}
+.userCartControl a, .userCartControl input {
+    padding: 3px;
+    font-weight: normal;
+    text-decoration: none;
+    cursor: pointer;
+}
+h4 {
+    margin: 10px 0 0 0;
+    padding: 0;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+div#currencySwitchMenu {
+    float: right;
+    text-align: right;
+}
+
+#cartStepIndicator {
+    margin-bottom: 0.5em;
+}
+.cartStepNext {
+    background: #fff;
+    color: #555;
+    font-weight: bold;
+}
+.cartStepPrev {
+    background: #fff;
+    color: #999;
+    font-weight: normal;
+}
+.cartStepCurr {
+    background: #666;
+    color: #fff;
+    font-weight: bold;
+    padding: 0 2px 0 2px;
+}
+.cartLoginFormBox {
+    border: 1px solid #999;
+    padding: 10px;
+    margin-top: 10px;
+    width: 45%;
+    float: left;
+}
+#cartLoginForm {
+    margin-right: 4%;
+}
+#cartLoginBypass {
+    border: 0;
+}
+#cartLoginBypass form {
+    text-align: center;
+    margin: 10px 0;
+}
+
+h2.checkoutSectionHeader {
+    font-size: 14px;
+    background: #333;
+    color: #fff;
+    margin: 0;
+    margin-top: 10px;
+    padding: 2px;
+}
+
+#miniCart {
+    float: right;
+    border: 1px solid #dedede;
+    padding: 3px;
+}
+.checkoutHintNotice {
+    font-size: 0.9em;
+}
+
+#cmCartListing {
+    width: 100%;
+}
+#cmCartListing table {
+    width: 100%;
+}
+
+#cartDiscountEntry { }
+.reqFieldNotice { }
+.checkoutFormBox { }
+
+.priceStrikeout {
+    text-decoration: line-through;
+}
+
+
+#checkoutConfirmPaymentInfoArea {
+    padding-bottom: 2.8em;
+}
+#checkoutConfirmPaymentInfoArea .checkoutConfirmEditAddrLink {
+    display: inline;
+}
+
+#orderPrintLink a {
+    float: right;
+    padding: 0.1em 0.4em;
+    border: 1px solid #f1ebc8;
+}
+#chkConfirmOrderInfo table {
+    margin: 2em 0;
+}
+#chkConfirmCustInfo, #chkConfirmOrderInfo {
+    font-size: 110%;
+}
+#chkConfirmCustInfo span {
+    display: block;
+    padding-left: 10em;
+}
+#chkConfirmCustInfo span.header {
+    float: left;
+    width: 10em;
+    padding-left: 0;
+}
+#chkConfirmOrderHeader {
+    padding-top: 1em;
+}
+#chkConfirmOrderHeader div.orderHeader span {
+    float: left;
+    clear: left;
+    width: 10em;
+    font-weight: bold;
+}
+
+a#cmContinueShopping {
+    display: block;
+    text-align: right;
+    font-weight: bold;
+}
