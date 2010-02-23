@@ -55,7 +55,7 @@ class cmProductOption extends db_container {
     function fetch_any($cols=null, $offset=0, $range=0, $orderby=null, $where='', $orderdir='ASC') {
         if (!empty($where)) $where .= " AND";
         $where .= " cm_products_id = " . $this->db->quote($this->_cm_product_id);
-        if (!$orderby) $orderby = 'optkey';
+        if (!$orderby) $orderby = 'order_weight,optkey';
         return parent::fetch_any($cols, $offset, $range, $orderby, $where, $orderdir);
     }
 }
