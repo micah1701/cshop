@@ -231,12 +231,13 @@ fi
 
 cd $CSHOP_BASEDIR/..       # /local
 
+SMARTY_REPO=http://smarty-php.googlecode.com/svn/tags/Smarty_2_6_26/libs
 read -p "checkout Smarty to 'local' dir? [y/n] " DO_IT
 if [ "$DO_IT" == "y" ]; then
-    echo "==> Checking out authlib from CVS repo $CVS_REPO"
-    cvs -d :pserver:cvsread@cvs.php.net:/repository co -r Smarty_2_6_10 -d Smarty smarty/libs
+    echo "==> Checking out Smarty from repo $SMARTY_REPO"
+    svn co $SMARTY_REPO Smarty
 fi 
-echo 'Smarty onsetlib authlib cshop' > .cvsignore
+echo 'Smarty cshop' > .cvsignore
 
 cd $CSHOP_BASEDIR
 
