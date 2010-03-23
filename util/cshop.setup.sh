@@ -1,7 +1,6 @@
 #!/bin/bash
 
 
-CVS_REPO="maximus.circusmedia.com:/Users/Shared/cvs"
 
 CSHOP_BASEDIR="`pwd`/.."
 
@@ -230,25 +229,7 @@ fi
 
 
 
-# CVS checkouts of external libs as needed
 cd $CSHOP_BASEDIR/..       # /local
-
-read -p "CVS checkout onsetlib to 'local' dir? [y/n] " DO_IT
-if [ "$DO_IT" == "y" ]; then
-    echo "==> Checking out onsetlib from CVS repo $CVS_REPO"
-    cvs -d $CVS_REPO co onsetlib
-fi 
-
-read -p "CVS checkout authlib to 'local' dir? [y/n] " DO_IT
-if [ "$DO_IT" == "y" ]; then
-    echo "==> Checking out authlib from CVS repo $CVS_REPO"
-    cvs -d $CVS_REPO co authlib
-
-    if [ ! -f authlib.local.php ]; then
-        echo "==> copying authlib.local.php from samples into local/"
-        cp authlib/samples/authlib.local.php authlib.local.php
-    fi
-fi 
 
 read -p "checkout Smarty to 'local' dir? [y/n] " DO_IT
 if [ "$DO_IT" == "y" ]; then
@@ -256,8 +237,6 @@ if [ "$DO_IT" == "y" ]; then
     cvs -d :pserver:cvsread@cvs.php.net:/repository co -r Smarty_2_6_10 -d Smarty smarty/libs
 fi 
 echo 'Smarty onsetlib authlib cshop' > .cvsignore
-
-
 
 cd $CSHOP_BASEDIR
 
