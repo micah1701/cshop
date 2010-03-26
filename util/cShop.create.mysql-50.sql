@@ -109,6 +109,7 @@ CREATE TABLE `cm_cart` (
   `create_date` timestamp NOT NULL default '0000-00-00 00:00:00',
   `purchased` tinyint(1) default NULL,
   `cm_paymentcc_id` int(10) unsigned default NULL,
+  is_bundle bool,
   PRIMARY KEY  (`id`),
   KEY `ix_uid` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

@@ -366,3 +366,7 @@ ALTER TABLE cm_bundles ADD weight double(5,2) not null;
 
 -- Thu Oct 29 11:18:55 EDT 2009
 ALTER TABLE cm_bundles ADD long_description text;
+
+
+-- Fri Mar 26 00:43:21 EDT 2010
+ALTER TABLE cm_cart ADD is_bundle bool;
