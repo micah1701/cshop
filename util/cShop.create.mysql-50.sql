@@ -212,6 +212,7 @@ CREATE TABLE `cm_categories` (
   `cat_photo_dims` varchar(32) default NULL,
   `swi_cat_class` enum('merchant','consumer','giftcards') default NULL,
   `urlkey` varchar(16) default NULL,
+   is_used_in_bundle bool,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `uq_urlkey` (`urlkey`),
   KEY `ix_shc` (`ship_class_id`),
@@ -898,6 +899,34 @@ CREATE TABLE `cm_sizes_seq` (
   `id` int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+ 
+CREATE TABLE cm_bundles (
+    id int unsigned not null AUTO_INCREMENT,
+    title varchar(255) not null,
+    base_price double (9,2) not null,
+    assembly_fee double (9,2) not null,
+    description varchar(1023) not null,
+    sku varchar(63) not null,
+    weight double(5,2) not null,
+    long_description text,
+    PRIMARY KEY (`id`)
+) Engine=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `cm_bundles_categories` (
+  id int unsigned not null AUTO_INCREMENT,
+  `cm_bundles_id` int(10) unsigned NOT NULL,
+  `cm_categories_id` int(10) unsigned NOT NULL,
+  `required` int(4) unsigned,
+  PRIMARY KEY (`id`),
+  UNIQUE (`cm_bundles_id`, `cm_categories_id`),
+  CONSTRAINT `cm_bc_ibfk_1` FOREIGN KEY (`cm_categories_id`) REFERENCES `cm_categ
+  CONSTRAINT `cm_bc_ibfk_2` FOREIGN KEY (`cm_bundles_id`) REFERENCES `cm_bundles`
+) Engine=InnoDB AUTO_INCREMENT=30;
+
+
+
 
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
