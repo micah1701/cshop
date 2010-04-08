@@ -339,7 +339,7 @@ else {
 
             // store.edit.php?nid=444
             $link = sprintf('%s?op_edit=%s&class=%s', $_SERVER['PHP_SELF'], urlencode($row[$dbc->get_pk_col()]), $class);
-            $table->addRow_fu($vals, '', null, $link);
+            $table->addRow($vals, '', null, $link);
         }
     }
     $numrows = $dbc->numRows;

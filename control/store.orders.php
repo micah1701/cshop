@@ -375,7 +375,7 @@ else {
                               $_SERVER['PHP_SELF'], 
                               $reqIdKey,
                               $o['order_token']);
-            $table->addRow_fu(array_values($vals), '', true, $link);
+            $table->addRow(array_values($vals), '', true, $link);
         }
 
         $pager = new res_pager($offset, $range, $order->numRows);

@@ -181,7 +181,7 @@ else {
                 $rowvals[] = $row[$k];
             }
                               
-            $table->addRow_fu($rowvals, null, true, $link);
+            $table->addRow($rowvals, null, true, $link);
         }
     }
 

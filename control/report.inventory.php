@@ -89,7 +89,7 @@ foreach ($report as $row) {
         $vals[] = $row[$k];
     }
 
-    $table->addRow_fu($vals, null, (!empty($link)), $link);
+    $table->addRow($vals, null, (!empty($link)), $link);
 }
 $numrows = $prod->numRows;
 

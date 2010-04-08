@@ -300,7 +300,7 @@ else {
             $class = 'controlListingRow';
             $link = sprintf('%s?op_edit=%d', $_SERVER['PHP_SELF'], $row['id']);
             unset($row['id']);
-            $table->addRow_fu(array_values($row), $class, true, $link);
+            $table->addRow(array_values($row), $class, true, $link);
         }
     }
 

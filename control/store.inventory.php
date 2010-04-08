@@ -176,7 +176,7 @@ foreach ($inv as $row) {
                       $_SERVER['PHP_SELF'],
                       $row['id'],
                       $productid);
-    $table->addRow_fu($vals, null, true, $link);
+    $table->addRow($vals, null, true, $link);
 }
 $numrows = count($inv);
 

@@ -252,7 +252,7 @@ else {
 
         // store.edit.php?nid=444
         $link = sprintf('%s?op_edit=%d', $_SERVER['PHP_SELF'], $row['id']);
-        $table->addRow_fu($vals, '', null, $link);
+        $table->addRow($vals, '', null, $link);
     }
     $numrows = $res->numRows();
 }

@@ -302,7 +302,7 @@ else {
                           $row['id'],
                           $productid);
                           
-        $table->addRow_fu($vals, null, true, $link);
+        $table->addRow($vals, null, true, $link);
     }
     $numrows = $res->numRows();
 }

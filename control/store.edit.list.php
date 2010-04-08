@@ -110,7 +110,7 @@ for ($ptr=$offset; $ptr<$ptrlimit; $ptr++) {
                    ); 
     // store.edit.php?nid=444
     $link = sprintf('store.edit.php?productid=%d', $row['id']);
-    $table->addRow_fu($vals, '', true, $link);
+    $table->addRow($vals, '', true, $link);
 }
 
 $pager = new res_pager($offset, $range, $numrows);

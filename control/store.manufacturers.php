@@ -229,7 +229,7 @@ else {
         // store.edit.php?nid=444
         $vals[] = sprintf('<a href="store.edit.list.php?mfr=%d">%d</a>', $row['id'], $row['product_count']);
         $vals[] = sprintf('<a href="store.manufacturers.php?mfr=%d" class="buttonEditItem">&raquo;</a>', $row['id']);
-        $table->addRow_fu($vals);
+        $table->addRow($vals);
     }
     $numrows = $res->numRows();
 }

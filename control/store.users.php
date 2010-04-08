@@ -246,7 +246,7 @@ else {
                               $_SERVER['PHP_SELF'], 
                               $reqIdKey,
                               $row['id']);
-            $table->addRow_fu($vals, '', true, $link);
+            $table->addRow($vals, '', true, $link);
         }
     }
 

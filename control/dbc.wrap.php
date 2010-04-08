@@ -223,7 +223,7 @@ else {
             foreach (array_keys($header_row) as $k) { 
                 $cells[] = (strlen($row[$k])<129)? $row[$k] : substr(htmlspecialchars($row[$k]), 0, 128) . '...';  // TODO html??
             }
-            $table->addRow_fu($cells, '', true, $link);
+            $table->addRow($cells, '', true, $link);
         }
     }
 

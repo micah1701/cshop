@@ -276,7 +276,7 @@ while ($row = $res->fetchRow()) {
     }
 
 
-    $table->addRow_fu($vals, null, (!empty($link)), $link);
+    $table->addRow($vals, null, (!empty($link)), $link);
 }
 $numrows = $res->numRows();
 

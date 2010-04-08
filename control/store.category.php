@@ -258,7 +258,7 @@ else {
         $link = sprintf('%s?cat=%d',
                           $_SERVER['PHP_SELF'], 
                           $row['id']);
-        $table->addRow_fu($vals, '', null, $link);
+        $table->addRow($vals, '', null, $link);
     }
     $numrows = $res->numRows();
 }
