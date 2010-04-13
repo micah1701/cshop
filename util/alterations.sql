@@ -370,3 +370,8 @@ ALTER TABLE cm_bundles ADD long_description text;
 
 -- Fri Mar 26 00:43:21 EDT 2010
 ALTER TABLE cm_cart ADD is_bundle bool;
+
+
+-- Tue Apr 13 15:09:40 EDT 2010
+ALTER TABLE cm_inventory ADD KEY `fk_pid_inv` (`product_id`);
+ALTER TABLE cm_inventory ADD CONSTRAINT `cm_inventory_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `cm_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
