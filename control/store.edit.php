@@ -12,7 +12,6 @@ error_reporting(E_ALL);
 require_once(CONFIG_DIR.'cshop.config.php');
 require_once(CSHOP_CLASSES_PRODUCT . '.class.php');
 require_once('formex.class.php');
-require_once('mosh_tool.class.php');
 require_once('uploadable.class.php');
 
 require_once("store.edit.inc.php");      
@@ -57,23 +56,25 @@ $errs = array();
 
 $c = CSHOP_CLASSES_PRODUCT;
 $pc = new $c($pdb);
-$colmap = $pc->colmap;
+$colmap = $pc->get_colmap();
+
+$fex = new formex('POST');
+$fex->convert_empty_string_to_null = true;
+$fex->add_element($colmap);
 
 /** POST rec'd, check valid, proc. upload and save if OK */
 if (isset($_POST['f_op']) and ($ACTION == OP_ADD or $ACTION == OP_EDIT)) {
-    $mosh = new mosh_tool();
     $msg = '';
 
     $vals = array();
     $img_vals = array();
 
 
-    $colmap = $pc->get_colmap();
-    if ($errs = $mosh->check_form($colmap)) {
+    if ($errs = $fex->validate($_POST)) {
         // handled below
     }
     else {
-        $vals = $mosh->get_form_vals($colmap);
+        $vals = $fex->get_submitted_vals($_POST);
         $upfiles = array('imageid' => array(), 
                          'feature_imageid' => array()); // tracks all new files we need to insert in media_prod table
 
@@ -236,14 +237,12 @@ elseif ($ACTION == OP_KILL) {
 
 
 if ($SHOWFORM) {
-    $fex = new formex('POST');
     $fex->js_src_inline = true;
     $fex->left_td_style = '';
 
     if ($ACTION == OP_EDIT) {
         $pc->set_id($productid);
     }
-    $fex->add_element($pc->get_colmap());
 
     if (isset($pc->colmap_help) && is_array($pc->colmap_help)) {
         foreach ($pc->colmap_help as $k => $text) {
