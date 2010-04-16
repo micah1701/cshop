@@ -375,3 +375,10 @@ ALTER TABLE cm_cart ADD is_bundle bool;
 -- Tue Apr 13 15:09:40 EDT 2010
 ALTER TABLE cm_inventory ADD KEY `fk_pid_inv` (`product_id`);
 ALTER TABLE cm_inventory ADD CONSTRAINT `cm_inventory_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `cm_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+-- Fri Apr 16 14:06:04 EDT 2010
+ALTER TABLE cm_products_categories ADD FOREIGN KEY (cm_categories_id) REFERENCES cm_categories (id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE cm_products_categories ADD FOREIGN KEY (cm_products_id) REFERENCES cm_products (id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
