@@ -212,7 +212,7 @@ CREATE TABLE `cm_categories` (
   `cat_photo_size` int(4) default NULL,
   `cat_photo_dims` varchar(32) default NULL,
   `swi_cat_class` enum('merchant','consumer','giftcards') default NULL,
-  `urlkey` varchar(16) default NULL,
+  `urlkey` varchar(63) default NULL,
    is_used_in_bundle bool,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `uq_urlkey` (`urlkey`),
