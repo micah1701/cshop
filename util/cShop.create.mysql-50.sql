@@ -316,6 +316,38 @@ CREATE TABLE `cm_giftcards_seq` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 
+
+--
+-- Table structure for table `cm_products`
+--
+
+DROP TABLE IF EXISTS `cm_products`;
+CREATE TABLE `cm_products` (
+  `id` int(10) unsigned NOT NULL default '0',
+  `cm_ship_class_id` int(10) unsigned NOT NULL default '0',
+  `cm_manufacturers_id` int(10) unsigned NOT NULL default '0',
+  `price` double(9,2) default NULL,
+  `list_price` double(9,2) default NULL,
+  `weight` double(9,2) default NULL,
+  `inv_qty` int(11) default NULL,
+  `title` varchar(255) default NULL,
+  `is_active` tinyint(1) default NULL,
+  `is_featured` tinyint(1) default NULL,
+  `feature_rank` int(10) unsigned NOT NULL default '0',
+  `sku` varchar(64) default NULL,
+  `description` text,
+  `size_attr` text,
+  `view_count` int(10) unsigned NOT NULL default '0',
+  `default_thumb_id` int(10) unsigned default NULL,
+  `is_special` enum('consumer','merchant') default NULL,
+  `order_weight` int(5) NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `ix_mid` (`cm_manufacturers_id`),
+  KEY `cm_products_FKIndex2` (`cm_ship_class_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
 --
 -- Table structure for table `cm_inventory`
 --
@@ -332,7 +364,8 @@ CREATE TABLE `cm_inventory` (
   PRIMARY KEY  (`id`),
   UNIQUE KEY `uq_sku` (`sku`),
   KEY `ix_size` (`sizes_id`),
-  KEY `ix_colw` (`colorways_id`)
+  KEY `ix_colw` (`colorways_id`),
+  CONSTRAINT `cm_inventory_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `cm_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -649,35 +682,6 @@ CREATE TABLE `cm_product_images_seq` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `cm_products`
---
-
-DROP TABLE IF EXISTS `cm_products`;
-CREATE TABLE `cm_products` (
-  `id` int(10) unsigned NOT NULL default '0',
-  `cm_ship_class_id` int(10) unsigned NOT NULL default '0',
-  `cm_manufacturers_id` int(10) unsigned NOT NULL default '0',
-  `price` double(9,2) default NULL,
-  `list_price` double(9,2) default NULL,
-  `weight` double(9,2) default NULL,
-  `inv_qty` int(11) default NULL,
-  `title` varchar(255) default NULL,
-  `is_active` tinyint(1) default NULL,
-  `is_featured` tinyint(1) default NULL,
-  `feature_rank` int(10) unsigned NOT NULL default '0',
-  `sku` varchar(64) default NULL,
-  `description` text,
-  `size_attr` text,
-  `view_count` int(10) unsigned NOT NULL default '0',
-  `default_thumb_id` int(10) unsigned default NULL,
-  `is_special` enum('consumer','merchant') default NULL,
-  `order_weight` int(5) NOT NULL,
-  PRIMARY KEY  (`id`),
-  KEY `ix_mid` (`cm_manufacturers_id`),
-  KEY `cm_products_FKIndex2` (`cm_ship_class_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
 -- Table structure for table `cm_products_categories`
 --
 
@@ -688,7 +692,9 @@ CREATE TABLE `cm_products_categories` (
   `level` int(4) NOT NULL default '0',
   PRIMARY KEY  (`cm_products_id`,`cm_categories_id`),
   KEY `fk_pid` (`cm_products_id`),
-  KEY `fk_pca` (`cm_categories_id`)
+  KEY `fk_pca` (`cm_categories_id`),
+  CONSTRAINT `cm_products_categories_ibfk_1` FOREIGN KEY (`cm_products_id`) REFERENCES `cm_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `cm_products_categories_ibfk_3` FOREIGN KEY (`cm_categories_id`) REFERENCES `cm_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -922,8 +928,8 @@ CREATE TABLE `cm_bundles_categories` (
   `required` int(4) unsigned,
   PRIMARY KEY (`id`),
   UNIQUE (`cm_bundles_id`, `cm_categories_id`),
-  CONSTRAINT `cm_bc_ibfk_1` FOREIGN KEY (`cm_categories_id`) REFERENCES `cm_categ
-  CONSTRAINT `cm_bc_ibfk_2` FOREIGN KEY (`cm_bundles_id`) REFERENCES `cm_bundles`
+  CONSTRAINT `cm_bc_ibfk_1` FOREIGN KEY (`cm_categories_id`) REFERENCES `cm_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `cm_bc_ibfk_2` FOREIGN KEY (`cm_bundles_id`) REFERENCES `cm_bundles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) Engine=InnoDB AUTO_INCREMENT=30;
 
 
