@@ -405,10 +405,10 @@ if ($SHOWFORM) {
             if (PEAR::isError($shipquotes)) {
                 $errs[] = $shipquotes->getMessage();
             }
-            if ($ship->has_calculation_error) {
+            elseif ($ship->has_calculation_error) {
                 $errs = $ship->calculation_errors;
             }
-            if (count($shipquotes))  {
+            elseif (count($shipquotes))  {
                 if ($ship->qualifies_freeship) {
                     $smarty->assign('HAVE_FREE_SHIP', true);
                 }
