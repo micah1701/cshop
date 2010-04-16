@@ -113,7 +113,7 @@ for ($ptr=$offset; $ptr<$ptrlimit; $ptr++) {
     $table->addRow($vals, '', true, $link);
 }
 
-$pager = new res_pager($offset, $range, $numrows);
+$pager = new res_pager($offset, $range, $numrows, 0, 21);
 $smarty->assign('pager', $pager);
 
 ##############################################################################
