@@ -238,10 +238,10 @@
         foreach ($this->quotes as $k => $v) {
             if ($this->quotes[$k] != ($this->quotes[$k] = preg_replace('/\(\$0\.00\)/', '(FREE!)', $v))) {
                 /* there is only free ship if *everything* in the cart is free shipping, right?! */
-                if ($this->all_cartitems_qualify_freeship) {
+                if (!empty($sm->allow_free_shipping_options) or $this->all_cartitems_qualify_freeship) {
                     $this->qualifies_freeship = true; // set the flag so the user gets a nice message or whatever.
                 }
-                else { /* otherwise we dont want to show free shipping option bc user might be tempted to use it */
+                elseif (empty($sm->allow_free_shipping_options)) { /* otherwise we dont want to show free shipping option bc user might be tempted to use it */
                     unset($this->quotes[$k]);
                 }
             }

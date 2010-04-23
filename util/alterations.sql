@@ -381,4 +381,5 @@ ALTER TABLE cm_inventory ADD CONSTRAINT `cm_inventory_ibfk_1` FOREIGN KEY (`prod
 ALTER TABLE cm_products_categories ADD FOREIGN KEY (cm_categories_id) REFERENCES cm_categories (id) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE cm_products_categories ADD FOREIGN KEY (cm_products_id) REFERENCES cm_products (id) ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE cm_categories MODIFY urlkey varchar(63) not null;
 
