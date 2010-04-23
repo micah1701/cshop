@@ -301,16 +301,16 @@ class cmProductCategory extends db_container {
      */
     function lookup_cat_by_name($name) {
         if (!strstr($name, '/')) { // there is no slash. Hope the urlkey is unique in this case!
-            $sql = sprintf("SELECT id FROM %s WHERE urlkey = %s", $this->get_table_name(), $this->db->quote(strtolower($name)));
+            $sql = sprintf("SELECT id FROM %s WHERE LOWER(urlkey) = %s", $this->get_table_name(), $this->db->quote(strtolower($name)));
             return $this->db->getOne($sql);
         }
         else { // yikes. we need to create a ad-hoc SQL that joins the cm_categories table to itself N times, where N='# nodes in path'
-            $mypath = split('/', $name);
+            $mypath = split('/', strtolower($name));
             $sql_FROM = array(); $sql_WHERE = array();
             $table = $this->get_table_name();
             for ($i=0; $i<count($mypath); $i++) { // build FROM and WHERE sql pieces for each node
                 $sql_FROM[] = "$table c$i";
-                $wha = " (c$i.urlkey = ?";
+                $wha = " (LOWER(c$i.urlkey) = ?";
                 if ($i > 0) $wha .= " AND c$i.parent_cat_id = c".($i-1).".id";
                 $wha .= ") ";
                 $sql_WHERE[] = $wha; 
