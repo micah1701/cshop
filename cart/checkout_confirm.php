@@ -48,7 +48,7 @@ if ($cart_total > 0) {
         $c = CSHOP_CLASSES_PAYMETHOD;
         $pay = new $c($pdb);
         $pay->set_id($payid);
-        if (!$pay->get_ccno()) {
+        if (!$pay->fetch()) {
             trigger_error('payment info cannot be re-used', E_USER_NOTICE);
             $payment_error = "Sorry, your payment info cannot be re-submitted. Please go back and re-enter the payment information";
             $payment_error_type = 'PAYMENT_RESUBMIT';
