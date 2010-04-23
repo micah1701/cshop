@@ -295,8 +295,10 @@ class cmProduct extends db_container {
             $cols[] = 'id';
         }
         $res = $this->fetch_any($cols, 0, 0, 'feature_rank', 'is_featured > 0');
-        for ($i=0; $i<count($res); $i++) {
-            $res[$i]['images'] = $this->get_thumb_imgs($res[$i]['id'], 1);
+        if (is_array($res)) {
+            for ($i=0; $i<count($res); $i++) {
+                $res[$i]['images'] = $this->get_thumb_imgs($res[$i]['id'], 1);
+            }
         }
         return $res;
     }

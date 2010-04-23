@@ -25,6 +25,8 @@ class cmShipMethod_Zone extends cmShipMethod {
                               'cm_shipmethods_zone_locales' => array('Included Countries', 'select_bicameral', array(), array('size'=>10), 1));
 
 
+    var $allow_free_shipping_options = true;
+
     /* populate the zonemethods with zones */
     function get_colmap() {
         $zones = array();

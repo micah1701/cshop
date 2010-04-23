@@ -724,7 +724,9 @@ class cmCart extends db_container {
                                                  AND sc.id = c.ship_class_id
                                                  AND (sc.is_free = 1))",
                              $this->get_id());
-             $this->_shipping_subtotal = $this->db->getOne($sql);
+             $res = $this->db->getOne($sql);
+             if ($res === null) $res = 0;
+             $this->_shipping_subtotal = $res;
          }
          return $this->_shipping_subtotal;
      }
