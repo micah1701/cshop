@@ -291,7 +291,7 @@ if ($ACTION == OP_ORDERS_PRODUCTS) {
         }
         if ($var == 'product_counts') $vals[0] = '#sold:';
         else $vals[0] = 'TOTALS:';
-        $table->addRow($vals, array('class' => 'tfoot'));
+        $table->addRow($vals, 'tfoot');
     }
 }
 
