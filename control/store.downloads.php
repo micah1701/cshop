@@ -19,23 +19,29 @@ $msg = null;
 $errs = array();
 
 $ACTION = null;
+$thisid = null;
 
 /** decide on a course of action... **/
 if (isset($_POST['f_op']) and isset($_POST['f_cm_products_id'])) {
 
     $productid = $_POST['f_cm_products_id'];
 
-    if ($_POST['f_op'] == OP_EDIT) 
+    if ($_POST['f_op'] == OP_EDIT) {
         $ACTION = OP_EDIT;
+        $thisid = $_POST['f_id'];
+    }
     else
         $ACTION = OP_ADD;
+
 }
 elseif (!empty($_GET['pid'])) {
 
     $productid = $_GET['pid'];
 
-    if (isset($_GET['op_edit'])) 
+    if (isset($_GET['op_edit'])) {
         $ACTION = OP_EDIT;
+        $thisid = $_GET['op_edit'];
+    }
     elseif (isset($_GET['op_add'])) 
         $ACTION = OP_ADD;
 
@@ -65,7 +71,15 @@ if (isset($_POST['f_op']) and ($ACTION == OP_EDIT or $ACTION == OP_ADD)) {
     if (! ($errs = $fex->validate($_POST))) {
         $vals = $fex->get_submitted_vals($_POST);
 
-        if (!count($errs)) {
+        if (!$download->do_validate($vals)) {
+            foreach ($download->get_validation_errors() as $err) {
+                $errs[] = $err['message'];
+            }
+        }
+        else {
+            if ($ACTION == OP_EDIT)
+                $download->set_id($thisid);
+
             PEAR::pushErrorHandling(PEAR_ERROR_RETURN);
             $res = $download->store($vals);
             PEAR::popErrorHandling();
@@ -118,6 +132,12 @@ if (!$ACTION) {
         }
         $numrows = count($downloads);
     }
+}
+elseif ($ACTION == OP_EDIT) {
+    $fex->add_element('id', array('', 'hidden'));
+    $download->set_id($thisid);
+    $p = $download->fetch();
+    $fex->set_elem_value($p);
 }
 
 
@@ -179,6 +199,9 @@ if (isset($_GET['msg'])) {
           <? echo $table->toHTML() ?>
         <? } ?>
     <? } elseif (isset($fex)) { ?>       
+        <div style="float: right">
+            <a href="?pid=<?= $productid ?>">&laquo; back</a>
+        </div>  
         <? if ($ACTION == OP_ADD) { ?>Adding new <?= $thing ?><? } ?>
         <? if ($ACTION == OP_EDIT) { ?>Updating <?= $thing ?><? } ?>
         <br />

@@ -19,10 +19,28 @@ class cmProductDownload extends db_container {
                         'cm_products_id' => array('', 'hidden')
                         );
 
+    var $validations = array('url' => array('validate_url', null, "Invalid URL"));
+
+    const ERROR_VAL_URL = -701;
 
     function fetch_by_product_id($pid, $cols=null) {
         $w = 'cm_products_id = '.intval($pid);
         return $this->fetch_any($cols, 0, 0, 'name', $w);
     }
+
+
+    /**
+     * zipcode validator, static for call from formex() validate
+     */
+    function validate_url($col, $value) {
+        $err = null;
+        if (empty($value))
+            $err = "URL required";
+        elseif (!preg_match('#(https?://([-\w\.]+)+(:\d+)?(/([\w/_\.]*(\?\S+)?)?)?)#', $value))
+            $err = "Please enter a valid URL";
+
+        if ($err) $this->_push_validation_error($err, self::ERROR_VAL_URL, $col, $value);
+    }
+
 }
 
