@@ -13,6 +13,7 @@ $thing = 'Digital Download';
 $ACTION = null;
 define ('OP_ADD', 'Add new '.$thing);
 define ('OP_EDIT', 'Update '.$thing);
+define ('OP_KILL', 'Remove '.$thing);
 
 
 $msg = null;
@@ -33,6 +34,11 @@ if (isset($_POST['f_op']) and isset($_POST['f_cm_products_id'])) {
     else
         $ACTION = OP_ADD;
 
+}
+elseif (isset($_POST['f_op_kill'])) {
+    $ACTION = OP_KILL;
+    $productid = $_POST['f_cm_products_id'];
+    $thisid = $_POST['f_id'];
 }
 elseif (!empty($_GET['pid'])) {
 
@@ -96,6 +102,11 @@ if (isset($_POST['f_op']) and ($ACTION == OP_EDIT or $ACTION == OP_ADD)) {
         }
     }
 }
+elseif ($ACTION == OP_KILL) {
+    $download->set_id($thisid);
+    if ($download->kill()) 
+        $msg = $thing . ' has been deleted.';
+}
 if (!empty($msg) and !count($errs)) { /** redir on success **/
     header(sprintf("Location: %s?pid=%d&msg=%s", $_SERVER['PHP_SELF'], $productid, base64_encode($msg)));
     exit();
@@ -133,19 +144,20 @@ if (!$ACTION) {
         $numrows = count($downloads);
     }
 }
-elseif ($ACTION == OP_EDIT) {
-    $fex->add_element('id', array('', 'hidden'));
-    $download->set_id($thisid);
-    $p = $download->fetch();
-    $fex->set_elem_value($p);
-}
-
 
 /** build form **/
 $fex->js_src_inline = true;
 $fex->add_element('op', array($ACTION, 'submit', null, null, 1));
 $fex->add_element('cm_products_id', array('id', 'hidden', $productid, 1));
 /** **/
+
+if ($ACTION == OP_EDIT) {
+    $download->set_id($thisid);
+
+    $fex->add_element('op_kill',array(OP_KILL, 'submit', null, null, 'onclick="return confirm(\'Are you sure?\')"'));
+    $fex->add_element('id', array('', 'hidden'));
+    $fex->set_elem_value($download->fetch());
+}
 
 
 
