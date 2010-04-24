@@ -323,6 +323,9 @@ $smarty->display('control/header.tpl');
     <? if (CSHOP_USE_RELATED_PRODUCTS) { ?>
   	  <div class="tabLabel<?= ($tab == 'related')? ' tabSelected' : '' ?>" id="tabrel" rel="relContainer">Related</div>
     <? } ?>
+    <? if (CSHOP_ENABLE_DIGITAL_DOWNLOADS) { ?>
+  	  <div class="tabLabel<?= ($tab == 'downloads')? ' tabSelected' : '' ?>" id="tabrel" rel="downContainer">Downloads</div>
+    <? } ?>
 <? } ?>
   </div>
   <div id="tabActiveContent">
@@ -398,6 +401,17 @@ $smarty->display('control/header.tpl');
             </div>
             <div id="mediaWrap" class="formWrapper">
               <iframe id="relatedProductsFrame" src="store.product_relations.php?nid=<?=$productid?>"  frameborder="0" marginwidth="0" marginheight="0" width="590" height="400" scrolling="yes" ></iframe> 
+            </div>
+          </div>
+      <? } ?>
+
+      <? if (CSHOP_ENABLE_DIGITAL_DOWNLOADS) { ?>
+          <div class="formContainer" id="downContainer"<? if ($tab == 'downloads') { ?> style="display: block"<? } ?>>
+            <div class="heading">
+                :: Downloads ::
+            </div>
+            <div id="mediaWrap" class="formWrapper">
+              <iframe id="downloadsFrame" src="store.downloads.php?pid=<?=$productid?>"  frameborder="0" marginwidth="0" marginheight="0" width="590" height="400" scrolling="yes" ></iframe> 
             </div>
           </div>
       <? } ?>

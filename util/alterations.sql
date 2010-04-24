@@ -387,3 +387,16 @@ ALTER TABLE cm_categories MODIFY urlkey varchar(63) not null;
 -- Fri Apr 23 18:48:29 EDT 2010
 ALTER TABLE cm_products MODIFY weight double(9,2) NOT NULL;
 
+
+-- Fri Apr 23 22:46:24 EDT 2010
+CREATE TABLE `cm_products_downloads` (
+  `id` int(10) unsigned NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `is_active` tinyint(1) DEFAULT NULL,
+  `url` varchar(1023) NOT NULL,
+  `cm_products_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `name` (`name`),
+  KEY `cm_products_id` (`cm_products_id`),
+  CONSTRAINT `cm_products_downloads_ibfk_1` FOREIGN KEY (`cm_products_id`) REFERENCES `cm_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

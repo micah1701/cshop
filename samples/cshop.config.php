@@ -37,6 +37,7 @@ define ('CSHOP_CLASSES_SHIPMETHOD', 'cmShipping');
 define ('CSHOP_CLASSES_TAXCALCULATOR', 'cmTaxCalculator');
 define ('CSHOP_CLASSES_GIFTCARD', 'cmGiftCard');
 define ('CSHOP_CLASSES_BUNDLE', 'cmBundle');
+define ('CSHOP_CLASSES_DOWNLOADS', 'cmProductDownload');
 
 /* classes used for auth/perm/session management (old-phplib) */
 define ('CSHOP_CLASSES_AUTH_AUTH', 'jen_Auth');
@@ -164,6 +165,9 @@ define('CSHOP_USE_PRODUCT_OPTION_TAB', false);
 
 /* use the related products feature? (this will only enable the form element in control) */
 define('CSHOP_USE_RELATED_PRODUCTS', false);
+
+/* enable the tab for digital downloads in control? */
+define('CSHOP_ENABLE_DIGITAL_DOWNLOADS', false);
 
 /** have fields for "adders" in each row of inventory, and look there for pricing? */
 define('CSHOP_INVENTORY_ALLOW_ADDER', false);
