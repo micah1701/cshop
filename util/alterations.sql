@@ -383,3 +383,7 @@ ALTER TABLE cm_products_categories ADD FOREIGN KEY (cm_products_id) REFERENCES c
 
 ALTER TABLE cm_categories MODIFY urlkey varchar(63) not null;
 
+
+-- Fri Apr 23 18:48:29 EDT 2010
+ALTER TABLE cm_products MODIFY weight double(9,2) NOT NULL;
+

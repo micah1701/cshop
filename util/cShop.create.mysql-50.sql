@@ -328,7 +328,7 @@ CREATE TABLE `cm_products` (
   `cm_manufacturers_id` int(10) unsigned NOT NULL default '0',
   `price` double(9,2) default NULL,
   `list_price` double(9,2) default NULL,
-  `weight` double(9,2) default NULL,
+  `weight` double(9,2) default 0 NOT NULL,
   `inv_qty` int(11) default NULL,
   `title` varchar(255) default NULL,
   `is_active` tinyint(1) default NULL,
