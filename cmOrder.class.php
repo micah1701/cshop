@@ -886,6 +886,10 @@ class cmOrder extends db_container {
                                                     SITE_DOMAIN_NAME,
                                                     $orderinfo['order_token']));
 
+        if ($this->has_digital_goods()) {
+            $smarty->assign('has_digital_goods', true);
+            $smarty->assign('download_list', $this->fetch_digital_goods());
+        }
 
         // get 2 versions of the message
         $msg = $smarty->fetch("float:emails/order_notify.txt.tpl");
