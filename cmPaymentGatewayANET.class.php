@@ -299,7 +299,7 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
         
         // make a hash of some s3kr3t stuff and compare it to the MD5 val in the response
         if (!$err and $this->_do_md5_check) {
-            $s = join('', array($this->_anet_md5, $this->_anet_login, $this->_gate_transid, $this->get_trans_amount()));
+            $s = join('', array($this->_anet_md5, $this->_anet_login, $this->_gate_transid, number_format($this->get_trans_amount(), 2)));
             $myhash = md5($s);
             if (strcasecmp($myhash, $rvals[37]) != 0) {
                 $this->_trans_result = 'ERROR';

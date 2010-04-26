@@ -383,3 +383,32 @@ ALTER TABLE cm_products_categories ADD FOREIGN KEY (cm_products_id) REFERENCES c
 
 ALTER TABLE cm_categories MODIFY urlkey varchar(63) not null;
 
+
+-- Fri Apr 23 18:48:29 EDT 2010
+ALTER TABLE cm_products MODIFY weight double(9,2) NOT NULL;
+
+
+-- Fri Apr 23 22:46:24 EDT 2010
+CREATE TABLE `cm_products_downloads` (
+  `id` int(10) unsigned NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `is_active` tinyint(1) DEFAULT NULL,
+  `url` varchar(1023) NOT NULL,
+  `cm_products_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `name` (`name`),
+  KEY `cm_products_id` (`cm_products_id`),
+  CONSTRAINT `cm_products_downloads_ibfk_1` FOREIGN KEY (`cm_products_id`) REFERENCES `cm_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Sun Apr 25 20:00:34 EDT 2010
+ALTER TABLE cm_products ADD is_digital bool;
+ALTER TABLE cm_cart ADD is_all_digital bool;
+
+
+-- Mon Apr 26 09:38:41 EDT 2010
+ALTER TABLE cm_cart_items ADD is_digital bool;
+ALTER TABLE cm_order_items ADD is_digital bool;
+ALTER TABLE cm_order_items ADD download_token varchar(255);
+ALTER TABLE cm_order_items ADD UNIQUE (download_token);
+

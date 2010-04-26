@@ -328,7 +328,7 @@ CREATE TABLE `cm_products` (
   `cm_manufacturers_id` int(10) unsigned NOT NULL default '0',
   `price` double(9,2) default NULL,
   `list_price` double(9,2) default NULL,
-  `weight` double(9,2) default NULL,
+  `weight` double(9,2) default 0 NOT NULL,
   `inv_qty` int(11) default NULL,
   `title` varchar(255) default NULL,
   `is_active` tinyint(1) default NULL,
@@ -931,6 +931,18 @@ CREATE TABLE `cm_bundles_categories` (
   CONSTRAINT `cm_bc_ibfk_1` FOREIGN KEY (`cm_categories_id`) REFERENCES `cm_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `cm_bc_ibfk_2` FOREIGN KEY (`cm_bundles_id`) REFERENCES `cm_bundles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) Engine=InnoDB AUTO_INCREMENT=30;
+
+CREATE TABLE `cm_products_downloads` (
+  `id` int(10) unsigned NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `is_active` tinyint(1) DEFAULT NULL,
+  `url` varchar(1023) NOT NULL,
+  `cm_products_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `name` (`name`),
+  KEY `cm_products_id` (`cm_products_id`),
+  CONSTRAINT `cm_products_downloads_ibfk_1` FOREIGN KEY (`cm_products_id`) REFERENCES `cm_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 

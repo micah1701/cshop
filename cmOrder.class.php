@@ -177,9 +177,13 @@ class cmOrder extends db_container {
             $vals['orders_status'] = CM_ORDER_STATUS_BACKORDER; 
         }
 
-        // shipping and tax amounts from the cart
-        $vals['ship_total'] = $cart_totals['shipping']['amt'];
-        $vals['ship_method'] = $cart_totals['shipping']['method'];
+        if (!$this->cart->requires_shipping()) { 
+            // shipping amounts from the cart
+            $vals['ship_total'] = $cart_totals['shipping']['amt'];
+            $vals['ship_method'] = $cart_totals['shipping']['method'];
+        }
+
+        // tax amounts pulled from cart.
         if (!empty($cart_totals['tax'])) {
             $vals['tax_total'] = $cart_totals['tax']['amt'];
             $vals['tax_method'] = $cart_totals['tax']['method'];
@@ -240,7 +244,7 @@ class cmOrder extends db_container {
         $cnt = 0;
         foreach ($items as $cartitem) {
             $oi = db_container::factory($this->db, $this->_items_table);
-            $order_items_cols = array('inventory_id','product_id','qty','price','discount','product_sku','product_descrip');
+            $order_items_cols = array('inventory_id','product_id','qty','price','discount','product_sku','product_descrip','is_digital');
 
             $newitem = array();
             foreach ($order_items_cols as $col) {
@@ -409,11 +413,12 @@ class cmOrder extends db_container {
         $vals = array();
         $user = $this->get_user();
 
-        $shipping = $user->fetchShippingAddr($this->_addr_cols);
-        foreach ($shipping as $k => $v) {
-            $vals["shipping_$k"] = $v;
+        if ($shipping = $user->fetchShippingAddr($this->_addr_cols)) {
+            foreach ($shipping as $k => $v) {
+                $vals["shipping_$k"] = $v;
+            }
+            return $this->store($vals);
         }
-        return $this->store($vals);
     }
 
     /**
@@ -511,7 +516,7 @@ class cmOrder extends db_container {
      */
     function fetch_items() {
          $items = array();
-         $sql = sprintf("SELECT id, inventory_id, product_id, qty, price, discount, product_sku
+         $sql = sprintf("SELECT id, inventory_id, product_id, qty, price, discount, product_sku, is_digital
                          , product_descrip, product_attribs, normalized_attribs, has_item_options, backorder_qty, stock_status
                          FROM %s
                          WHERE order_id = %d
@@ -868,7 +873,9 @@ class cmOrder extends db_container {
         $smarty->assign('cart', $orderitems);
         $smarty->assign('numitems', count($orderitems));
         $smarty->assign('billing', $this->fetch_addr('billing'));
-        $smarty->assign('shipping', $this->fetch_addr('shipping'));
+
+        if ($this->requires_shipping())
+            $smarty->assign('shipping', $this->fetch_addr('shipping'));
 
 
         $h = $this->fetch_history();
@@ -879,6 +886,10 @@ class cmOrder extends db_container {
                                                     SITE_DOMAIN_NAME,
                                                     $orderinfo['order_token']));
 
+        if ($this->has_digital_goods()) {
+            $smarty->assign('has_digital_goods', true);
+            $smarty->assign('download_list', $this->fetch_digital_goods());
+        }
 
         // get 2 versions of the message
         $msg = $smarty->fetch("float:emails/order_notify.txt.tpl");
@@ -932,6 +943,86 @@ class cmOrder extends db_container {
     }
 
 
+    function requires_shipping() {
+        if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS) return true;
+
+        $sql = sprintf("SELECT COUNT(*) FROM %s WHERE is_digital IS NULL AND order_id = %d", 
+                        $this->_items_table,
+                        $this->get_id());
+        $res = $this->db->getOne($sql);
+        return ($res !== '0');
+    }
+
+    /**
+     * does the order contains any digital items.
+     * @return bool
+     */
+    function has_digital_goods() {
+        if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS) return;
+
+        $sql = sprintf("SELECT COUNT(*) FROM %s WHERE is_digital = 1 AND order_id = %d", 
+                        $this->_items_table,
+                        $this->get_id());
+        $res = $this->db->getOne($sql);
+        return ($res >= 1);
+    }
+
+    /**
+     * does the order contains any digital items.
+     * @return bool
+     */
+    function fetch_digital_goods() {
+        if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS) return;
+
+        $sql = sprintf("SELECT id, product_id, product_descrip, download_token FROM %s WHERE is_digital = 1 AND order_id = %d", 
+                        $this->_items_table,
+                        $this->get_id());
+        $res = $this->db->query($sql);
+        $items = array();
+        while ($row = $res->fetchRow()) {
+            if (empty($row['download_token'])) { // create and save new URL if not done yet.
+                $row['download_token'] = $this->generate_download_token($row['product_id']);
+
+                $oi = db_container::factory($this->db, $this->_items_table);
+                $oi->set_id($row['id']);
+                $oi->store(array('download_token' => $row['download_token']));
+            }
+            $row['download_url'] = sprintf(CSHOP_DOWNLOAD_LINK_FMT, $this->fetch_token(), $row['download_token']);
+            $items[] = $row;
+        }
+        return $items;
+    }
+
+
+    /**
+     * create a nice random token, for digital download links
+     *
+     * @param $pid int      product id
+     * @return string       URL
+     */
+    function generate_download_token($pid, $len=15) {
+        $tok = '';
+        $hex = md5( $pid . uniqid(rand(), true) ); // make random-ish hex string
+        while ( strlen($hex) ) {
+            $tok .= chr( base_convert( substr($hex, 0, 2), 16, 10) ); // convert every 2 bytes to whatever ascii
+            $hex = substr($hex, 2);
+        }
+        $tok = strtr(substr(base64_encode( $tok ), 0, $len), '+/=', '-__'); // url-safe and truncate
+
+        return $tok;
+    }
+
+    /**
+     * get the order id by looking up the given token and call set_id() on this object
+     * not sure why
+     * @param token string
+     * @return int the order id */
+    function fetch_downloadable_by_token($tok) {
+        $sql = sprintf("SELECT id, order_id, product_id, product_descrip FROM %s WHERE download_token = %s",
+                        $this->_items_table,
+                        $this->db->quoteSmart($tok));
+        return $this->db->getRow($sql);
+    }
 
 
 }

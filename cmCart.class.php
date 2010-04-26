@@ -236,6 +236,7 @@ class cmCart extends db_container {
                            'inventory_id' => $invid,
                            'product_descrip' => $pctr->get_title(),
                            #'product_attribs' => serialize($attribs), // obsolete? maybe.
+                           'is_digital' => $pctr->get_header('is_digital'),
                            'has_item_options' => (is_array($options) and count($options)));
 
              if ($this->do_apply_discount_to_lineitems()) {
@@ -367,7 +368,7 @@ class cmCart extends db_container {
          if (empty($this->_items)) {
              $items = array();
              $cols = array('id', 'inventory_id', 'product_id', 'qty', 'price', 'discount', 'is_bundle', 
-                           'product_sku', 'product_descrip', 'product_attribs', 'has_item_options');
+                           'product_sku', 'product_descrip', 'product_attribs', 'has_item_options','is_digital');
              if (!$get_thumbs) {
                  $sql = sprintf("SELECT %s
                                  FROM %s
@@ -1405,6 +1406,51 @@ class cmCart extends db_container {
             $res = $this->db->query($sql1);
             $res = $this->db->query($sql2);
         }
+    }
+
+
+
+    /**
+     * stub to decide if shipping addr and method is even applicable to this cart. It is, usually.
+     * 
+     * @return bool
+     */
+    function requires_shipping() {
+        if (!$this->is_all_digital()) 
+            return true;
+    }
+
+
+    /**
+     * decide if everything in the cart has the 'is_digital_only' flag set.
+     *
+     * @return bool
+     */
+    function is_all_digital() {
+
+        if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS)
+            return;
+
+        $sql = sprintf("SELECT NOT EXISTS (SELECT TRUE FROM %s WHERE is_digital IS NULL AND cart_id = %d) AS r",
+                         $this->_items_table,
+                         $this->get_id());
+        $res = $this->db->getOne($sql);
+
+        $this->set_all_digital_flag(($res == 1));
+        return ($res == 1);
+    }
+
+
+    /**
+     * set an 'is_all_digital' boolean in the cart to help the Orders obj down the line
+     *
+     * return bool/PE
+     */
+    function set_all_digital_flag($toggle=true) {
+        if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS)
+            return;
+
+        return $this->store(array('is_all_digital' => $toggle));
     }
 
 }

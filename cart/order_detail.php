@@ -85,7 +85,10 @@ else {
 
         $smarty->assign('cart', $orderitems);
         $smarty->assign('billing', $order->fetch_addr('billing'));
-        $smarty->assign('shipping', $order->fetch_addr('shipping'));
+        if (!$order->requires_shipping())
+            $smarty->assign('no_shipping_required', true);
+        else
+            $smarty->assign('shipping', $order->fetch_addr('shipping'));
 
         //$smarty->assign('discount_amt', abs($cart_totals['discount']['amt']));
         $smarty->assign('discount_descrip', $cart_totals['discount']['descrip']);
@@ -93,6 +96,11 @@ else {
         $smarty->assign('order_status', $order->get_status());
 
         $smarty->assign('history', $order->fetch_history());
+
+        if ($order->has_digital_goods()) {
+            $smarty->assign('has_digital_goods', true);
+            $smarty->assign('download_list', $order->fetch_digital_goods());
+        }
     }
 }
 

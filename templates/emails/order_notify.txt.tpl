@@ -48,8 +48,10 @@ PAYMENT METHOD: <~ $orderinfo.payment_method ~>
 BILLING TO:
 <~ include file="cart/address_format.txt.tpl" address=$billing ~>
 
+<~ if $shipping ~>
 SHIPPING TO:
 <~ include file="cart/address_format.txt.tpl" address=$shipping ~>
+<~/if~>
 
 
 <~ if $comments ~>
@@ -76,6 +78,21 @@ ORDER ITEMS:
   -----------------------------------------------------------------------------
 
 <~/foreach ~>
+
+<~ if $has_digital_goods ~>
+
+YOUR DOWNLOADS
+==============================================================================
+Your order contains digital goods which can now be
+downloaded. Please click the below links to retrieve your files.
+
+------------------------------------------------------------------------------
+<~ foreach from=$download_list item=download ~>
+<~ $download.product_descrip ~>: <~ $download.download_url ~>
+------------------------------------------------------------------------------
+<~/foreach~>
+
+<~/if~>
 
  SUBTOTAL <~ $cart_totals.subtotal|currency_format ~>
 
