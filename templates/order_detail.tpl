@@ -49,7 +49,11 @@
                  </td>
                 <td valign="top" class="checkoutAddress">
                     <h4>Shipping Address</h4>
-                    <~ include file="cart/address_format.tpl" address=$shipping ~>
+                    <~ if $no_shipping_required ~>
+                        <strong>No shipping required.</strong>
+                    <~ else ~>
+                        <~ include file="cart/address_format.tpl" address=$shipping ~>
+                    <~ /if ~>
                  </td>
             </tr>
         </table>
