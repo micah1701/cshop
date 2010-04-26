@@ -140,6 +140,8 @@ if ($ACTION == OP_ADD_SHIP) {
     if (CSHOP_ALLOW_ANON_ACCOUNT and $auth->has_bypass_flag()) { 
         $user = cmClassFactory::getInstanceOf(CSHOP_CLASSES_USER, $pdb);       
 
+        $fex->add_element($user->get_colmap());
+
         $vals = $fex->get_submitted_vals($_POST);
 
         $res = $user->create_anon_user($vals['email'], $vals);
@@ -160,6 +162,9 @@ if ($ACTION == OP_ADD_SHIP) {
         exit();
     }
     else {
+        
+        $fex->add_element($colmap);
+
         if (! ($errs = $fex->validate($_POST))) {
             //$thiscolmap = $user->addr->get_colmap();
             $vals = $fex->get_submitted_vals($_POST);
