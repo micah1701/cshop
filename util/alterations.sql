@@ -409,5 +409,6 @@ ALTER TABLE cm_cart ADD is_all_digital bool;
 -- Mon Apr 26 09:38:41 EDT 2010
 ALTER TABLE cm_cart_items ADD is_digital bool;
 ALTER TABLE cm_order_items ADD is_digital bool;
-ALTER TABLE cm_order_items ADD download_url varchar(255);
+ALTER TABLE cm_order_items ADD download_token varchar(255);
+ALTER TABLE cm_order_items ADD UNIQUE (download_token);
 

@@ -974,18 +974,18 @@ class cmOrder extends db_container {
     function fetch_digital_goods() {
         if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS) return;
 
-        $sql = sprintf("SELECT id, product_id, product_descrip, download_url FROM %s WHERE is_digital = 1 AND order_id = %d", 
+        $sql = sprintf("SELECT id, product_id, product_descrip, download_token FROM %s WHERE is_digital = 1 AND order_id = %d", 
                         $this->_items_table,
                         $this->get_id());
         $res = $this->db->query($sql);
         $items = array();
         while ($row = $res->fetchRow()) {
-            if (empty($row['download_url'])) { // create and save new URL if not done yet.
-                $row['download_url'] = $this->generate_download_url($row['product_id']);
+            if (empty($row['download_token'])) { // create and save new URL if not done yet.
+                $row['download_token'] = $this->generate_download_token($row['product_id']);
 
                 $oi = db_container::factory($this->db, $this->_items_table);
                 $oi->set_id($row['id']);
-                $oi->store(array('download_url' => $row['download_url']));
+                $oi->store(array('download_token' => $row['download_token']));
             }
             $items[] = $row;
         }
@@ -994,18 +994,34 @@ class cmOrder extends db_container {
 
 
     /**
-     * create a full URL to the place where a downloadable item can be found.
+     * create a nice random token, for digital download links
      *
      * @param $pid int      product id
      * @return string       URL
      */
-    function generate_download_url($pid) {
-        $url = sprintf(CSHOP_DOWNLOAD_LINK_FMT,
-                       $pid,
-                       uniqid());
-        return $url;
+    function generate_download_token($pid, $len=15) {
+        $tok = '';
+        $hex = md5( $pid . uniqid(rand(), true) ); // make random-ish hex string
+        while ( strlen($hex) ) {
+            $tok .= chr( base_convert( substr($hex, 0, 2), 16, 10) ); // convert every 2 bytes to whatever ascii
+            $hex = substr($hex, 2);
+        }
+        $tok = strtr(substr(base64_encode( $tok ), 0, $len), '+/=', '-__'); // url-safe and truncate
+
+        return $pid . '.' . $tok;
     }
 
+    /**
+     * get the order id by looking up the given token and call set_id() on this object
+     * not sure why
+     * @param token string
+     * @return int the order id */
+    function fetch_downloadable_by_token($tok) {
+        $sql = sprintf("SELECT id, order_id, product_id, product_descrip FROM %s WHERE download_token = %s",
+                        $this->_items_table,
+                        $this->db->quoteSmart($tok));
+        return $this->db->getRow($sql);
+    }
 
 
 }

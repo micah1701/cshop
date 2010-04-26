@@ -21,7 +21,11 @@ class cmProductDownload extends db_container {
 
     var $validations = array('url' => array('validate_url', null, "Invalid URL"));
 
+    var $download_request_headers = array();
+
     const ERROR_VAL_URL = -701;
+
+
 
     function fetch_by_product_id($pid, $cols=null) {
         $w = 'cm_products_id = '.intval($pid);
@@ -41,6 +45,62 @@ class cmProductDownload extends db_container {
 
         if ($err) $this->_push_validation_error($err, self::ERROR_VAL_URL, $col, $value);
     }
+
+
+    function get_download_request_headers() {
+        return $this->download_request_headers;
+    }
+
+    /**
+     * pull and print a downloadable, using curl functions for passthrough.
+     * extend for whatever storage mechanism or service we will be using on this cshop instance
+     *
+     * meant to be called when $this->_id is set already 
+     */
+    function digital_download_dumper($product_id) {
+        if (empty($product_id)) return;
+
+        $url = null;
+        if ($info = $this->fetch_by_product_id($product_id)) {
+            $url = $info[0]['url'];
+        }
+        //  'https://storage5.clouddrive.com/v1/MossoCloudFS_7aa80c20-d06b-4abd-b6c8-5f52139a51a3/test-images/unicornp.jpg';
+        if (!$url) {
+            trigger_error('Misconfiguration: no URL found for this item', E_USER_ERROR);
+        }
+
+        $headers = $this->get_download_request_headers(); 
+
+        $ch = curl_init();
+
+        // set URL and other appropriate options
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'cmProductDownload::_curlPassHeaders');
+
+        curl_exec($ch);
+
+        $res = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ($res != 200) {
+            trigger_error("HTTP/curl() result $res", E_USER_WARNING);
+        } 
+        curl_close($ch);
+    }
+
+
+    static function _curlPassHeaders($ch, $header) {
+        if (!preg_match('/^HTTP/i', $header)) {
+            header($header);
+        }
+        //else {
+        //$filename = preg_replace('/[^\w\d._-]+/', '_', $item_info['product_descrip']) . '.zip';
+        //header('Content-Disposition: attachment; filename="'.$filename.'"');
+        //}
+        return strlen($header);
+    }
+
+
 
 }
 

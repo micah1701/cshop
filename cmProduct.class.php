@@ -1090,6 +1090,7 @@ class cmProduct extends db_container {
     }
 
 
+
 }
 
 /* lame back-compat */
