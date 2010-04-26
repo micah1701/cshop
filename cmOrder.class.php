@@ -987,6 +987,7 @@ class cmOrder extends db_container {
                 $oi->set_id($row['id']);
                 $oi->store(array('download_token' => $row['download_token']));
             }
+            $row['download_url'] = sprintf(CSHOP_DOWNLOAD_LINK_FMT, $this->fetch_token(), $row['download_token']);
             $items[] = $row;
         }
         return $items;
