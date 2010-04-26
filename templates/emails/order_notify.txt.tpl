@@ -48,8 +48,10 @@ PAYMENT METHOD: <~ $orderinfo.payment_method ~>
 BILLING TO:
 <~ include file="cart/address_format.txt.tpl" address=$billing ~>
 
+<~ if $shipping ~>
 SHIPPING TO:
 <~ include file="cart/address_format.txt.tpl" address=$shipping ~>
+<~/if~>
 
 
 <~ if $comments ~>

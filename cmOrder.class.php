@@ -1009,7 +1009,7 @@ class cmOrder extends db_container {
         }
         $tok = strtr(substr(base64_encode( $tok ), 0, $len), '+/=', '-__'); // url-safe and truncate
 
-        return $pid . '.' . $tok;
+        return $tok;
     }
 
     /**

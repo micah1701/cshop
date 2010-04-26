@@ -194,7 +194,7 @@
             <b>Shipping to:</b>
           </td>
           <td>
-            <~ if $no_shipping_required ~>
+            <~ if !$shipping ~>
                 <strong>No shipping required.</strong>
             <~ else ~>
                 <~ include file="float:address_format.tpl" address=$shipping ~>
