@@ -197,10 +197,15 @@ if ($pay) {
     }
 }
 
-if (!$shipping = $user->fetchShippingAddr()) {
-    trigger_error("did not get shipping address for uid $uid", E_USER_ERROR);
+if ($cart->is_all_digital()) {
+    $shipping = array('name' => 'n/a');
 }
-$shipping['country'] = formex_field::_get_countries(true, $shipping['country']);
+else {
+    if (!$shipping = $user->fetchShippingAddr()) {
+        trigger_error("did not get shipping address for uid $uid", E_USER_ERROR);
+    }
+    $shipping['country'] = formex_field::_get_countries(true, $shipping['country']);
+}
 
 
 if (defined('CSHOP_ACCEPT_GIFTCARDS') && CSHOP_ACCEPT_GIFTCARDS) {

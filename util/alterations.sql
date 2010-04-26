@@ -400,3 +400,9 @@ CREATE TABLE `cm_products_downloads` (
   KEY `cm_products_id` (`cm_products_id`),
   CONSTRAINT `cm_products_downloads_ibfk_1` FOREIGN KEY (`cm_products_id`) REFERENCES `cm_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Sun Apr 25 20:00:34 EDT 2010
+ALTER TABLE cm_products ADD is_digital_only bool;
+ALTER TABLE cm_cart ADD is_all_digital bool;
+ALTER TABLE cm_orders ADD is_all_digital bool;
+

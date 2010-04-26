@@ -230,6 +230,9 @@ elseif ($ACTION == OP_ADD_BILL) {
 
         if (!$errs) { 
             $addrcolmap = $user->addr->get_colmap();
+            print '<pre>DEBUG: at line '.__LINE__.' of '.__FILE__."\n";
+            print_r($user);
+            print '</pre>';
             if (isset($_POST['f_same_as_shipping'])) {
                 /* should be a method in cmUser() for this... */
                 $ship = $user->fetch(array('shipping_addr_id'));
@@ -364,10 +367,13 @@ if ($SHOWFORM) {
 
         if ($ACTION == OP_GET_SHIP_ADDR) {
 
+            if ($cart->is_all_digital()) { // bypass all shipping if everything is not shippable
+                header("Location: {$_SERVER['PHP_SELF']}?billing\n");
+                exit();
+            }
             $op_new_ship = isset($_GET['op_add_ship']);
 
-            $shipclass = CSHOP_CLASSES_SHIPMETHOD;
-            $ship = new $shipclass($pdb);
+            $ship = cmClassFactory::getInstanceOf(CSHOP_CLASSES_SHIPMETHOD, $pdb);
 
             /* limits the country select if need be, depending on the ship method */
             if ($countrylist = $ship->get_avail_countries()) {

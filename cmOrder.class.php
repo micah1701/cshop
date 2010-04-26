@@ -177,9 +177,15 @@ class cmOrder extends db_container {
             $vals['orders_status'] = CM_ORDER_STATUS_BACKORDER; 
         }
 
-        // shipping and tax amounts from the cart
-        $vals['ship_total'] = $cart_totals['shipping']['amt'];
-        $vals['ship_method'] = $cart_totals['shipping']['method'];
+        if ($cart->is_all_digital()) { // no shipping needed
+            $vals['is_all_digital'] = true;
+        }
+        else { // shipping amounts from the cart
+            $vals['ship_total'] = $cart_totals['shipping']['amt'];
+            $vals['ship_method'] = $cart_totals['shipping']['method'];
+        }
+
+        // tax amounts pulled from cart.
         if (!empty($cart_totals['tax'])) {
             $vals['tax_total'] = $cart_totals['tax']['amt'];
             $vals['tax_method'] = $cart_totals['tax']['method'];

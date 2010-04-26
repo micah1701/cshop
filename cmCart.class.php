@@ -1407,6 +1407,52 @@ class cmCart extends db_container {
         }
     }
 
+
+    /**
+     * decide if everything in the cart has the 'is_digital_only' flag set.
+     *
+     * @return bool
+     */
+    function is_all_digital() {
+
+        $this->set_all_digital_flag(false);
+
+        if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS)
+            return;
+
+        $sql = sprintf("SELECT is_digital_only, COUNT(*) AS cnt 
+                        FROM %s ci, %s p 
+                        WHERE cart_id = %d AND p.id = ci.product_id 
+                        GROUP BY p.is_digital_only",
+                         $this->_items_table,
+                         $this->_products_table,
+                         $this->get_id());
+        $res = $this->db->query($sql);
+
+        if ($res->numRows() == 0) 
+            return;
+
+        while ($row = $res->fetchRow()) {
+            if ($row['is_digital_only'] != 1)
+                return false;
+        }
+        $this->set_all_digital_flag();
+        return true;
+    }
+
+
+    /**
+     * set an 'is_all_digital' boolean in the cart to help the Orders obj down the line
+     *
+     * return bool/PE
+     */
+    function set_all_digital_flag($toggle=true) {
+        if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS)
+            return;
+
+        return $this->store(array('is_all_digital' => $toggle));
+    }
+
 }
 
 
