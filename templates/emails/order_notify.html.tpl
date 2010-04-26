@@ -194,7 +194,11 @@
             <b>Shipping to:</b>
           </td>
           <td>
+            <~ if $no_shipping_required ~>
+                <strong>No shipping required.</strong>
+            <~ else ~>
                 <~ include file="float:address_format.tpl" address=$shipping ~>
+            <~ /if ~>
          </td>
        </tr>
      </table>
@@ -211,6 +215,17 @@
     </div>
     </td>
   </tr>
+
+    <~ if $has_digital_goods ~>
+      <tr>
+        <td colspan="2">
+            <div style="text-align: left; border-bottom: 1px solid #555">
+                <~ include file="float:order_digital_goods.tpl" ~>
+            </div>
+        </td>
+       </tr>
+    <~/if~>
+
 
   <~ if $history ~>
       <tr>

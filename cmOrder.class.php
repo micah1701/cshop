@@ -989,10 +989,16 @@ class cmOrder extends db_container {
     }
 
 
-    function generate_download_url() {
-        $url = sprintf('http://%s/downloads/%s',
-                        SITE_DOMAIN_NAME,
-                        uniqid());
+    /**
+     * create a full URL to the place where a downloadable item can be found.
+     *
+     * @param $pid int      product id
+     * @return string       URL
+     */
+    function generate_download_url($pid) {
+        $url = sprintf(CSHOP_DOWNLOAD_LINK_FMT,
+                       $pid,
+                       uniqid());
         return $url;
     }
 
