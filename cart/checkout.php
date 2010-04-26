@@ -80,15 +80,11 @@ else { #if (isset($_GET['shipping'])) {
 
 
 /* the cart and the user. That's what its all about */
-$cartclass = CSHOP_CLASSES_CART;
-$cart = new $cartclass($pdb);
-
-$userclass = CSHOP_CLASSES_USER;
-$user = new $userclass($pdb);
+$cart = cmClassFactory::getInstanceOf(CSHOP_CLASSES_CART, $pdb);
+$user = cmClassFactory::getInstanceOf(CSHOP_CLASSES_USER, $pdb);
 
 /* now what it really is all about is payment */
-$c = CSHOP_CLASSES_PAYMETHOD;
-$pay = new $c($pdb);
+$pay = cmClassFactory::getInstanceOf(CSHOP_CLASSES_PAYMETHOD, $pdb);
 
 /* decide what currency to show. They would have set this in the cart */
 $sess->register('CSHOP_CURRENCY_DISPLAY');
@@ -108,18 +104,11 @@ $cartid = $cart->get_id(); // actually called set_id() on cart too! yes, strange
 /* create colmap for fex and mosh, but adding uname and email fields in case needed. */
 $colmap = $user->addr->get_colmap();
 
-// there is no user yet - add any fields in $user->colmap here
-if (CSHOP_ALLOW_ANON_ACCOUNT and $auth->has_bypass_flag()) {
-    $colmap = array_merge($colmap, $user->get_colmap());
-    if (!empty($colmap['username'])) {
-        unset($colmap['username']);
-    }
-}
 // try to fetch a user row based on whatvever is in $_SESSION[$user->_sesskey]. yes its quite safe!
-elseif ($userinfo = $user->fetch()) {
-}
-else {
-    trigger_error('auth info not found!', E_USER_WARNING);
+if (! (CSHOP_ALLOW_ANON_ACCOUNT and $auth->has_bypass_flag())) {
+    if (! ($userinfo = $user->fetch())) {
+        trigger_error('auth info not found!', E_USER_WARNING);
+    }
 }
 
 /** making sure they did not mysteriously lose the cart somehow, if so redirect and complain */
@@ -369,6 +358,10 @@ if ($SHOWFORM) {
         $fex->add_element($colmap);
 
         if ($ACTION == OP_GET_SHIP_ADDR) {
+
+            if (CSHOP_ALLOW_ANON_ACCOUNT and $auth->has_bypass_flag()) {
+                $fex->add_element($user->get_colmap());
+            }
 
             if (!$cart->requires_shipping()) { // bypass shipping addr form if everything is not shippable
                 $smarty->assign('skip_shipping_addr', true);
