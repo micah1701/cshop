@@ -236,6 +236,7 @@ class cmCart extends db_container {
                            'inventory_id' => $invid,
                            'product_descrip' => $pctr->get_title(),
                            #'product_attribs' => serialize($attribs), // obsolete? maybe.
+                           'is_digital' => $pctr->get_header('is_digital'),
                            'has_item_options' => (is_array($options) and count($options)));
 
              if ($this->do_apply_discount_to_lineitems()) {
@@ -367,7 +368,7 @@ class cmCart extends db_container {
          if (empty($this->_items)) {
              $items = array();
              $cols = array('id', 'inventory_id', 'product_id', 'qty', 'price', 'discount', 'is_bundle', 
-                           'product_sku', 'product_descrip', 'product_attribs', 'has_item_options');
+                           'product_sku', 'product_descrip', 'product_attribs', 'has_item_options','is_digital');
              if (!$get_thumbs) {
                  $sql = sprintf("SELECT %s
                                  FROM %s
@@ -1427,29 +1428,16 @@ class cmCart extends db_container {
      */
     function is_all_digital() {
 
-        $this->set_all_digital_flag(false);
-
         if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS)
             return;
 
-        $sql = sprintf("SELECT is_digital_only, COUNT(*) AS cnt 
-                        FROM %s ci, %s p 
-                        WHERE cart_id = %d AND p.id = ci.product_id 
-                        GROUP BY p.is_digital_only",
+        $sql = sprintf("SELECT NOT EXISTS (SELECT TRUE FROM %s WHERE is_digital IS NULL AND cart_id = %d) AS r",
                          $this->_items_table,
-                         $this->_products_table,
                          $this->get_id());
-        $res = $this->db->query($sql);
+        $res = $this->db->getOne($sql);
 
-        if ($res->numRows() == 0) 
-            return;
-
-        while ($row = $res->fetchRow()) {
-            if ($row['is_digital_only'] != 1)
-                return false;
-        }
-        $this->set_all_digital_flag();
-        return true;
+        $this->set_all_digital_flag(($res == 1));
+        return ($res == 1);
     }
 
 

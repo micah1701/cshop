@@ -402,7 +402,11 @@ CREATE TABLE `cm_products_downloads` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Sun Apr 25 20:00:34 EDT 2010
-ALTER TABLE cm_products ADD is_digital_only bool;
+ALTER TABLE cm_products ADD is_digital bool;
 ALTER TABLE cm_cart ADD is_all_digital bool;
-ALTER TABLE cm_orders ADD is_all_digital bool;
+
+
+-- Mon Apr 26 09:38:41 EDT 2010
+ALTER TABLE cm_order_items ADD is_digital bool;
+ALTER TABLE cm_cart_items ADD is_digital bool;
 

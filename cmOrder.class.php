@@ -244,7 +244,7 @@ class cmOrder extends db_container {
         $cnt = 0;
         foreach ($items as $cartitem) {
             $oi = db_container::factory($this->db, $this->_items_table);
-            $order_items_cols = array('inventory_id','product_id','qty','price','discount','product_sku','product_descrip');
+            $order_items_cols = array('inventory_id','product_id','qty','price','discount','product_sku','product_descrip','is_digital');
 
             $newitem = array();
             foreach ($order_items_cols as $col) {
@@ -873,7 +873,9 @@ class cmOrder extends db_container {
         $smarty->assign('cart', $orderitems);
         $smarty->assign('numitems', count($orderitems));
         $smarty->assign('billing', $this->fetch_addr('billing'));
-        $smarty->assign('shipping', $this->fetch_addr('shipping'));
+
+        if ($this->requires_shipping())
+            $smarty->assign('shipping', $this->fetch_addr('shipping'));
 
 
         $h = $this->fetch_history();
@@ -937,6 +939,19 @@ class cmOrder extends db_container {
     }
 
 
+    function requires_shipping() {
+        if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS) return true;
+
+        $sql = sprintf("SELECT COUNT(*) FROM %s WHERE is_digital IS NULL", $this->_items_table);
+        $res = $this->db->getOne($sql);
+        return ($res !== 0);
+    }
+
+    function has_digital_goods() {
+        $sql = sprintf("SELECT COUNT(*) FROM %s WHERE is_digital = 1", $this->_items_table);
+        $res = $this->db->getOne($sql);
+        return ($res >= 1);
+    }
 
 
 }
