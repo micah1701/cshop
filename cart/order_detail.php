@@ -96,6 +96,11 @@ else {
         $smarty->assign('order_status', $order->get_status());
 
         $smarty->assign('history', $order->fetch_history());
+
+        if ($order->has_digital_goods()) {
+            $smarty->assign('has_digital_goods', true);
+            $smarty->assign('download_list', $order->fetch_digital_goods());
+        }
     }
 }
 

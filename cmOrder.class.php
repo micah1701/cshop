@@ -949,6 +949,10 @@ class cmOrder extends db_container {
         return ($res !== '0');
     }
 
+    /**
+     * does the order contains any digital items.
+     * @return bool
+     */
     function has_digital_goods() {
         if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS) return;
 
@@ -958,6 +962,40 @@ class cmOrder extends db_container {
         $res = $this->db->getOne($sql);
         return ($res >= 1);
     }
+
+    /**
+     * does the order contains any digital items.
+     * @return bool
+     */
+    function fetch_digital_goods() {
+        if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS) return;
+
+        $sql = sprintf("SELECT id, product_id, product_descrip, download_url FROM %s WHERE is_digital = 1 AND order_id = %d", 
+                        $this->_items_table,
+                        $this->get_id());
+        $res = $this->db->query($sql);
+        $items = array();
+        while ($row = $res->fetchRow()) {
+            if (empty($row['download_url'])) { // create and save new URL if not done yet.
+                $row['download_url'] = $this->generate_download_url($row['product_id']);
+
+                $oi = db_container::factory($this->db, $this->_items_table);
+                $oi->set_id($row['id']);
+                $oi->store(array('download_url' => $row['download_url']));
+            }
+            $items[] = $row;
+        }
+        return $items;
+    }
+
+
+    function generate_download_url() {
+        $url = sprintf('http://%s/downloads/%s',
+                        SITE_DOMAIN_NAME,
+                        uniqid());
+        return $url;
+    }
+
 
 
 }

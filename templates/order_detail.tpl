@@ -65,6 +65,9 @@
         <~ include file="float:cart_contents.tpl" suppress_update=1 ~>
     </div>
 
+    <~ if $has_digital_goods ~>
+        <~ include file="float:order_digital_goods.tpl" ~>
+    <~/if~>
 
     <~ if $history ~>
       <div id="orderHistory">
