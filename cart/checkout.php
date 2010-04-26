@@ -131,54 +131,55 @@ if (!$cart_itemcount or PEAR::isError($cart_itemcount)) {
 }
 
 
+$fex = new formex();
 
 
 /* enter user shipping addr */
 if ($ACTION == OP_ADD_SHIP) {
-    $mosh = new mosh_tool();
-    if ($errs = $mosh->check_form($colmap)) {
-        // handled below
+    /* they would like to proceed without choosing a password and such. Create an "anonymous" user object stub and log them in automatically */
+    if (CSHOP_ALLOW_ANON_ACCOUNT and $auth->has_bypass_flag()) { 
+        $user = cmClassFactory::getInstanceOf(CSHOP_CLASSES_USER, $pdb);       
+
+        $vals = $fex->get_submitted_vals($_POST);
+
+        $res = $user->create_anon_user($vals['email'], $vals);
+
+        if (PEAR::isError($res)) {
+            trigger_error($res->getCode(), E_USER_ERROR);
+        }
+        $auth->force_preauth($user->get_id()); // magically logs them in with the new uid
+    }
+
+    // save the comments on billing/shipping eitheway, its shared
+    if (!empty($_POST['f_user_comments'])) {
+        $cart->set_user_comment($_POST['f_user_comments']);
+    }
+
+    if (!$cart->requires_shipping()) {
+        header("Location: {$_SERVER['PHP_SELF']}?billing\n"); // goto: billing 
+        exit();
     }
     else {
-        if (CSHOP_ALLOW_ANON_ACCOUNT and $auth->has_bypass_flag()) { 
-                                        /* they would like to proceed without choosing */
-            $c = CSHOP_CLASSES_USER;    /* a password and such. Create an "anonymous" user */
-            $user = new $c($pdb);       /* object stub and log them in automatically */
-            $user_colmap = $user->get_colmap();
-            $vals = $mosh->get_form_vals($user_colmap);
+        if (! ($errs = $fex->validate($_POST))) {
+            //$thiscolmap = $user->addr->get_colmap();
+            $vals = $fex->get_submitted_vals($_POST);
+            $vals['user_id'] = $user->get_id();
 
-            $res = $user->create_anon_user($vals['email'], $vals);
-
-            if (PEAR::isError($res)) {
-                trigger_error($res->getCode(), E_USER_ERROR);
+            if (!empty($_POST['f_shipping_addr_id'])) { // they are editing an address that was already in the DB
+                $user->addr->set_id($_POST['f_shipping_addr_id']);
             }
-            $auth->force_preauth($user->get_id()); // magically logs them in with the new uid
-        }
+            $res = $user->addr->store($vals);
 
-        $thiscolmap = $user->addr->get_colmap();
-        $vals = $mosh->get_form_vals($thiscolmap);
-        $vals['user_id'] = $user->get_id();
-        if (!empty($_POST['f_shipping_addr_id'])) { // they are editing an address that was already in the DB
-            $user->addr->set_id($_POST['f_shipping_addr_id']);
+            if (PEAR::isError($res) and $res->getCode() != DBCON_ZERO_EFFECT) { //"0 rows were changed"
+                trigger_error($res->getMessage(), E_USER_ERROR);
+            }
+            else {
+                if ($user->store(array('shipping_addr_id' => $user->addr->get_id()))) {
+                    header("Location: {$_SERVER['PHP_SELF']}?pickship\n"); // SUCCESS, goto: pick a shipping method
+                    exit();
+                }
+            }
         }
-        $res = $user->addr->store($vals);
-        if (PEAR::isError($res) and $res->getCode() != DBCON_ZERO_EFFECT) { //"0 rows were changed"
-            trigger_error($res->getMessage(), E_USER_ERROR);
-        }
-        else {
-            $user->store(array('shipping_addr_id' => $user->addr->get_id()));
-            $SUCCESS = true;
-        }
-
-        // save the comments on billing/shipping eitheway, its shared
-        if (!empty($_POST['f_user_comments'])) {
-            $cart->set_user_comment($_POST['f_user_comments']);
-        }
-
-    }
-    if ($SUCCESS) {
-        header("Location: {$_SERVER['PHP_SELF']}?pickship\n");
-        exit();
     }
     $ACTION = OP_GET_SHIP_ADDR;
 }
@@ -230,9 +231,6 @@ elseif ($ACTION == OP_ADD_BILL) {
 
         if (!$errs) { 
             $addrcolmap = $user->addr->get_colmap();
-            print '<pre>DEBUG: at line '.__LINE__.' of '.__FILE__."\n";
-            print_r($user);
-            print '</pre>';
             if (isset($_POST['f_same_as_shipping'])) {
                 /* should be a method in cmUser() for this... */
                 $ship = $user->fetch(array('shipping_addr_id'));
@@ -350,7 +348,6 @@ $smarty->assign('subtotal', $subtotal);
 
 /*** create form object, set up and pass to smarty **/
 if ($SHOWFORM) {
-    $fex = new formex();
     $fex->add_element('op', array(null, 'hidden', $ACTION));
     $fex->add_element('butt', array('CONTINUE', 'submit', null, null, " onclick=\"this.value='Please wait...';\"", 0));
 
@@ -367,9 +364,8 @@ if ($SHOWFORM) {
 
         if ($ACTION == OP_GET_SHIP_ADDR) {
 
-            if ($cart->is_all_digital()) { // bypass all shipping if everything is not shippable
-                header("Location: {$_SERVER['PHP_SELF']}?billing\n");
-                exit();
+            if (!$cart->requires_shipping()) { // bypass shipping addr form if everything is not shippable
+                $smarty->assign('skip_shipping_addr', true);
             }
             $op_new_ship = isset($_GET['op_add_ship']);
 
@@ -465,7 +461,9 @@ if ($SHOWFORM) {
             }
 
             /* try to find prev. shipping addr as entered */
-            if ($shipping = $user->fetchShippingAddr()) {
+            $shipping = array();
+            if ($cart->requires_shipping()) {
+                $shipping = $user->fetchShippingAddr();
                 $smarty->assign('shipaddr', $shipping);
             }
 
@@ -475,13 +473,14 @@ if ($SHOWFORM) {
                 $thiscolmap = $pay->get_colmap();
                 $fex->add_element($thiscolmap);
 
-                /* the magic auto-fill checkbox */
-                $fex->add_element('same_as_shipping', array('Same as shipping', 
-                                                            'checkbox', 
-                                                            null, 
-                                                            null, 
-                                                            'onclick="addrAutoFill(this.checked)"', 
-                                                            0));
+                if ($shipping) { // /* the magic auto-fill checkbox */
+                    $fex->add_element('same_as_shipping', array('Same as shipping', 
+                                                                'checkbox', 
+                                                                null, 
+                                                                null, 
+                                                                'onclick="addrAutoFill(this.checked)"', 
+                                                                0));
+                }
 
                 /* just add in ship total here, there is no choice for ass! */
                 $fex->add_element('ship_method', array(null, 'hidden', null));

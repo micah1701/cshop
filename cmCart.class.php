@@ -1408,6 +1408,18 @@ class cmCart extends db_container {
     }
 
 
+
+    /**
+     * stub to decide if shipping addr and method is even applicable to this cart. It is, usually.
+     * 
+     * @return bool
+     */
+    function requires_shipping() {
+        if (!$this->is_all_digital()) 
+            return true;
+    }
+
+
     /**
      * decide if everything in the cart has the 'is_digital_only' flag set.
      *

@@ -17,6 +17,9 @@ require_once(CSHOP_CLASSES_GIFTCARD.'.class.php');
 
 // init page auth objects
 page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>CSHOP_CLASSES_AUTH_AUTH, 'perm'=>CSHOP_CLASSES_AUTH_PERM));
+print '<pre>DEBUG: at line '.__LINE__.' of '.__FILE__."\n";
+print_r($auth);
+print '</pre>';
 
 // flag for smarty
 $smarty->assign('page_id', 'checkout_confirm');
@@ -197,7 +200,7 @@ if ($pay) {
     }
 }
 
-if ($cart->is_all_digital()) {
+if (!$cart->requires_shipping()) {
     $shipping = array('name' => 'n/a');
 }
 else {

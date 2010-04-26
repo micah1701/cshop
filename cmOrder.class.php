@@ -177,10 +177,8 @@ class cmOrder extends db_container {
             $vals['orders_status'] = CM_ORDER_STATUS_BACKORDER; 
         }
 
-        if ($cart->is_all_digital()) { // no shipping needed
-            $vals['is_all_digital'] = true;
-        }
-        else { // shipping amounts from the cart
+        if (!$this->cart->requires_shipping()) { 
+            // shipping amounts from the cart
             $vals['ship_total'] = $cart_totals['shipping']['amt'];
             $vals['ship_method'] = $cart_totals['shipping']['method'];
         }
@@ -415,11 +413,12 @@ class cmOrder extends db_container {
         $vals = array();
         $user = $this->get_user();
 
-        $shipping = $user->fetchShippingAddr($this->_addr_cols);
-        foreach ($shipping as $k => $v) {
-            $vals["shipping_$k"] = $v;
+        if ($shipping = $user->fetchShippingAddr($this->_addr_cols)) {
+            foreach ($shipping as $k => $v) {
+                $vals["shipping_$k"] = $v;
+            }
+            return $this->store($vals);
         }
-        return $this->store($vals);
     }
 
     /**
