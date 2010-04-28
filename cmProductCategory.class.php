@@ -215,10 +215,11 @@ class cmProductCategory extends db_container {
      * @param $prune_to array list of category ids identifying a branch on the 
      *                        tree. Any nodes that are not siblings or children of nodes on this path will be ignored - 
      *                        OR if TRUE, will prune to the branch containing the current id of this instance.
+     * @param $ignore_empty bool    ignore categories that do not contain any products?
      * @return a complex array struct
      */
-    function get_category_tree($startwith=0, $cols=null, $prune_to=null) {
-        $sth =& $this->_sth_category_tree_singleton($cols);
+    function get_category_tree($startwith=0, $cols=null, $prune_to=null, $ignore_empty=false) {
+        $sth = $this->_sth_category_tree_singleton($cols, null, $ignore_empty );
 
         $res = $this->db->execute($sth, array($startwith));
 
@@ -229,7 +230,7 @@ class cmProductCategory extends db_container {
         $sibs = array();
         while ($row = $res->fetchRow()) {
             if (!$prune_to or in_array($row['id'], $prune_to)) {
-                if ($kids = $this->get_category_tree($row['id'], null, $prune_to)) {
+                if ($kids = $this->get_category_tree($row['id'], $cols, $prune_to, $ignore_empty)) {
                     $row['children'] = $kids;
                 }
             }
@@ -250,7 +251,7 @@ class cmProductCategory extends db_container {
      * @param $cols array list of columns in cm_categories you want returned
      * @param $orderby str expression for ORDER BY
      */
-    function _sth_category_tree_singleton($cols=null, $orderby=null) {
+    function _sth_category_tree_singleton($cols=null, $orderby=null, $ignore_empty=false) {
         if (empty($this->_sth_category_tree)) {
             if (!is_array($cols)) {
                 $cols = array_keys($this->colmap);
@@ -259,8 +260,20 @@ class cmProductCategory extends db_container {
 
             $col_list = join(',', $cols);
 
-            $sql = "SELECT $col_list,parent_cat_id,id,is_active FROM ".$this->get_table_name()."
-                    WHERE parent_cat_id = ? ORDER BY $orderby, name";
+            if ($ignore_empty) {
+                $sql = "SELECT $col_list,parent_cat_id,id,is_active, COUNT(pc.cm_products_id) AS product_count
+                        FROM ".$this->get_table_name()." c
+                        LEFT JOIN cm_products_categories pc ON (pc.cm_categories_id = c.id)
+                        WHERE parent_cat_id = ?
+                        GROUP BY (c.id)
+                        HAVING COUNT(pc.cm_products_id) > 0 
+                        ORDER BY $orderby, name";
+            }
+            else {
+                $sql = "SELECT $col_list,parent_cat_id,id,is_active FROM ".$this->get_table_name()."
+                        WHERE parent_cat_id = ? ORDER BY $orderby, name";
+            }
+
             $this->_sth_category_tree = $this->db->prepare($sql);
         }
         return $this->_sth_category_tree;
@@ -277,7 +290,7 @@ class cmProductCategory extends db_container {
      */
     function get_categories_for_select($startwith=0, $currlevel=0, $get_inactives=false) {
         $cols = array('name','urlkey');
-        $sth =& $this->_sth_category_tree_singleton($cols, 'parent_cat_id,order_weight');
+        $sth = $this->_sth_category_tree_singleton($cols, 'parent_cat_id,order_weight');
 
         $res = $this->db->execute($sth, array($startwith));
 
