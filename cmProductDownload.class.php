@@ -90,7 +90,7 @@ class cmProductDownload extends db_container {
 }
 
 function cmProductDownload_curlPassHeaders($ch, $header) {
-    if (!preg_match('/^HTTP/i', $header)) {
+    if (preg_match('/^Content-type:/i', $header)) {
         header($header);
     }
     //else {
