@@ -93,7 +93,7 @@ if (isset($_POST['op']) and ($ACTION == OP_ADD or $ACTION == OP_EDIT)) {
             }
             $res = $user->store($vals, false);
             if (PEAR::isError($res)) {
-                $errs[] = $user->getErrorMessage($res);
+                $errs[] = $res->getMessage();
             }
             else {
                 $msg .= sprintf('%s "%s" was updated.', $table_title, $vals[$table_namecol]);
@@ -107,7 +107,7 @@ if (isset($_POST['op']) and ($ACTION == OP_ADD or $ACTION == OP_EDIT)) {
             if (empty($vals['username'])) $vals['username'] = null;
             $res = $user->store($vals, false);
             if (PEAR::isError($res)) {
-                $errs[] = $user->getErrorMessage($res);
+                $errs[] = $res->getDebugInfo();
             }
             else {
                 $uniq = $user->force_pword_change(); // force pw change by default!
