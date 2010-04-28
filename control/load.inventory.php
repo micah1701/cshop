@@ -11,20 +11,24 @@ require_once(CSHOP_CLASSES_PRODUCT.'.class.php');
 require_once("uploadable.class.php");      
 
 
-// how many columns should be in the datafile?
-$datafile_expected_cols = 9;
-
 // column indexes where sku and qty will be found
 $datafile_pos = array('sku' => 0,
-                      'name' => 1,
-                      'price'=>2,
-                      'weight'=>3,
-                      'description'=>4,
-                      'cat' => 5,
-                      'size' => 6,
-                      'color' => 7,
-                      'qty' => 8,
+                      'name' => null,
+                      'price'=>null,
+                      'weight'=>null,
+                      'description'=>null,
+                      'cat' => null,
+                      'size' => null,
+                      'color' => null,
+                      'qty' => 1,
                     );
+
+// how many columns should be in the datafile?
+$datafile_expected_cols = 0;
+foreach (array_values($datafile_pos) as $p) {
+    if ($p !== null) $datafile_expected_cols++;
+}
+    
 
 
 $SHOWFORM = true;
@@ -172,7 +176,7 @@ elseif (isset($_POST['op_up'])) {
     else {
         $uplo->setErrorHandling(PEAR_ERROR_RETURN);
         $uplo->preserve_original_name = false;
-        $uplo->params = array('allowed'=>'text/csv',
+        $uplo->params = array( #'allowed'=>array('text/csv'),
                                'path'=> CSHOP_MEDIA_FULLPATH,
                                'ws_path' => CSHOP_MEDIA_URLPATH,
                                 'fnamebase' => uniqid('inventory-data.000'));
@@ -199,7 +203,8 @@ elseif (isset($_POST['op_up'])) {
 
                 $res = create_tmp_table($mdb);
 
-                $sql = "INSERT INTO tmp_inv (name,sku,size,color,qty,cat,price,weight,description) 
+                $cols = join(',', array_keys($datafile_pos));
+                $sql = "INSERT INTO tmp_inv ($cols)
                                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"; 
 
                 if (! ($sth_insert_tmp_row = $mdb->prepare($sql, null, MDB2_PREPARE_MANIP))) {
@@ -227,15 +232,16 @@ elseif (isset($_POST['op_up'])) {
                     }
 
                     try {
-                        $res = $sth_insert_tmp_row->execute(array($data[$datafile_pos['name']],
-                                                                   $data[$datafile_pos['sku']],
-                                                                   $data[$datafile_pos['size']],
-                                                                   $data[$datafile_pos['color']],
-                                                                   $data[$datafile_pos['qty']],
-                                                                   $data[$datafile_pos['cat']],
-                                                                   $data[$datafile_pos['price']],
-                                                                   $data[$datafile_pos['weight']],
-                                                                   $data[$datafile_pos['description']]));
+                        $vals = array();
+                        foreach ($datafile_pos as $col => $pos) {
+                            if ($pos !== null)
+                                $vals[] = $data[$pos];
+                            else
+                                $vals[] = null;
+                        }
+
+                        $res = $sth_insert_tmp_row->execute($vals);
+
                     } catch (PDOException $e) {
                         $errs[] = "An error occurred while testing the data: " . $e->getMessage();
                         break;
