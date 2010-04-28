@@ -432,4 +432,18 @@ class cmProductCategory extends db_container {
         return $items;
     }
 
+
+    function get_child_categories($startwith=0, $cols=null, $ignore_empty=false) {
+        $sth = $this->_sth_category_tree_singleton($cols, null, $ignore_empty );
+
+        $res = $this->db->execute($sth, array($startwith));
+
+        $sibs = array();
+        while ($row = $res->fetchRow()) {
+            $sibs[] = $row;
+        }
+        $res->free();
+        return $sibs;
+    }
+
 }
