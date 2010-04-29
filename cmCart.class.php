@@ -1431,7 +1431,8 @@ class cmCart extends db_container {
         if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS)
             return;
 
-        $sql = sprintf("SELECT NOT EXISTS (SELECT TRUE FROM %s WHERE is_digital IS NULL AND cart_id = %d) AS r",
+        $sql = sprintf("SELECT NOT EXISTS (SELECT TRUE FROM %s 
+                        WHERE (is_digital = 0 OR is_digital IS NULL) AND cart_id = %d) AS r",
                          $this->_items_table,
                          $this->get_id());
         $res = $this->db->getOne($sql);

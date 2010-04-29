@@ -182,7 +182,7 @@ class cmOrder extends db_container {
             $vals['orders_status'] = CM_ORDER_STATUS_BACKORDER; 
         }
 
-        if (!$this->cart->requires_shipping()) { 
+        if ($this->cart->requires_shipping()) { 
             // shipping amounts from the cart
             $vals['ship_total'] = $cart_totals['shipping']['amt'];
             $vals['ship_method'] = $cart_totals['shipping']['method'];
