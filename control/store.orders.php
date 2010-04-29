@@ -345,13 +345,9 @@ else {
     }
     /** **/
 
-    $cols = array('cust_name','company','email','DATE_FORMAT(order_create_date, \'%d %b %Y\') AS orderdate','order_create_date', 'orders_status', 'currency', 'ship_date', 'amt_quoted','order_token');
-    if (defined('CSHOP_ALLOW_ANON_ACCOUNT')) {
-        $cols[] = 'anon_email';
-    }
     $header_row = array('id'=>'Order ID','order_token'=>'Order Number','email'=>'User', 'orders_status'=>'Status', 'orderdate'=>'Order Date', 'amt_quoted'=>'Total', 'ship_date'=>'Ship Date');
 
-    if ($orders = $order->fetch_any($cols, $offset, $range, $orby, $where, $orderdir)) {
+    if ($orders = $order->fetch_any(null, $offset, $range, $orby, $where, $orderdir)) {
         
         /** list all cm_categories in one big ass dump using HTML_Table **/
         $table = new fu_HTML_Table(array("width" => "600"));
@@ -361,14 +357,14 @@ else {
 
         /* we got orders. add to $table object */
         foreach ($orders as $o) {
-            $name = $o['cust_name'];
+            $name = (!empty($o['cust_name']))? $o['cust_name'] : $o['first_name'].' '.$o['last_name'];
             if (!empty($o['company'])) $name .= " [{$o['company']}]";
             $email = (!empty($o['email']))? $o['email'] : $o['anon_email'];
             $vals = array($o['id'],
                           $o['order_token'],
                           "$name &lt;{$email}&gt;",
                           $order->statuses[$o['orders_status']],
-                          $o['orderdate'],
+                          date('d M Y', strtotime($o['order_create_date'])),
                           $o['amt_quoted'],
                           $o['ship_date']);
             $link = sprintf('%s?%s=%s',

@@ -20,10 +20,9 @@ class cmOrder extends db_container {
     var $_table = 'cm_orders';
 
     // TODO should not have these here, should be other ctr classes
+    var $_history_table = 'cm_order_history';
     var $_items_table = 'cm_order_items';
     var $_items_options_table = 'cm_order_items_options';
-    var $_users_table = 'auth_user';
-    var $_history_table = 'cm_order_history';
     var $_transaction_history_table = 'cm_order_transactions';
     var $_cart_totals_table = 'cm_cart_extra_totals';
 
@@ -92,8 +91,7 @@ class cmOrder extends db_container {
     /* get a user object assoc with this order */
     function get_user() {
         if (!isset($this->user)) {
-            $class = CSHOP_CLASSES_USER;
-            $this->user = new $class($this->db);
+            $this->user = cmClassFactory::getInstanceOf(CSHOP_CLASSES_USER, $this->db);
             if (!$this->header or !isset($this->header['user_id'])) {
                 $this->fetch(array('user_id'));
             }
@@ -130,13 +128,20 @@ class cmOrder extends db_container {
     /* sql for selecting many a row for the order listing */
     function _get_fetch_any_sql($cols, $orderby, $where, $orderdir='ASC') {
 
-        array_push($cols, 'cust_name','company','email','telephone','fax');
+        // need to get the user class's fields to add to the result. And we 
+        // have in instantiate a class bc you cant ref a static class by 
+        // variable in PHP < 5.3
+        $userclass = CSHOP_CLASSES_USER;
+        $user = new $userclass($this->db);
+        if ($cols) {
+            array_splice($cols, count($cols), 0, array_keys($user->colmap));
+        }
 
         $sql = sprintf("SELECT ord.id, ord.user_id, %s
                         FROM %s ord LEFT JOIN %s u ON (u.id = ord.user_id)",
-                                ($cols)? join(',', $cols) : '*',
+                                (is_array($cols))? join(',', $cols) : 'u.*,ord.*',
                                 $this->get_table_name(),
-                                $this->_users_table);
+                                $user->get_table_name());
         if ($where) $sql .= "\nWHERE " . $where;
         if ($orderby) $sql .= "\nORDER BY $orderby $orderdir";
         return $sql;
