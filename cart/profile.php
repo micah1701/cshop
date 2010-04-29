@@ -129,7 +129,7 @@ if (isset($_POST['f_op'])) {
         elseif (strlen($_POST['f_password']) < 6) {
             $errs[] = 'Your password must be 6 or more characters long';
         }
-        elseif ($_POST['f_password'] == $_POST['f_username']) {
+        elseif (isset($_POST['f_username']) && $_POST['f_password'] == $_POST['f_username']) {
             $errs[] = 'Your password cannot be the same as your username';
         }
     }

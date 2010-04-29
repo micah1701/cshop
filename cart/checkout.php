@@ -512,7 +512,10 @@ if ($SHOWFORM) {
     // create convenience cust_name value if needed
     if (isset($userinfo)) {
         if (!isset($userinfo['cust_name'])) {
-            $userinfo['cust_name'] = join(' ', array($userinfo['fname'], $userinfo['lname']));
+            if (isset($userinfo['fname']))
+                $userinfo['cust_name'] = join(' ', array($userinfo['fname'], $userinfo['lname']));
+            elseif (isset($userinfo['first_name']))
+                $userinfo['cust_name'] = join(' ', array($userinfo['first_name'], $userinfo['last_name']));
         }
         if (!empty($userinfo['anon_email'])) {
             $userinfo['email'] = $userinfo['anon_email'];

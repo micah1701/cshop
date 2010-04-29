@@ -39,7 +39,12 @@
             <td valign="top">
                 <strong>Customer:</strong>
             </td>
-            <td><a href="store.users.php?uid=<~ $user.id ~>"><~ $user.cust_name ~></a><br />
+            <td><a href="store.users.php?uid=<~ $user.id ~>">
+                    <~ if $user.cust_name ~>
+                        <~ $user.cust_name ~>
+                    <~ else ~>
+                        <~ $user.first_name ~> <~ $user.last_name ~>
+                    <~/if~></a><br />
                  <~ if $user.company ~><~ $user.company ~><br /><~/if~>
                  &lt;<~ $user_email ~>&gt;
             </td>
