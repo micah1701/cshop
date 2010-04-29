@@ -12,16 +12,20 @@ require_once("uploadable.class.php");
 
 
 // column indexes where sku and qty will be found
-$datafile_pos = array('sku' => 0,
-                      'name' => null,
-                      'price'=>null,
-                      'weight'=>null,
-                      'description'=>null,
-                      'cat' => null,
-                      'size' => null,
-                      'color' => null,
-                      'qty' => 1,
-                    );
+if (isset($CSHOP_INVENTORY_LOADER_COLS)) {
+    $datafile_pos = $CSHOP_INVENTORY_LOADER_COLS;
+}
+else {
+    $datafile_pos = array('sku' => 0,
+                          'name' => 1,
+                          'price'=>2,
+                          'weight'=>3,
+                          'description'=>4,
+                          'cat' => 5,
+                          'size' => 6,
+                          'color' => 7,
+                          'qty' => 8);
+}
 
 // how many columns should be in the datafile?
 $datafile_expected_cols = 0;
