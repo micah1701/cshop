@@ -98,7 +98,7 @@ if (isset($_POST['op_confirm'])) {
 
 
         // products
-        $sth_sel = $mdb->prepare("SELECT id FROM cm_products WHERE UPPER(title) = ?");
+        $sth_sel = $mdb->prepare("SELECT id FROM cm_products WHERE UPPER(sku) = ?");
         $sth_ins = $mdb->prepare("INSERT INTO cm_products (id, sku, title, price, weight, description) VALUES (?, ?, ?, ?, ?, ?)", null, MDB2_PREPARE_MANIP);
         $sth_up = $mdb->prepare("UPDATE cm_products SET price = ?, weight = ?, description = ? WHERE id = ?", null, MDB2_PREPARE_MANIP);
         //
@@ -109,18 +109,20 @@ if (isset($_POST['op_confirm'])) {
         $res = $mdb->query($sql);
 
         while ($row = $res->fetchRow(MDB2_FETCHMODE_ASSOC)) {
-            $res_sel = $sth_sel->execute(strtoupper($row['name']));
-            if ($row_p = $res_sel->fetchRow()) {
-                $pid = $row_p[0];
-                $counts['updated_product'] += $sth_up->execute(array($row['price'], $row['weight'], $row['description'], $pid));
-            }
-            else {
-                $pid = $mdb->nextId('cm_products');
-                $counts['new_product'] += $sth_ins->execute(array($pid, $row['sku'], $row['name'], $row['price'], $row['weight'], $row['description']));
-            }
+            if ($row['name'] or $row['price']) { // if there is nothing good in the data, skip it.
+                $res_sel = $sth_sel->execute(strtoupper($row['sku']));
+                if ($row_p = $res_sel->fetchRow()) {
+                    $pid = $row_p[0];
+                    $counts['updated_product'] += $sth_up->execute(array($row['price'], $row['weight'], $row['description'], $pid));
+                }
+                else {
+                    $pid = $mdb->nextId('cm_products');
+                    $counts['new_product'] += $sth_ins->execute(array($pid, $row['sku'], $row['name'], $row['price'], $row['weight'], $row['description']));
+                }
 
-            // cats
-            $res_cat = $sth_catmap->execute(array($pid, $row['cat']));
+                // cats
+                $res_cat = $sth_catmap->execute(array($pid, $row['cat']));
+            }
         }
 
 
@@ -366,10 +368,17 @@ $smarty->display('control/header.tpl');
 
     <p>
         The data file should be a standard comma-separated values, quoted with &quot;, with fields in the following order:
-        <pre>
-        SKU | NAME | PRICE | WEIGHT | DESCRIPTION | CATEGORY | SIZE | COLOR | QTY
-        </pre>
+        <? 
+        asort($datafile_pos);
+        $cols = array();
+        foreach ($datafile_pos as $col => $pos) { 
+            if ($pos !== null) { 
+                $cols[] = strtoupper($col);
+            }
+        }
+        ?>
     </p>
+        <pre><?= join('&nbsp;|&nbsp;', $cols) ?><pre>
 
     <? $uploform->display(); ?>
 <? } ?>
