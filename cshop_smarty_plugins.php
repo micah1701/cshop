@@ -1,14 +1,9 @@
 <?php
 
-/* add a custom Smarty modifier to clean up strings to avoid ugluy URLs. */
-$smarty->register_modifier('cleanforurl', 'smarty_modifier_cleanforurl');
-
 function smarty_modifier_cleanforurl($str) {
     return rawurlencode( strtolower( substr( preg_replace('/[^\d\w_-]+/', '', preg_replace('/\s+/', '-', trim($str)) ), 0, 32) ) );
 }
 
-/* add a custom Smarty modifier to clean up strings to avoid ugluy URLs. */
-$smarty->register_modifier('tabindex', 'smarty_modifier_tabindex');
 
 function smarty_modifier_tabindex($str, $ti) {
     return preg_replace('/<(input|textarea|select) ([^>]+)>/', "<$1 tabindex=\"$ti\" $2>", $str);
@@ -37,5 +32,13 @@ function smarty_modifier_obfuscate_email($str) {
     return $res;
 }
 
-$smarty->register_modifier('obfuscate_email', 'smarty_modifier_obfuscate_email');
+if (isset($smarty) and is_object($smarty)) {
+    $smarty->register_modifier('obfuscate_email', 'smarty_modifier_obfuscate_email');
+
+    /* add a custom Smarty modifier to add tabindex attribs to inputs */
+    $smarty->register_modifier('tabindex', 'smarty_modifier_tabindex');
+
+    /* add a custom Smarty modifier to clean up strings to avoid ugluy URLs. */
+    $smarty->register_modifier('cleanforurl', 'smarty_modifier_cleanforurl');
+}
 
