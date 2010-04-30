@@ -428,131 +428,6 @@ CREATE TABLE `cm_media_files` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-
---
--- Table structure for table `cm_order_history`
---
-
-DROP TABLE IF EXISTS `cm_order_history`;
-CREATE TABLE `cm_order_history` (
-  `id` int(10) unsigned NOT NULL default '0',
-  `order_id` int(10) unsigned NOT NULL default '0',
-  `order_status` varchar(32) NOT NULL default '',
-  `stamp` datetime NOT NULL,
-  `user_notify` tinyint(1) default NULL,
-  `comments` varchar(255) default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `ix_oid` (`order_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `cm_order_history_seq`
---
-
-DROP TABLE IF EXISTS `cm_order_history_seq`;
-CREATE TABLE `cm_order_history_seq` (
-  `id` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `cm_order_items`
---
-
-DROP TABLE IF EXISTS `cm_order_items`;
-CREATE TABLE `cm_order_items` (
-  `id` int(10) unsigned NOT NULL default '0',
-  `order_id` int(10) unsigned NOT NULL default '0',
-  `product_id` int(10) unsigned NOT NULL default '0',
-  `inventory_id` int(10) unsigned NOT NULL default '0',
-  `stock_status` int(1) NOT NULL default '1',
-  `qty` int(11) NOT NULL default '0',
-  `price` double(9,2) NOT NULL default '0.00',
-  `discount` double(9,2) NOT NULL default '0.00',
-  `tax` double(7,4) NOT NULL default '0.0000',
-  `product_sku` varchar(64) default NULL,
-  `product_descrip` varchar(255) default NULL,
-  `product_attribs` text,
-  `normalized_attribs` text,
-  `has_item_options` tinyint(1) default NULL,
-  `backorder_qty` int(10) unsigned NOT NULL default '0',
-  `is_digital` tinyint(1) default NULL,
-  `download_token` varchar(255) default NULL,
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `download_token` (`download_token`),
-  KEY `ix_oid` (`order_id`),
-  KEY `ix_pid` (`product_id`),
-  KEY `ix_iid` (`inventory_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `cm_order_items_options`
---
-
-DROP TABLE IF EXISTS `cm_order_items_options`;
-CREATE TABLE `cm_order_items_options` (
-  `cm_order_items_id` int(10) unsigned NOT NULL default '0',
-  `optkey` varchar(64) NOT NULL default '',
-  `opt_descr` varchar(255) NOT NULL default '',
-  `opt_value` varchar(255) default NULL,
-  UNIQUE KEY `uq_key` (`cm_order_items_id`,`optkey`),
-  KEY `ix_ccii` (`cm_order_items_id`),
-  KEY `ix_ok` (`optkey`),
-  KEY `ix_ov` (`opt_value`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `cm_order_items_seq`
---
-
-DROP TABLE IF EXISTS `cm_order_items_seq`;
-CREATE TABLE `cm_order_items_seq` (
-  `id` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `cm_order_transactions`
---
-
-DROP TABLE IF EXISTS `cm_order_transactions`;
-CREATE TABLE `cm_order_transactions` (
-  `id` int(10) unsigned NOT NULL default '0',
-  `cm_orders_id` int(10) unsigned NOT NULL default '0',
-  `user_id` int(10) unsigned default NULL,
-  `stamp` datetime NOT NULL,
-  `trans_type` varchar(32) NOT NULL default '',
-  `trans_result` varchar(255) default NULL,
-  `trans_amount` double(9,2) default NULL,
-  `trans_request` text,
-  `trans_response` text,
-  `trans_id` varchar(32) default NULL,
-  `is_voided` char(1) default NULL,
-  `verify_addr` char(1) default NULL,
-  `has_avs_result` char(1) default NULL,
-  `verify_zip` char(1) default NULL,
-  `verify_name` char(1) default NULL,
-  `verify_international` char(1) default NULL,
-  `verify_csc` char(1) default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `ix_oid` (`cm_orders_id`),
-  KEY `ix_tid` (`trans_id`),
-  KEY `ix_uid` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-ALTER TABLE cm_order_transactions ADD trans_auth_code varchar(15) AFTER trans_id;
-ALTER TABLE cm_order_transactions ADD trans_result_msg varchar(255) AFTER trans_result;
-
---
--- Table structure for table `cm_order_transactions_seq`
---
-
-DROP TABLE IF EXISTS `cm_order_transactions_seq`;
-CREATE TABLE `cm_order_transactions_seq` (
-  `id` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
 --
 -- Table structure for table `cm_orders`
 --
@@ -619,12 +494,146 @@ CREATE TABLE `cm_orders` (
   KEY `ix_cid` (`cart_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+
+ALTER TABLE cm_orders  ADD FOREIGN KEY (user_id) REFERENCES control_useraccounts (id) ON DELETE NO ACTION ON UPDATE CASCADE;
+
 --
 -- Table structure for table `cm_orders_seq`
 --
 
 DROP TABLE IF EXISTS `cm_orders_seq`;
 CREATE TABLE `cm_orders_seq` (
+  `id` int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+--
+-- Table structure for table `cm_order_history`
+--
+
+DROP TABLE IF EXISTS `cm_order_history`;
+CREATE TABLE `cm_order_history` (
+  `id` int(10) unsigned NOT NULL default '0',
+  `order_id` int NOT NULL default '0',
+  `order_status` varchar(32) NOT NULL default '',
+  `stamp` datetime NOT NULL,
+  `user_notify` tinyint(1) default NULL,
+  `comments` varchar(255) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `ix_oid` (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE cm_order_history ADD FOREIGN KEY (order_id) REFERENCES cm_orders (id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Table structure for table `cm_order_history_seq`
+--
+
+DROP TABLE IF EXISTS `cm_order_history_seq`;
+CREATE TABLE `cm_order_history_seq` (
+  `id` int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `cm_order_items`
+--
+
+DROP TABLE IF EXISTS `cm_order_items`;
+CREATE TABLE `cm_order_items` (
+  `id` int(10) unsigned NOT NULL default '0',
+  `order_id` int              NOT NULL default '0',
+  `product_id` int(10) unsigned NOT NULL default '0',
+  `inventory_id` int(10) unsigned NOT NULL default '0',
+  `stock_status` int(1) NOT NULL default '1',
+  `qty` int(11) NOT NULL default '0',
+  `price` double(9,2) NOT NULL default '0.00',
+  `discount` double(9,2) NOT NULL default '0.00',
+  `tax` double(7,4) NOT NULL default '0.0000',
+  `product_sku` varchar(64) default NULL,
+  `product_descrip` varchar(255) default NULL,
+  `product_attribs` text,
+  `normalized_attribs` text,
+  `has_item_options` tinyint(1) default NULL,
+  `backorder_qty` int(10) unsigned NOT NULL default '0',
+  `is_digital` tinyint(1) default NULL,
+  `download_token` varchar(255) default NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `download_token` (`download_token`),
+  KEY `ix_oid` (`order_id`),
+  KEY `ix_pid` (`product_id`),
+  KEY `ix_iid` (`inventory_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE cm_order_items ADD FOREIGN KEY (order_id) REFERENCES cm_orders (id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Table structure for table `cm_order_items_options`
+--
+
+DROP TABLE IF EXISTS `cm_order_items_options`;
+CREATE TABLE `cm_order_items_options` (
+  `cm_order_items_id` int(10) unsigned NOT NULL default '0',
+  `optkey` varchar(64) NOT NULL default '',
+  `opt_descr` varchar(255) NOT NULL default '',
+  `opt_value` varchar(255) default NULL,
+  UNIQUE KEY `uq_key` (`cm_order_items_id`,`optkey`),
+  KEY `ix_ccii` (`cm_order_items_id`),
+  KEY `ix_ok` (`optkey`),
+  KEY `ix_ov` (`opt_value`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `cm_order_items_seq`
+--
+
+DROP TABLE IF EXISTS `cm_order_items_seq`;
+CREATE TABLE `cm_order_items_seq` (
+  `id` int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `cm_order_transactions`
+--
+
+DROP TABLE IF EXISTS `cm_order_transactions`;
+CREATE TABLE `cm_order_transactions` (
+  `id` int(10) unsigned NOT NULL default '0',
+  `cm_orders_id` int              NOT NULL default '0',
+  `user_id` int(10) unsigned default NULL,
+  `stamp` datetime NOT NULL,
+  `trans_type` varchar(32) NOT NULL default '',
+  `trans_result` varchar(255) default NULL,
+  `trans_amount` double(9,2) default NULL,
+  `trans_request` text,
+  `trans_response` text,
+  `trans_id` varchar(32) default NULL,
+  `is_voided` char(1) default NULL,
+  `verify_addr` char(1) default NULL,
+  `has_avs_result` char(1) default NULL,
+  `verify_zip` char(1) default NULL,
+  `verify_name` char(1) default NULL,
+  `verify_international` char(1) default NULL,
+  `verify_csc` char(1) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `ix_oid` (`cm_orders_id`),
+  KEY `ix_tid` (`trans_id`),
+  KEY `ix_uid` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+ALTER TABLE cm_order_transactions ADD trans_auth_code varchar(15) AFTER trans_id;
+ALTER TABLE cm_order_transactions ADD trans_result_msg varchar(255) AFTER trans_result;
+
+ALTER TABLE cm_order_transactions ADD FOREIGN KEY (cm_orders_id) REFERENCES cm_orders (id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+--
+-- Table structure for table `cm_order_transactions_seq`
+--
+
+DROP TABLE IF EXISTS `cm_order_transactions_seq`;
+CREATE TABLE `cm_order_transactions_seq` (
   `id` int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

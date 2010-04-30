@@ -412,3 +412,17 @@ ALTER TABLE cm_order_items ADD is_digital bool;
 ALTER TABLE cm_order_items ADD download_token varchar(255);
 ALTER TABLE cm_order_items ADD UNIQUE (download_token);
 
+
+-- Fri Apr 30 14:37:30 EDT 2010
+delete from cm_order_transactions where cm_orders_id not in (select id from cm_orders);
+ALTER TABLE cm_order_transactions MODIFY cm_orders_id int not null;
+ALTER TABLE cm_order_transactions ADD FOREIGN KEY (cm_orders_id) REFERENCES cm_orders (id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+delete from cm_order_history where order_id not in (select id from cm_orders);
+ALTER TABLE cm_order_history MODIFY order_id int not null;
+ALTER TABLE cm_order_history ADD FOREIGN KEY (order_id) REFERENCES cm_orders (id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+delete from cm_order_items where order_id not in (select id from cm_orders);
+ALTER TABLE cm_order_items MODIFY order_id int not null;
+ALTER TABLE cm_order_items ADD FOREIGN KEY (order_id) REFERENCES cm_orders (id) ON DELETE CASCADE ON UPDATE CASCADE;
+
