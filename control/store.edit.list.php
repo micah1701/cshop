@@ -23,10 +23,12 @@ $offset = (isset($_GET['page']))? (($_GET['page']-1) * $range) : 0;
 $filt = new filter_form('GET');
 $filt->left_td_style = '';
 $filt->field_prefix = '';
-$filt->add_element('hdr1', array('<b>Filter by::</b> Category:', 'heading'));
+$filt->add_element('hdr1', array('Category:', 'heading'));
 $filt->add_element('cat', array('', 'select', cshopUtils::get_all_categories($pdb, true)));
 $filt->add_element('hdr2', array('Manufacturer', 'heading'));
 $filt->add_element('mfr', array('', 'select', cshopUtils::get_all_manufacturers($pdb, true)));
+$filt->add_element('hdr3', array('SKU', 'heading'));
+$filt->add_element('sku', array('', 'text', '', array('size'=>5)));
 $filt->add_element('op_filter', array('GO', 'submit'));
 
 
@@ -37,12 +39,16 @@ $getvars = '';
 if (isset($_GET['mfr']) or isset($_GET['cat'])) {
     $where = 'WHERE 1=1 ';
     if (!empty($_GET['mfr'])) {
-        $where .= ' AND cm_manufacturers_id = ' . addslashes($_GET['mfr']);
+        $where .= ' AND cm_manufacturers_id = ' . $pdb->quoteSmart($_GET['mfr']);
         $getvars .= '&mfr=' . urlencode($_GET['mfr']);
     }
     if (!empty($_GET['cat'])) {
-        $where .= ' AND pc.cm_categories_id = ' . addslashes($_GET['cat']);
+        $where .= ' AND pc.cm_categories_id = ' . $pdb->quoteSmart($_GET['cat']);
         $getvars .= '&cat=' . urlencode($_GET['cat']);
+    }
+    if (!empty($_GET['sku'])) {
+        $where .= ' AND p.sku = ' . $pdb->quoteSmart($_GET['sku']);
+        $getvars .= '&sku=' . urlencode($_GET['sku']);
     }
 }
 
@@ -132,8 +138,10 @@ $smarty->display('control/header.tpl');
     <br />
 <? } ?>
 
-
-<? $filt->display(); ?>
+<div class="filterForm">
+    <b>Filter by::</b><br />
+    <? $filt->display(); ?>
+</div>
 
     <br />
     <div align="right" style="width: 600px; padding: 4px">
