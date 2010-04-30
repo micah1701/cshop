@@ -1,7 +1,7 @@
 <?php
 
 function smarty_modifier_cleanforurl($str) {
-    return rawurlencode( strtolower( substr( preg_replace('/[^\d\w_-]+/', '', preg_replace('/\s+/', '-', trim($str)) ), 0, 32) ) );
+    return rawurlencode( strtolower( substr( preg_replace('/[^\d\w_-]+/', '', preg_replace('/\s+/', '-', trim($str)) ), 0, 255) ) );
 }
 
 
