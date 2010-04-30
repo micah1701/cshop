@@ -852,6 +852,11 @@ class cmOrder extends db_container {
         $uservals = $user->fetch();
         if (empty($uservals['email'])) $uservals['email'] = $user->get_email();
 
+        if (empty($uservals['cust_name']) and !empty($uservals['fname']))
+            $uservals['cust_name'] = $uservals['fname'] . ' ' . $uservals['lname'];
+        elseif (empty($uservals['cust_name']) and !empty($uservals['first_name']))
+            $uservals['cust_name'] = $uservals['first_name'] . ' ' . $uservals['last_name'];
+
         $smarty->assign('user', $uservals);
 
         $orderinfo = $this->fetch();
