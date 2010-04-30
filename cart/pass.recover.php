@@ -13,7 +13,7 @@ require_once('cshop/cmCart.class.php');
 require_once('cshop/cmUser.class.php');
 
 // init page auth objects
-page_open(array('sess'=>'jen_Session', 'auth'=>'defaultAuth'));
+page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>'defaultAuth'));
 
 // control flags
 $ACTION = null;

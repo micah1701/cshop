@@ -10,7 +10,7 @@ require_once('mosh_tool.class.php');
 require_once(CSHOP_CLASSES_USER.'.class.php');
 
 // init page auth objects
-page_open(array('sess'=>'jen_Session', 'auth'=>'defaultAuth'));
+page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>'defaultAuth'));
 
 // flag for smarty
 $smarty->assign('page_id', 'user_profile');

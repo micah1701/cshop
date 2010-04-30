@@ -8,7 +8,7 @@
 
 // init page auth objects
 require_once(CONFIG_DIR . 'cshop.config.php');
-page_open(array('sess'=>'jen_Session', 'auth'=>'selfAuth'));
+page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>'selfAuth'));
 
 $auth->unauth();
 

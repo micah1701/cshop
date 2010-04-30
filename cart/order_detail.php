@@ -11,7 +11,7 @@ require_once(CSHOP_CLASSES_USER.'.class.php');
 require_once(CSHOP_CLASSES_CART.'.class.php');
 
 // init page auth objects
-page_open(array('sess'=>'jen_Session', 'auth'=>'selfAuth'));
+page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>'selfAuth'));
 
 // flag for smarty
 $smarty->assign('page_id', 'order_detail');
