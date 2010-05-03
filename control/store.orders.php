@@ -76,7 +76,7 @@ if (isset($_GET['op_csv'])) {
 
     $table = new CSV_Table();
 
-    #$table->print_csv_headers(SITE_DOMAIN_NAME . ".$filename.csv");
+    $table->print_csv_headers(SITE_DOMAIN_NAME . ".$filename.csv");
     #
     print $table->show($res);
     exit();
@@ -392,6 +392,9 @@ else {
 
         $pager = new res_pager($offset, $range, $order->numRows);
         $smarty->assign('pager', $pager);
+
+        $sep = (strpos($_SERVER['REQUEST_URI'], '?') === false)? '?' : '&';
+        $csv_link = $_SERVER['REQUEST_URI'] . $sep . 'op_csv';
     }
     $pagetitle = 'ORDERS';
 }
@@ -439,6 +442,9 @@ if (isset($_GET['info'])) { ?>
     <? } ?>
 
 <? } else { ?>
+    <? if (!empty($csv_link) and isset($pager) and $pager->numrows) { ?>
+        <div class="csvVersion"><a href="<?= $csv_link ?>">Download</a></div>
+    <? } ?>
     <div class="headlineW">
        <h2 class="productName headline"><?= SITE_DOMAIN_NAME ?> :: <?= $pagetitle ?></h2>
     </div>
