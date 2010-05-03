@@ -92,7 +92,20 @@ class cmUser extends db_container {
         if ($this->_id) {
             $this->_id = null;
         }
-        $vals['anon_email'] = $email;
+        // strip 'anon_' off of anything in vals. 
+        // to get around the fact that we had to prefix the fields in anon 
+        // user signup with this to avoid naming conflict with the 
+        // shipping addr half of the form :/
+        foreach ($vals as $k => $v) { 
+            $stripped_k = preg_replace('#^anon_#', '', $k);
+            unset($vals[$k]);
+            $vals[$stripped_k] = $v;
+        }
+        if ($email)
+            $vals['anon_email'] = $email;
+        elseif ($vals['email'])
+            $vals['anon_email'] = $vals['email'];
+
         $vals['email'] = null;
         $vals['is_anon'] = true;
         $vals['perms'] = 'PUBLIC';
@@ -100,6 +113,18 @@ class cmUser extends db_container {
     }
 
 
+    /**
+     * hack to modify colmap to fetch each field prefixed with 'anon_'. This is 
+     * to avoid conflicts in field names with the shipping addr form, which 
+     * happens to be on the same page in anon checkout :/
+     */
+    function get_anon_colmap() {
+        $anoncolmap = array();
+        foreach ($this->colmap as $k => $v) {
+            $anoncolmap['anon_'.$k] = $v;
+        }
+        return $anoncolmap;
+    }
 
 
 

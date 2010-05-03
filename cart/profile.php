@@ -6,7 +6,6 @@
  */
 require_once(CONFIG_DIR.'cshop.config.php');
 require_once('formex.class.php');
-require_once('mosh_tool.class.php');
 require_once(CSHOP_CLASSES_USER.'.class.php');
 
 // init page auth objects
@@ -97,7 +96,7 @@ else { // default action
 
 /** process user account info */
 if (isset($_POST['f_op'])) {
-    $mosh = new mosh_tool();
+    $fex = new formex();
 
     /* new user. proc userinfo, address and login simultaneously */
     if ($ACTION == OP_NEW_USER && $user->do_require_address_on_register) {
@@ -117,7 +116,8 @@ if (isset($_POST['f_op'])) {
     }
 
     if (!empty($colmap)) {
-        $errs = $mosh->check_form($colmap); // handled below
+        $fex->add_element($colmap);
+        $errs = $fex->validate($_POST); // handled below
     }
 
     /* checking the password validity */
@@ -137,9 +137,10 @@ if (isset($_POST['f_op'])) {
 
     if (!count($errs)) {
 
-        // try 
+        $pdb->autoCommit(false); // begin trans, because we have potential two stages here that each can fail validation
+
         if ($ACTION == OP_NEW_USER or $ACTION == OP_EDIT_PROFILE) {
-            $vals = $mosh->get_form_vals($user->colmap);
+            $vals = $fex->get_submitted_vals($_POST);
             PEAR::setErrorHandling(PEAR_ERROR_RETURN);
             /* make sure an INSERT is executed, and removes the sesskey too */
             if ($ACTION == OP_NEW_USER) {
@@ -156,7 +157,13 @@ if (isset($_POST['f_op'])) {
             }
             elseif ($ACTION == OP_NEW_USER) { // its a brand new user account, save login info and addr too
                 $user->change_pword($_POST['f_password']);
-                $user->store_address('shipping', $mosh->get_form_vals($user->addr->colmap));
+
+                // store shipping address
+                $fex->_elems = array();
+                $fex->add_element($user->addr->get_colmap());
+                $shipvals = $fex->get_submitted_vals($_POST);
+                $user->store_address('shipping', $shipvals);
+
                 // sets up the auth object to believe this person has logged in
                 $auth->force_preauth($user->get_id()); 
                 $auth->auth['first_time'] = true;
@@ -167,9 +174,11 @@ if (isset($_POST['f_op'])) {
             }
         }
         elseif ($ACTION == OP_EDIT_ADDR) { // edit the given address, should be ident. by $req_id
+            $fex->_elems = array();
+            $fex->add_element($user->addr->get_colmap());
+            $shipvals = $fex->get_submitted_vals($_POST);
             $user->addr->set_id($req_id);
-            $vals = $mosh->get_form_vals($colmap);
-            $res = $user->addr->store($vals);
+            $user->store_address('shipping', $shipvals);
             $msg = "Address has been updated";
         }
         elseif ($ACTION == OP_EDIT_LOGIN) { // pass update only
@@ -178,13 +187,18 @@ if (isset($_POST['f_op'])) {
         }
 
         if ($ACTION == OP_NEW_USER && $SUCCESS) {
+            $pdb->commit();
             header("Location: checkout.php?shipping&new\n");
             exit();
         }
         elseif ($msg && empty($errs)) {
+            $pdb->commit();
             header("Location: profile.php?info=" . base64_encode($msg));
             exit();
         }
+
+        $pdb->rollback();
+        $pdb->autoCommit(true);
     }
 }
 

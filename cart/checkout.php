@@ -7,7 +7,6 @@
  */
 require_once(CONFIG_DIR . 'cshop.config.php');
 require_once('formex.class.php');
-require_once('mosh_tool.class.php');
 require_once(CSHOP_CLASSES_CART.'.class.php');
 require_once(CSHOP_CLASSES_USER.'.class.php');
 require_once(CSHOP_CLASSES_PAYMETHOD.'.class.php');
@@ -101,7 +100,7 @@ $cartid = $cart->get_id(); // actually called set_id() on cart too! yes, strange
 
 
 
-/* create colmap for fex and mosh, but adding uname and email fields in case needed. */
+/* create colmap for fex, but adding uname and email fields in case needed. */
 $colmap = $user->addr->get_colmap();
 
 // try to fetch a user row based on whatvever is in $_SESSION[$user->_sesskey]. yes its quite safe!
@@ -123,23 +122,28 @@ if (!$cart_itemcount or PEAR::isError($cart_itemcount)) {
 $fex = new formex();
 
 
-/* enter user shipping addr */
+/* enter user shipping addr, and possibly new Anonymous user account */
 if ($ACTION == OP_ADD_SHIP) {
+    $pdb->autoCommit(false); // begin trans, because we have potential two stages here that each can fail validation
+
     /* they would like to proceed without choosing a password and such. Create an "anonymous" user object stub and log them in automatically */
     if (CSHOP_ALLOW_ANON_ACCOUNT and $auth->has_bypass_flag()) { 
         $user = cmClassFactory::getInstanceOf(CSHOP_CLASSES_USER, $pdb);       
 
         $fex_anon_user = new formex();
-        $fex_anon_user->add_element($user->get_colmap());
+        $fex_anon_user->add_element($user->get_anon_colmap());
 
-        $vals = $fex_anon_user->get_submitted_vals($_POST);
+        if (! ($errs = $fex_anon_user->validate($_POST))) {
 
-        $res = $user->create_anon_user($vals['email'], $vals);
+            $vals = $fex_anon_user->get_submitted_vals($_POST);
 
-        if (PEAR::isError($res)) {
-            trigger_error($res->getCode(), E_USER_ERROR);
+            $res = $user->create_anon_user('', $vals);
+
+            if (PEAR::isError($res)) {
+                trigger_error($res->getCode(), E_USER_ERROR);
+            }
+            $auth->force_preauth($user->get_id()); // magically logs them in with the new uid
         }
-        $auth->force_preauth($user->get_id()); // magically logs them in with the new uid
     }
 
     // save the comments on billing/shipping eitheway, its shared
@@ -148,15 +152,15 @@ if ($ACTION == OP_ADD_SHIP) {
     }
 
     if (!$cart->requires_shipping()) {
+        $pdb->commit();
         header("Location: {$_SERVER['PHP_SELF']}?billing\n"); // goto: billing 
         exit();
     }
-    else {
+    elseif (empty($errs)) {
         
         $fex->add_element($user->addr->get_colmap());
 
         if (! ($errs = $fex->validate($_POST))) {
-            //$thiscolmap = $user->addr->get_colmap();
             $vals = $fex->get_submitted_vals($_POST);
             $vals['user_id'] = $user->get_id();
 
@@ -170,12 +174,15 @@ if ($ACTION == OP_ADD_SHIP) {
             }
             else {
                 if ($user->store(array('shipping_addr_id' => $user->addr->get_id()))) {
+                    $pdb->commit();
                     header("Location: {$_SERVER['PHP_SELF']}?pickship\n"); // SUCCESS, goto: pick a shipping method
                     exit();
                 }
             }
         }
     }
+    $pdb->rollback();
+    $pdb->autoCommit(true);
     $ACTION = OP_GET_SHIP_ADDR;
 }
 /** enter the selected shipping method **/
@@ -206,7 +213,7 @@ elseif (isset($_POST['f_ship_method']) and $ACTION == OP_PICK_SHIP) {
 }
 /** check/enter payment info and billing addr */
 elseif ($ACTION == OP_ADD_BILL) {
-    $mosh = new mosh_tool();
+    $fex = new formex();
 
     $cart_total = $cart->get_grandtotal();
 
@@ -215,70 +222,73 @@ elseif ($ACTION == OP_ADD_BILL) {
         exit();
     }
     else {
-        $thiscolmap = $pay->get_colmap();
-        if ($errs = $mosh->check_form($thiscolmap)) {
-        }
-        else {
-            $payvals = $mosh->get_form_vals($thiscolmap);
+
+        $pdb->autoCommit(false); // begin trans, because we have address insert/activation and dependent payment storage
+        $fex->add_element($pay->get_colmap());
+        if (! ($errs = $fex->validate($_POST))) {
+            $payvals = $fex->get_submitted_vals($_POST);
             $payvals['ccno'] = cmPaymentCC::clean_ccno($payvals['ccno']);
             $errs = $pay->check_values($payvals);
         }
 
         if (!$errs) { 
-            $addrcolmap = $user->addr->get_colmap();
             if (isset($_POST['f_same_as_shipping'])) {
                 /* should be a method in cmUser() for this... */
                 $ship = $user->fetch(array('shipping_addr_id'));
                 $user->activateAddress('billing', $ship['shipping_addr_id']);
             }
-            elseif ($errs = $mosh->check_form($addrcolmap)) {
-            }
             else {
+                $fex = new formex();
+                $fex->add_element($user->addr->get_colmap());
+                if (! ($errs = $fex->validate($_POST))) {
 
-                $vals = $mosh->get_form_vals($addrcolmap);
-                $vals['user_id'] = $uid;
-                $user->addr->store($vals);
+                    $vals = $fex->get_submitted_vals($_POST);
+                    $vals['user_id'] = $uid;
 
-                $res = $user->addr->store($vals);
-                if (PEAR::isError($res) and $res->getCode() != DBCON_ZERO_EFFECT) { //"0 rows were changed"
-                    trigger_error($res->getMessage(), E_USER_ERROR);
-                }
-                else { // store the id of the new addr row in the user table
-                    $user->activateAddress('billing', $user->addr->get_id());
+                    $res = $user->addr->store($vals);
+                    if (PEAR::isError($res) and $res->getCode() != DBCON_ZERO_EFFECT) { //"0 rows were changed"
+                        $errs[] = "Address could not be saved: " . $res->getMessage();
+                        trigger_error($res->getDebugInfo(), E_USER_WARNING);
+                    }
+                    else { // store the id of the new addr row in the user table
+                        $user->activateAddress('billing', $user->addr->get_id());
+                    }
                 }
             }
-        }
 
-        if (!$errs) {
-            // get values from the CC input form and store
-            $payvals['user_id'] = $user->get_id();
-            $pay->set_csc($_POST['f_csc1']);
-            $payid = $pay->store($payvals);
+            if (!$errs) {
+                // get values from the CC input form and store
+                $payvals['user_id'] = $user->get_id();
+                $pay->set_csc($_POST['f_csc1']);
+                $payid = $pay->store($payvals);
 
-            $cart->set_payment($pay);
+                $cart->set_payment($pay);
 
-            // save the comments on billing/shipping eitheway, its shared
-            if (!empty($_POST['f_user_comments'])) {
-                $cart->set_user_comment($_POST['f_user_comments']);
+                // save the comments on billing/shipping eitheway, its shared
+                if (!empty($_POST['f_user_comments'])) {
+                    $cart->set_user_comment($_POST['f_user_comments']);
+                }
+
+                $pdb->commit();
+                header("Location: checkout_confirm.php\n");
+                exit();
             }
-
-            header("Location: checkout_confirm.php\n");
-            exit();
         }
     }
     // something failed, we will be doing SHOWFORM below
     $ACTION = OP_GET_BILL;
+    $pdb->rollback();
+    $pdb->autoCommit(true);
 }
 /* add a giftcard, verifying it and checking applied amt v/s cart totals */
 elseif (defined('CSHOP_ACCEPT_GIFTCARDS') && CSHOP_ACCEPT_GIFTCARDS && $ACTION == OP_ADD_GC) {
-    $c = CSHOP_CLASSES_GIFTCARD;
-    $gc = new $c($pdb);
-    $mosh = new mosh_tool();
+    $gc = cmClassFactory::getInstanceOf(CSHOP_CLASSES_GIFTCARD, $pdb);
 
     PEAR::setErrorHandling(PEAR_ERROR_RETURN);
 
-    $gc_colmap = $gc->get_colmap();
-    $vals = $mosh->get_form_vals($gc_colmap);
+    $fex = new formex();
+    $fex->add_element($gc->get_colmap());
+    $vals = $fex->get_submitted_vals($_POST);
     $gc->set_number($vals['gc_no']);
     $gc->set_amount($vals['gc_amt']);
 
@@ -320,8 +330,7 @@ elseif (defined('CSHOP_ACCEPT_GIFTCARDS') && CSHOP_ACCEPT_GIFTCARDS && $ACTION =
 /* remove a gift card */
 elseif (defined('CSHOP_ACCEPT_GIFTCARDS') && CSHOP_ACCEPT_GIFTCARDS && $ACTION == OP_KILL_GC) {
     $req_gc = $_GET['id'];
-    $c = CSHOP_CLASSES_GIFTCARD;
-    $gc = new $c($pdb);
+    $gc = cmClassFactory::getInstanceOf(CSHOP_CLASSES_GIFTCARD, $pdb);
     $res = $gc->set_id($req_gc);
     $res = $gc->kill();
     if (!PEAR::isError($res)) {
@@ -360,7 +369,7 @@ if ($SHOWFORM) {
         if ($ACTION == OP_GET_SHIP_ADDR) {
 
             if (CSHOP_ALLOW_ANON_ACCOUNT and $auth->has_bypass_flag()) {
-                $fex->add_element($user->get_colmap());
+                $fex->add_element($user->get_anon_colmap());
             }
 
             if (!$cart->requires_shipping()) { // bypass shipping addr form if everything is not shippable
