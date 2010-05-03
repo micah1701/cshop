@@ -1035,6 +1035,25 @@ class cmOrder extends db_container {
     }
 
 
+    /**
+     * run a query to fetch full order data, probably for use in admin xml/csv export or similar
+     *
+     * @param $order_token string       optional order token to limit to a single order
+     * @returns object                  PEAR::DB query result()
+     */
+    function fetch_all_for_export($order_token=null) {
+        $sql = "SELECT o.*, oi.* from ".$this->get_table_name()." o 
+                LEFT JOIN ".$this->_items_table." oi ON oi.order_id = o.id ";
+
+        if ($order_token)
+            $sql .= " WHERE order_token = " . $this->db->quoteSmart($order_token);
+
+        $sql .= " ORDER BY o.last_modified DESC, o.id DESC";
+
+        return $this->db->query($sql);
+    }
+
+
 }
 
 

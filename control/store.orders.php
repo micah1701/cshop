@@ -11,10 +11,10 @@ require_once(CSHOP_CLASSES_CART . '.class.php');
 require_once(CSHOP_CLASSES_PAYMENT . '.class.php');
 
 require_once('formex.class.php');
-require_once('mosh_tool.class.php');
 require_once("fu_HTML_Table.class.php");      
 require_once("filter_form.class.php");      
 require_once("res_pager.class.php");      
+require_once("csv_table.class.php");      
 
 /* set of actions this script may perform */
 define ('OP_UPDATE', 'UPDATE');
@@ -68,6 +68,21 @@ else {
     $SHOWFORM = false;
 }
 /** **/
+
+
+if (isset($_GET['op_csv'])) {
+    $res = $order->fetch_all_for_export();
+    $filename = strtolower('orders.csv');
+
+    $table = new CSV_Table();
+
+    #$table->print_csv_headers(SITE_DOMAIN_NAME . ".$filename.csv");
+    #
+    print $table->show($res);
+    exit();
+}
+
+
 
 /** hook up smarty with the currency_format function from cmCart */
 $c = CSHOP_CLASSES_CART;
@@ -140,17 +155,18 @@ elseif ($ACTION == OP_TRANSACT && defined('CSHOP_CONTROL_SHOW_TRANSACTION_CONTRO
 }
 /* update the order status */
 elseif ($ACTION == OP_UPDATE) {
-    $mosh = new mosh_tool();
-    $mosh->form_field_prefix = '';
     $msg = '';
 
     $order->set_id_by_token($itemid);
 
     $vals = array();
-    if ($errs = $mosh->check_form($order->colmap)) { // handled below
-    }
-    else {
-        $vals = $mosh->get_form_vals($order->colmap);
+
+    $fex = new formex();
+    $fex->_field_prefix = '';
+    $fex->add_element($order->colmap);
+
+    if (! ($errs = $fex->validate($_POST))) { // handled below
+        $vals = $fex->get_submitted_vals($_POST);
         $status = null;
         if (isset($vals['orders_status'])) {
             $status = $vals['orders_status'];
