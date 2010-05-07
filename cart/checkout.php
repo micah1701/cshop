@@ -213,7 +213,11 @@ elseif (isset($_POST['f_ship_method']) and $ACTION == OP_PICK_SHIP) {
 }
 /** check/enter payment info and billing addr */
 elseif ($ACTION == OP_ADD_BILL) {
-    $fex = new formex();
+
+    // save the comments on billing/shipping eitheway, its shared
+    if (!empty($_POST['f_user_comments'])) {
+        $cart->set_user_comment($_POST['f_user_comments']);
+    }
 
     $cart_total = $cart->get_grandtotal();
 
@@ -222,6 +226,7 @@ elseif ($ACTION == OP_ADD_BILL) {
         exit();
     }
     else {
+        $fex = new formex();
 
         $pdb->autoCommit(false); // begin trans, because we have address insert/activation and dependent payment storage
         $fex->add_element($pay->get_colmap());
@@ -263,11 +268,6 @@ elseif ($ACTION == OP_ADD_BILL) {
                 $payid = $pay->store($payvals);
 
                 $cart->set_payment($pay);
-
-                // save the comments on billing/shipping eitheway, its shared
-                if (!empty($_POST['f_user_comments'])) {
-                    $cart->set_user_comment($_POST['f_user_comments']);
-                }
 
                 $pdb->commit();
                 header("Location: checkout_confirm.php\n");
@@ -462,8 +462,11 @@ if ($SHOWFORM) {
                 $smarty->assign('giftcards', $cart->get_giftcards());
                 $smarty->assign('gc_total', $gc_total);
 
-                /* there must be enough giftcards to cover everything */
-                if ($cart_total == 0) {
+            }
+
+
+            if (CSHOP_ACCEPT_GIFTCARDS or CSHOP_DO_TAKE_COUPONS) {
+                if ($cart_total == 0) { /* there must be enough giftcards or coups to cover everything */
                     $PAYMENT_REQUIRED = false;
                 }
             }
