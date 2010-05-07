@@ -70,11 +70,18 @@ if (isset($_POST['f_op']) and ($ACTION == OP_ADD or $ACTION == OP_EDIT)) {
         $vals['adder'] = ($_POST['f_adder'] == 0)? null : $_POST['f_adder'];
     }
 
-    $where = sprintf("product_id = %d AND sizes_id = %d AND colorways_id = %d AND sku = '%s'",
+    $where = sprintf("product_id = %d AND sku = '%s'",
                     $productid,
-                    $vals['sizes_id'],
-                    $vals['colorways_id'],
                     addslashes($vals['sku']));
+
+    if (empty($vals['sizes_id']) and empty($vals['colorways_id'])) {
+        $where .= " AND (sizes_id IS NULL OR sizes_id = 0) AND (colorways_id IS NULL or colorways_id = 0)"; 
+    }
+    else {
+        $where .= sprintf(" AND sizes_id = %d AND colorways_id = %d ",
+                            $vals['sizes_id'],
+                            $vals['colorways_id']);
+    }
 
     $sql = "SELECT id FROM $inventory_table WHERE $where";
     if ($pdb->getOne($sql)) {
