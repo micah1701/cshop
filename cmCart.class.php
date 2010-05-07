@@ -887,6 +887,7 @@ class cmCart extends db_container {
                               $this->get_id());
                $sum += $this->db->getOne($sql);
          }
+         if ($sum < 0) $sum = 0; // refuse to have negative total
 
          return $sum;
      }
@@ -1000,6 +1001,7 @@ class cmCart extends db_container {
                $discount = $this->get_discount($subtotal);
                if (!$this->_discount_is_applied) {
                    $grand -= $discount;
+                   if ($grand < 0) $grand = 0;
                }
                $tots['discount'] = -1 * $discount;
            }

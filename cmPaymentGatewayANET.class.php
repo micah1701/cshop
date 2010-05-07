@@ -495,15 +495,17 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
         $amt_authorized = 0;
         $amt_billed = 0;
         $x_open = true;
-        foreach ($this->_order->fetch_transaction_summary() as $t) {
-            if ($t['trans_type'] == 'AUTH_ONLY' && $t['trans_result'] == 'APPROVED') {
-                $amt_authorized = $t['trans_amount'];
-            }
-            elseif ($t['trans_type'] == 'PRIOR_AUTH_CAPTURE' && $t['trans_result'] == 'APPROVED') {
-                $amt_billed += $t['trans_amount'];
-            }
-            elseif (($t['trans_type'] == 'VOID' or $t['trans_type'] == 'CREDIT') && $t['trans_result'] == 'APPROVED') {
-                $x_open = false;
+        if ($transactions = $this->_order->fetch_transaction_summary()) {
+            foreach ($transactions as $t) {
+                if ($t['trans_type'] == 'AUTH_ONLY' && $t['trans_result'] == 'APPROVED') {
+                    $amt_authorized = $t['trans_amount'];
+                }
+                elseif ($t['trans_type'] == 'PRIOR_AUTH_CAPTURE' && $t['trans_result'] == 'APPROVED') {
+                    $amt_billed += $t['trans_amount'];
+                }
+                elseif (($t['trans_type'] == 'VOID' or $t['trans_type'] == 'CREDIT') && $t['trans_result'] == 'APPROVED') {
+                    $x_open = false;
+                }
             }
         }
         if ($x_open) {

@@ -107,6 +107,13 @@ if (isset($_POST['op_confirm'])) {
             }
         }
     }
+    if (CSHOP_DO_TAKE_COUPONS) { 
+        if ($coup = $cart->get_discount_descrip()) {
+            if ($cart_total <= 0) {
+                $payment_error_type = 'FULL COUPONS';
+            }
+        }
+    }
 
     /* TODO if any other than the first GC fail, or GCs succeed but CC fails
      * below, we have already debited thier cards. In case of any GC or CC
@@ -118,7 +125,7 @@ if (isset($_POST['op_confirm'])) {
             $PAYMENT_SUCCESS = true; // because we dont actually need payments
         }
         elseif (CSHOP_DO_TAKE_COUPONS) { 
-            // TODO calc if discount_amt = grandtotal
+            $PAYMENT_SUCCESS = true; // because we dont actually need payments
         }
     }
     /* they need to pay up - check CC# or other */

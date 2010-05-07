@@ -166,7 +166,7 @@ class cmCoupon extends db_container {
                     return $amt * $this->header['percent_off'] / 100;
                 }
                 else {
-                    return $this->header['amt_off'];
+                    return ($amt < $this->header['amt_off'])? $amt : $this->header['amt_off'];
                 }
             }
             else {

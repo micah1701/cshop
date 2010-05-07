@@ -90,7 +90,7 @@ else {
         else
             $smarty->assign('shipping', $order->fetch_addr('shipping'));
 
-        //$smarty->assign('discount_amt', abs($cart_totals['discount']['amt']));
+        $smarty->assign('discount_amt', abs($cart_totals['discount']['amt']));
         $smarty->assign('discount_descrip', $cart_totals['discount']['descrip']);
 
         $smarty->assign('order_status', $order->get_status());
