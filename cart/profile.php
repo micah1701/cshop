@@ -255,7 +255,9 @@ elseif ($userinfo) { // for static display in tpl
     $addrs = $user->fetchAllAddr();
     $smarty->assign('addrs', $addrs);
     $smarty->assign('userinfo', $userinfo);
+
 }
+    $smarty->assign('order_history', $user->fetch_order_history());
 
 $smarty->assign('ACTION', $ACTION);
 

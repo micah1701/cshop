@@ -27,7 +27,7 @@
         <~ foreach from=$order_history item=o ~>
             <tr style="background-color: #<~ cycle values=eee,dedede ~>">
               <td>
-                <~ $o.id ~>
+                <~ $o.order_token ~>
               </td>
               <td>
                 <~ $o.shipping_name ~>
@@ -42,7 +42,7 @@
                 $<~ $o.amt_billed_to_date ~>
               </td>
               <td>
-                <a href="/cart/order_detail.php?oid=<~ $o.id ~>">MORE INFO &raquo;&raquo;</a>
+                <a href="/cart/order_detail.php?tok=<~ $o.order_token ~>">MORE INFO &raquo;&raquo;</a>
               </td>
             </tr>
         <~/foreach ~>

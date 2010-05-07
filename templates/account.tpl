@@ -289,6 +289,10 @@
   <~/if~>
 <~/if~>
 
+<~ if $order_history ~>
+    <~ include file=float:order_list.tpl ~>
+<~/if~>
+
        <div id="checkoutSubmitButtonArea">   
                 <~ $cform.op.TAG ~>
                 <~ $cform.HIDDENS ~>
