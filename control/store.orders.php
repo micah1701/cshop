@@ -162,7 +162,7 @@ elseif ($ACTION == OP_UPDATE) {
     $vals = array();
 
     $fex = new formex();
-    $fex->_field_prefix = '';
+    $fex->field_prefix = '';
     $fex->add_element($order->colmap);
 
     if (! ($errs = $fex->validate($_POST))) { // handled below
