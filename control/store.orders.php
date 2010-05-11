@@ -327,7 +327,7 @@ else {
     /** **/
 
     /** decide how to order the results */
-    $orderable = array('id', 'orderdate', 'order_create_date', 'email', 'orders_status', 'amt_quoted', 'ship_date');
+    $orderable = array('ord.id','order_create_date', 'email', 'orders_status', 'amt_quoted', 'ship_date');
     if (isset($_GET['by']) and in_array($_GET['by'], $orderable)) {
         $orby = $_GET['by'];
         $orderdir = (isset($_GET['dir']) and $_GET['dir'] == 'D')? 'DESC' : 'ASC';
@@ -361,7 +361,7 @@ else {
     }
     /** **/
 
-    $header_row = array('id'=>'Order ID','order_token'=>'Order Number','email'=>'User', 'orders_status'=>'Status', 'orderdate'=>'Order Date', 'amt_quoted'=>'Total', 'ship_date'=>'Ship Date');
+    $header_row = array('ord.id'=>'Order ID','order_token'=>'Order Number','email'=>'User', 'orders_status'=>'Status', 'order_create_date'=>'Order Date', 'amt_quoted'=>'Total', 'ship_date'=>'Ship Date');
 
     if ($orders = $order->fetch_any(null, $offset, $range, $orby, $where, $orderdir)) {
         
