@@ -74,12 +74,19 @@ if (isset($_GET['op_csv'])) {
     $res = $order->fetch_all_for_export();
     $filename = strtolower('orders.csv');
 
-    $table = new CSV_Table();
+    if ($res->numRows()) {
+        $table = new CSV_Table();
 
-    $table->print_csv_headers(SITE_DOMAIN_NAME . ".$filename.csv");
-    #
-    print $table->show($res);
-    exit();
+        $table->print_csv_headers(SITE_DOMAIN_NAME . ".$filename.csv");
+        #
+        print $table->show($res);
+        exit();
+    }
+    else {
+        $msg = "No orders found for export.";
+        header("Location: {$_SERVER['PHP_SELF']}?info=". base64_encode($msg));
+        exit();
+    }
 }
 
 
