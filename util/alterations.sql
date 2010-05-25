@@ -369,7 +369,7 @@ ALTER TABLE cm_bundles ADD long_description text;
 
 
 -- Fri Mar 26 00:43:21 EDT 2010
-ALTER TABLE cm_cart ADD is_bundle bool;
+ALTER TABLE cm_cart_items ADD is_bundle bool;
 
 
 -- Tue Apr 13 15:09:40 EDT 2010

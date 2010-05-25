@@ -110,7 +110,6 @@ CREATE TABLE `cm_cart` (
   `purchased` tinyint(1) default NULL,
   `is_all_digital` tinyint(1) default NULL,
   `cm_paymentcc_id` int(10) unsigned default NULL,
-  is_bundle bool,
   PRIMARY KEY  (`id`),
   KEY `ix_uid` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -147,6 +146,7 @@ CREATE TABLE `cm_cart_items` (
   `product_descrip` varchar(255) default NULL,
   `product_attribs` text,
   `has_item_options` tinyint(1) default NULL,
+  is_bundle bool,
   is_digital bool,
   PRIMARY KEY  (`id`),
   KEY `ix_cit` (`cart_id`),
