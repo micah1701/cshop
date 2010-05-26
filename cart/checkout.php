@@ -19,6 +19,7 @@ require_once(CSHOP_CLASSES_GIFTCARD.'.class.php');
 page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>CSHOP_CLASSES_AUTH_AUTH, 'perm'=>CSHOP_CLASSES_AUTH_PERM));
 
 
+echo 'wtf';
 // flag for smarty
 $smarty->assign('page_id', 'checkout');
 $smarty->assign('pagetitle', 'Checkout');

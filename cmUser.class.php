@@ -13,7 +13,7 @@ require_once('Mail/mime.php');
  */
 class cmUser extends db_container {
     var $_sesskey = 'circusUser_id';
-    var $_table = 'auth_user';
+    var $_table = 'cm_auth_user';
 
     /** in account.php, do we require user to provide their address to sign up? */
     var $do_require_address_on_register = false;
