@@ -120,8 +120,8 @@ class cmUser extends db_container {
      */
     function get_anon_colmap() {
         $anoncolmap = array();
-        foreach ($this->colmap as $k => $v) {
-            $anoncolmap['anon_'.$k] = $v;
+        foreach (array('cust_name','email','telephone','fax') as $k) {
+            $anoncolmap['anon_'.$k] = $this->colmap[$k];
         }
         return $anoncolmap;
     }
