@@ -37,6 +37,14 @@
     <table>
         <tr>
           <td>
+            <strong>Order ID:</strong>
+          </td>
+          <td>
+            <~ $orderinfo.id ~>
+          </td>
+        </tr>
+        <tr>
+          <td>
             <strong>Order Number:</strong>
           </td>
           <td>
