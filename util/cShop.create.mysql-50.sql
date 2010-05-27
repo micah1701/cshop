@@ -16,11 +16,11 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `auth_user`
+-- Table structure for table `cm_auth_user`
 --
 
-DROP TABLE IF EXISTS `auth_user`;
-CREATE TABLE `auth_user` (
+DROP TABLE IF EXISTS `cm_auth_user`;
+CREATE TABLE `cm_auth_user` (
   `id` int(10) unsigned NOT NULL default '0',
   `fname` varchar(32) NOT NULL default '',
   `lname` varchar(32) NOT NULL default '',
@@ -63,7 +63,7 @@ CREATE TABLE `auth_user_seq` (
 DROP TABLE IF EXISTS `cm_address_book`;
 CREATE TABLE `cm_address_book` (
   `id` int(11) NOT NULL default '0',
-  `user_id` int(11) NOT NULL default '0',
+  `user_id` int(10) UNSIGNED NOT NULL default '0',
   `name` varchar(255) NOT NULL default '',
   `company` varchar(32) default NULL,
   `street_addr` varchar(128) NOT NULL default '',
@@ -79,7 +79,8 @@ CREATE TABLE `cm_address_book` (
   `fax` varchar(32) default NULL,
   `email` varchar(128) default NULL,
   PRIMARY KEY  (`id`),
-  KEY `ix_uid` (`user_id`)
+  KEY `ix_uid` (`user_id`),
+  CONSTRAINT `cm_address_book_1` FOREIGN KEY (`user_id`) REFERENCES `cm_auth_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -110,7 +111,6 @@ CREATE TABLE `cm_cart` (
   `purchased` tinyint(1) default NULL,
   `is_all_digital` tinyint(1) default NULL,
   `cm_paymentcc_id` int(10) unsigned default NULL,
-  is_bundle bool,
   PRIMARY KEY  (`id`),
   KEY `ix_uid` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -147,6 +147,7 @@ CREATE TABLE `cm_cart_items` (
   `product_descrip` varchar(255) default NULL,
   `product_attribs` text,
   `has_item_options` tinyint(1) default NULL,
+  is_bundle bool,
   is_digital bool,
   PRIMARY KEY  (`id`),
   KEY `ix_cit` (`cart_id`),
@@ -435,7 +436,7 @@ CREATE TABLE `cm_media_files` (
 DROP TABLE IF EXISTS `cm_orders`;
 CREATE TABLE `cm_orders` (
   `id` int(11) NOT NULL default '0',
-  `user_id` int(11) NOT NULL default '0',
+  `user_id` int(10) UNSIGNED NOT NULL default '0',
   `cart_id` int(10) unsigned default NULL,
   `shipping_name` varchar(255) NOT NULL default '',
   `shipping_company` varchar(32) default NULL,
@@ -495,7 +496,7 @@ CREATE TABLE `cm_orders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-ALTER TABLE cm_orders  ADD FOREIGN KEY (user_id) REFERENCES control_useraccounts (id) ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE cm_orders  ADD FOREIGN KEY (user_id) REFERENCES cm_auth_user (id) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
 -- Table structure for table `cm_orders_seq`

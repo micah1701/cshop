@@ -13,7 +13,7 @@ require_once('Mail/mime.php');
  */
 class cmUser extends db_container {
     var $_sesskey = 'circusUser_id';
-    var $_table = 'auth_user';
+    var $_table = 'cm_auth_user';
 
     /** in account.php, do we require user to provide their address to sign up? */
     var $do_require_address_on_register = false;
@@ -120,8 +120,8 @@ class cmUser extends db_container {
      */
     function get_anon_colmap() {
         $anoncolmap = array();
-        foreach ($this->colmap as $k => $v) {
-            $anoncolmap['anon_'.$k] = $v;
+        foreach (array('cust_name','email','telephone','fax') as $k) {
+            $anoncolmap['anon_'.$k] = $this->colmap[$k];
         }
         return $anoncolmap;
     }

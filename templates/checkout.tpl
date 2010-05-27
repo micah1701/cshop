@@ -51,23 +51,23 @@
                     <label for="cust_name" >Your Name</label>
                 </td>
                 <td class="formField">
-                    <~ $cform.cust_name.TAG ~> <span class="formReqStar">*</span>
+                    <~ $cform.anon_cust_name.TAG ~> <span class="formReqStar">*</span>
                 </td>
             </tr>
             <tr>
-                <td class="<~ $cform.email.CLASS ~>">
-                    <label for="email" ><~ $cform.email.LABEL ~></label>
+                <td class="<~ $cform.anon_email.CLASS ~>">
+                    <label for="anon_email" ><~ $cform.anon_email.LABEL ~></label>
                 </td>
                 <td class="formField">
-                    <~ $cform.email.TAG ~><span class="formReqStar">*</span>
+                    <~ $cform.anon_email.TAG ~><span class="formReqStar">*</span>
                 </td>
             </tr>
             <tr>
-                <td class="<~ $cform.telephone.CLASS ~>">
-                    <label for="telephone" ><~ $cform.telephone.LABEL ~></label>
+                <td class="<~ $cform.anon_telephone.CLASS ~>">
+                    <label for="anon_telephone" ><~ $cform.anon_telephone.LABEL ~></label>
                 </td>
                 <td class="formField">
-                    <~ $cform.telephone.TAG ~>
+                    <~ $cform.anon_telephone.TAG ~>
                 </td>
             </tr>
         </table>

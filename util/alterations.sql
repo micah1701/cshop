@@ -369,7 +369,7 @@ ALTER TABLE cm_bundles ADD long_description text;
 
 
 -- Fri Mar 26 00:43:21 EDT 2010
-ALTER TABLE cm_cart ADD is_bundle bool;
+ALTER TABLE cm_cart_items ADD is_bundle bool;
 
 
 -- Tue Apr 13 15:09:40 EDT 2010
@@ -426,3 +426,10 @@ delete from cm_order_items where order_id not in (select id from cm_orders);
 ALTER TABLE cm_order_items MODIFY order_id int not null;
 ALTER TABLE cm_order_items ADD FOREIGN KEY (order_id) REFERENCES cm_orders (id) ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- Tue May 25 20:56:57 EDT 2010
+ALTER TABLE auth_user RENAME cm_auth_user;
+ALTER TABLE cm_orders MODIFY user_id INT(10) UNSIGNED NOT NULL;
+ALTER TABLE cm_orders ADD FOREIGN KEY (user_id) REFERENCES cm_auth_user (id) ON DELETE NO ACTIOn ON UPDATE CASCADE;
+
+ALTER TABLE cm_address_book MODIFY user_id int(10) unsigned not null;
+ALTER TABLE cm_address_book ADD FOREIGN KEY (user_id) REFERENCES cm_auth_user (id) ON DELETE CASCADE ON UPDATE CASCADE;
