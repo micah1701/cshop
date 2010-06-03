@@ -154,7 +154,7 @@ class cmProduct extends db_container {
             return $pid;
         }
         else {
-            trigger_error("invalid SKU '$sku'", E_USER_ERROR);
+            return $this->raiseError("invalid SKU '$sku'");
         }
     }
 
