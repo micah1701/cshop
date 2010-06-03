@@ -13,6 +13,14 @@
     <table  width="320" class="orderDetail"  cellpadding="0" cellspacing="0" >
         <tr>
           <td>
+            <strong>Order ID:</strong>
+          </td>
+          <td>
+            <~ $orderinfo.id ~>
+          </td>
+        </tr>
+        <tr>
+          <td>
             <strong>Order Number:</strong>
           </td>
           <td>
