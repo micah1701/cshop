@@ -75,6 +75,18 @@ class cmProductDownload extends db_container {
 
         // set URL and other appropriate options
         curl_setopt($ch, CURLOPT_URL, $url);
+
+        /** debugging ##
+        * $temp_file = '/tmp/db';
+        * $fh = fopen($temp_file, 'w');
+        #
+        * curl_setopt($ch, CURLOPT_VERBOSE, true);
+        * curl_setopt($ch, CURLOPT_NOBODY, true);
+        * curl_setopt($ch, CURLOPT_STDERR, $fh);
+        * curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        */
+
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'cmProductDownload_curlPassHeaders');
 
@@ -90,13 +102,9 @@ class cmProductDownload extends db_container {
 }
 
 function cmProductDownload_curlPassHeaders($ch, $header) {
-    if (preg_match('/^Content-type:/i', $header)) {
+    #if (preg_match('/^Content-type:/i', $header)) {
         header($header);
-    }
-    //else {
-    //$filename = preg_replace('/[^\w\d._-]+/', '_', $item_info['product_descrip']) . '.zip';
-    //header('Content-Disposition: attachment; filename="'.$filename.'"');
-    //}
+    #}
     return strlen($header);
 }
 

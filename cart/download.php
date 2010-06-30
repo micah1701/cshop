@@ -53,6 +53,9 @@ if ($item_info['order_id'] != $orderinfo['id']) {
     trigger_error("illegal attempt to access download", E_USER_ERROR);
 }
 
+$filename = preg_replace('/[^\w\d._-]+/', '_', $item_info['product_descrip']) . '.zip';
+header('Content-Disposition: attachment; filename="'.$filename.'"');
+
 $downlo = cmClassFactory::getInstanceOf(CSHOP_CLASSES_DOWNLOADS, $pdb);
 $downlo->digital_download_dumper($item_info['product_id']);
 
