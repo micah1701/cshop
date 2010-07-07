@@ -121,8 +121,14 @@ if (isset($_POST['op']) and ($ACTION == OP_ADD or $ACTION == OP_EDIT)) {
 }
 elseif (($ACTION == OP_KILL)) {
     $user->set_id($itemid);
-    $res = $user->kill();
-    $msg = "The selected $table_title was totally removed.";
+
+    if ($orders = $user->fetch_order_history()) {
+        $errs[] = "User cannot be removed with existing orders";
+    }
+    else {
+        $res = $user->kill();
+        $msg = "The selected $table_title was totally removed.";
+    }
 }
 elseif ($ACTION == OP_PASS) {
     $user->set_id($itemid);
@@ -208,7 +214,7 @@ else {
         $cols = array_keys($user->control_header_cols);
     }
 
-    if (isset($_GET['by']) and in_array($_GET['by'], $cols)) {
+    if (isset($_GET['by']) and (in_array($_GET['by'], $cols) or $_GET['by'] == 'num_orders')) {
         $orderby = $_GET['by'];
     }
     else {
@@ -216,8 +222,10 @@ else {
     }
     $orderdir = (isset($_GET['dir']) and $_GET['dir'] == 'D')? 'DESC' : 'ASC';
 
-    $table->addSortRow($header_row, null, null, 'TH', null);
     $cols = array_keys($header_row);
+
+    $header_row['num_orders'] = '#Orders';
+    $table->addSortRow($header_row, $orderby, null, 'TH', null, $orderdir);
 
     /** decide how to filter the results */
     $where = "1=1"; 
@@ -236,13 +244,13 @@ else {
     /** **/
 
     if (defined('CSHOP_ALLOW_ANON_ACCOUNT')) {
-        $sql = sprintf("SELECT id, %s, IFNULL(email, anon_email) AS email FROM %s WHERE $where ORDER BY %s %s",
+        $sql = sprintf("SELECT u.id, %s, IFNULL(email, anon_email) AS email, COUNT(o.user_id) AS num_orders FROM %s u LEFT JOIN cm_orders o ON (o.user_id = u.id) WHERE $where GROUP BY u.id ORDER BY %s %s",
                         join(',', $cols),
                         $user->get_table_name(),
                         $orderby, $orderdir);
     }
     else {
-        $sql = sprintf("SELECT id, %s FROM %s WHERE $where ORDER BY %s %s",
+        $sql = sprintf("SELECT u.id, %s, COUNT(o.user_id) AS num_orders FROM %s u LEFT JOIN cm_orders o ON (o.user_id = u.id) WHERE $where GROUP BY u.id ORDER BY %s %s",
                         join(',', $cols),
                         $user->get_table_name(),
                         $orderby, $orderdir);
@@ -256,16 +264,19 @@ else {
         for ($ptr = $offset; ($range == 0) or (($offset + $range) > $ptr); $ptr++) {
             if (! $row = $res->fetchRow(DB_FETCHMODE_ASSOC, $ptr)) break;
 
+            if (empty($row['perms'])) $row['perms'] = 'anon';
+
             $vals = array();
             foreach ($cols as $k) {
                 $vals[] = $row[$k];
             }
+            $vals[] = $row['num_orders'];
 
             $link = sprintf('%s?%s=%d',
                               $_SERVER['PHP_SELF'], 
                               $reqIdKey,
                               $row['id']);
-            $table->addRow($vals, '', true, $link);
+            $table->addRow($vals, '', false, $link);
         }
     }
 
