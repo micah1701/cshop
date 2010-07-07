@@ -20,12 +20,15 @@ div #container {
    height: 100%;
    width: 100%;
 }
-div #headertext {
+div #headertext, tr.header {
     width: 100%;
     background-color: #000000;
     color: #FFFFFF;
     font-weight: bold;
     font-size: 12px;
+}
+tr.header, div.history table tr.header:hover {
+    background-color: #000000 !important;
 }
 div #navbar {
         border: 0px solid;

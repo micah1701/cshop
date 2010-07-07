@@ -167,6 +167,25 @@ if ($SHOWFORM) {
     }
     $fex->add_element($user->get_colmap()); 
     $fex->add_element('op', array($ACTION, 'submit')); // the button
+
+    if ($orders = $user->fetch_order_history()) {
+        $table = new fu_HTML_Table(array("width" => "820"));
+        $table->setAutoGrow(true);
+        $table->setAutoFill("-");
+        $table->addRow(array('Order Number', 'Ship name', 'Status', 'Date', 'Amt Quoted'), 'header', false);
+        foreach ($orders as $o) {
+            $vals = array($o['order_token'],
+                          $o['shipping_name'],
+                          $o['status'],
+                          date('d M Y', strtotime($o['order_create_date'])),
+                          $o['amt_quoted']);
+            $link = sprintf('store.orders.php?tok=%s',
+                              $o['order_token']);
+            $table->addRow($vals, '', false, $link);
+        }
+
+
+    }
 }
 else {
     /** list all cm_categories in one big ass dump using HTML_Table **/
@@ -374,6 +393,20 @@ $smarty->display('control/header.tpl');
 
      </div>
   </div>
+
+  <div style="margin: 5em 0">
+    <div class="headlineW">
+      <h2 class="productName headline">Order History</h2>
+    </div>
+    <div class="history" style="width: 854px">
+        <? if (!empty($orders)) { ?>
+          <?= $table->toHTML() ?>
+        <? } else { ?>
+            No orders found for this user.
+        <? } ?>
+    </div>
+  </div>
+
 <? } else { ?>
     <div style="width: 600px; padding: 4px;" align="right">
       <? $filt->display(); ?>

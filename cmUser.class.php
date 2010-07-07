@@ -396,7 +396,7 @@ EOM;
      * @return array struct of the orders, for smarty */
     function fetch_order_history($cols=null) {
         if (empty($cols)) {
-            $cols = array('order_token','shipping_name','orders_status','billing_name','amt_billed_to_date');
+            $cols = array('order_token','shipping_name','orders_status','billing_name','amt_billed_to_date','amt_quoted','order_create_date');
         }
         $sql = sprintf("SELECT %s FROM cm_orders WHERE user_id = %d",
                         join(',', $cols),

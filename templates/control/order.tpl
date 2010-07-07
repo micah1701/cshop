@@ -47,7 +47,7 @@
             <td valign="top">
                 <strong>Customer:</strong>
             </td>
-            <td><a href="store.users.php?uid=<~ $user.id ~>">
+            <td><~ if $user.perms ~><a href="store.users.php?uid=<~ $user.id ~>"><~/if~>
                     <~ if $user.cust_name ~>
                         <~ $user.cust_name ~>
                     <~ else ~>
