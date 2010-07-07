@@ -437,3 +437,4 @@ ALTER TABLE cm_address_book ADD FOREIGN KEY (user_id) REFERENCES cm_auth_user (i
 
 -- Wed Jul  7 13:22:49 EDT 2010
 ALTER TABLE cm_cart ADD uses_wholesale_pricing bool;
+ALTER TABLE cm_orders ADD uses_wholesale_pricing bool;

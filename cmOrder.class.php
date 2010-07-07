@@ -213,6 +213,7 @@ class cmOrder extends db_container {
         if ($gc_total = $this->cart->get_giftcard_total()) {
             $vals['giftcard_total'] = $gc_total;
         }
+        $vals['uses_wholesale_pricing'] = $this->cart->uses_wholesale_pricing();
 
         $this->db->autoCommit(false); // BEGIN.
 

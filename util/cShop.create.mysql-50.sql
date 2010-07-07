@@ -489,6 +489,7 @@ CREATE TABLE `cm_orders` (
   `amt_quoted` decimal(15,2) NOT NULL default '0.00',
   `amt_billed_to_date` decimal(15,2) NOT NULL default '0.00',
   `order_token` varchar(32) default NULL,
+  uses_wholesale_pricing bool,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `uq_tok` (`order_token`),
   KEY `ix_uid` (`user_id`),

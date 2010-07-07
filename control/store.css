@@ -225,7 +225,7 @@ a.printInvoice {
 }
 
 div.headlineW {
-    width: 665px;
+    width: 860px;
     margin: 0 0 8px 0;
     position: relative;
 }
@@ -563,7 +563,6 @@ td.formLabelCell {
     max-width: 878px;
 }
 .csvVersion a {
-    float: right;
     font-size: 90%;
     background: url(img/csv_icon.gif) right center no-repeat;
     height: 17px;
@@ -596,4 +595,7 @@ div.orderTransactForm table {
 }
 .filterform form {
     border: 0;
+}
+
+tr.whsl {
 }

@@ -1469,12 +1469,18 @@ class cmCart extends db_container {
     function set_uses_wholesale_pricing($toggle=true) {
         if (!defined('CSHOP_ENABLE_WHOLESALE_PRICING') || ! CSHOP_ENABLE_WHOLESALE_PRICING) return;
 
-        if ($this->_uses_wholesale_pricing != $toggle) {
-            $this->_uses_wholesale_pricing = $toggle;
-            if ($this->_id) {
-                return $this->store(array('uses_wholesale_pricing' => $toggle));
-            }
+        $this->_uses_wholesale_pricing = $toggle;
+        if ($this->get_id()) {
+            return $this->store(array('uses_wholesale_pricing' => $toggle));
         }
+    }
+
+    function uses_wholesale_pricing() {
+        if ($this->get_id()) {
+            $val = $this->fetch(array('uses_wholesale_pricing'));
+            $this->_uses_wholesale_pricing = $val['uses_wholesale_pricing'];
+        }
+        return $this->_uses_wholesale_pricing;
     }
 
 }
