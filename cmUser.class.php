@@ -424,5 +424,37 @@ EOM;
         return sprintf('%s %s', $this->header['fname'], $this->header['lname']);
     }
 
+
+
+    /**
+     * check that a given username and password checks out
+     *
+     * @param $username string
+     * @param $password string
+     * @return true if found
+     */
+    function authenticate($username, $pw) {
+
+        if (empty($username) or empty($pw)) return false;
+
+        $sql = sprintf('SELECT id, perms, username, cust_name, company, email, password, force_pword_change, token
+                        FROM %s WHERE (username = %s OR email = %s)',
+                        $this->get_table_name(),
+                        $this->db->quoteSmart($username),
+                        $this->db->quoteSmart($username));
+
+
+        $row = $this->db->getRow($sql);
+        if (!empty($row)) {
+            if (crypt($pw, $row['password']) == $row['password']) {
+                $this->set_id($row['id']);
+                return $row;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+
 }
 

@@ -17,11 +17,9 @@ require_once(CSHOP_CLASSES_USER . '.class.php');
 $smarty->assign('page_id', 'cart');
 $smarty->assign('pagetitle', CSHOP_CART_PAGETITLE);
 
-$cartclass = CSHOP_CLASSES_CART;
-$cart = new $cartclass($pdb);
-
-$c = CSHOP_CLASSES_USER;
-$user = new $c($pdb);
+$cart = cmClassFactory::getInstanceOf(CSHOP_CLASSES_CART, $pdb);
+$user = cmClassFactory::getInstanceOf(CSHOP_CLASSES_USER, $pdb);
+$product = cmClassFactory::getInstanceOf(CSHOP_CLASSES_PRODUCT, $pdb);
 
 // init page auth objects
 page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>'defaultAuth'));
@@ -46,10 +44,28 @@ if (count($cart->currency_opts) > 1) {
 }
 
 
-$cart->setErrorHandling(PEAR_ERROR_CALLBACK, 'cmCartErrorHandler');
 
 /** ADD AN ITEM **/
-if (isset($_REQUEST['op_add_pid'])) {
+if (isset($_POST['op_add_sku'])) {
+    $product->setErrorHandling(PEAR_ERROR_RETURN);
+    $cart->setErrorHandling(PEAR_ERROR_RETURN);
+    $res = $product->set_id_by_sku($_POST['op_add_sku']);
+    if (!PEAR::isError($res)) {
+        $pid = $product->get_id();
+        $qty = (isset($_POST['qty']) and is_numeric($_POST['qty']))? $_POST['qty'] : 1;
+
+        $res = $cart->add_item($pid, $qty);
+    }
+    $success = (!PEAR::isError($res) or $res->getMessage() == 'warning: 0 rows were changed');
+    if (isset($_POST['format']) && $_POST['format'] == 'txt') {
+        echo ($success)? 'op_add_cart_success=true' : 'op_add_cart_fail='.$res->getMessage();
+        exit();
+    }
+    else {
+        $smarty->assign('op_add_cart_success', true);
+    }
+}
+elseif (isset($_REQUEST['op_add_pid'])) {
     $attribs = array();
 
     /* can specify both 'sizes' and 'colorid' to find the inventory item
@@ -73,7 +89,13 @@ if (isset($_REQUEST['op_add_pid'])) {
         }
     }
     $res = $cart->add_item($_REQUEST['op_add_pid'], $qty, $attribs, $options);
-    if (!PEAR::isError($res) or $res->getMessage() == 'warning: 0 rows were changed') {
+    $success = (!PEAR::isError($res) or $res->getMessage() == 'warning: 0 rows were changed');
+
+    if (isset($_POST['format']) && $_POST['format'] == 'txt') {
+        echo ($success)? 'op_add_cart_success=true' : 'op_add_cart_fail='.$res->getMessage();
+        exit();
+    }
+    else {
         $smarty->assign('op_add_cart_success', true);
     }
 
@@ -145,9 +167,6 @@ if (!empty($sess_promo_code)) {
 }
 
 
-
-$c = CSHOP_CLASSES_PRODUCT;
-$product = new $c($pdb);
 
 $cartitems = $cart->fetch_items();
 
