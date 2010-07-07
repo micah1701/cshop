@@ -193,8 +193,12 @@ define('CSHOP_CONTROL_SHOW_TRANSACTIONS', true);
 /** show controls to allow admin to place A/net transaction from the order detail page? */
 define('CSHOP_CONTROL_SHOW_TRANSACTION_CONTROLLER', false);
 
+/** enable use of wholesale/dealer pricing in storefront and cart? */
+define('CSHOP_ENABLE_WHOLESALE_PRICING', true);
+
 /* make formex use old-style uppercase field keys like TAG, CLASS, etc */
 define('FORMEX_BACK_COMPAT_UC_FIELD_KEYS', true);
+
 
 /** choices for "Class" under media tab in products admin. Max 16chars each */
 $CSHOP_MEDIA_CLASSES = array('listing'=>'Listing',

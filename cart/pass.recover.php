@@ -30,7 +30,7 @@ define('OP_RESET_PASS', 'RESET PASSWORD');
 define('OP_RESET_PASS_PROC', 'DO RESET PASSWORD');
 
 
-$user = new cmUser($pdb);
+$user = cmClassFactory::getInstanceOf(CSHOP_CLASSES_USER, $pdb);
 $mosh = new mosh_tool();
 
 
@@ -74,7 +74,7 @@ if ($ACTION == OP_SEND_TOKEN) { // check email addr and send email to user
 elseif ($ACTION == OP_RESET_PASS) { // link in email was clicked - check it out...
     $err = NULL;
     $SHOWFORM = NULL;
-    if (!preg_match('/^[a-f0-9]{16}$/', $_GET[$recover_key_name])) {
+    if (!preg_match('/^[a-f0-9]+$/', $_GET[$recover_key_name])) {
         $err = "MASH_INCOMPLETE";
     }
     elseif (!preg_match('/^[0-9]+$/', $_GET['u'])) {

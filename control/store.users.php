@@ -177,7 +177,7 @@ else {
 
     $header_row = array();
     if (!isset($user->control_header_cols)) {
-        $cols = array('cust_name', 'last_name', 'first_name', 'company', 'email');
+        $cols = array('cust_name', 'last_name', 'first_name', 'company', 'email', 'perms');
         foreach ($cols as $k) {
             if (!empty($user->colmap[$k])) {
                 $header_row[$k] = $user->colmap[$k][0];
@@ -254,6 +254,7 @@ else {
     $smarty->assign('pager', $pager);
 
     /** create filter form **/
+    $colmap = $user->get_colmap();
     $filt = new filter_form('GET');
     $filt->left_td_style = '';
     $filt->field_prefix = '';
@@ -265,7 +266,6 @@ else {
     $filt->add_element('hdr2', array('email:', 'heading'));
     $filt->add_element('f_email', array('', 'text', null, array('size'=>20)));
     $filt->add_element('op_filter', array('GO', 'submit'));
-    $colmap = $user->get_colmap();
     if (isset($colmap['perms'])) {
         $filt->set_element_opts('f_perms', array(''=>'[ANY]') + $colmap['perms'][2]);
     }

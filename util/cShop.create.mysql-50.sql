@@ -111,6 +111,7 @@ CREATE TABLE `cm_cart` (
   `purchased` tinyint(1) default NULL,
   `is_all_digital` tinyint(1) default NULL,
   `cm_paymentcc_id` int(10) unsigned default NULL,
+  uses_wholesale_pricing bool,
   PRIMARY KEY  (`id`),
   KEY `ix_uid` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

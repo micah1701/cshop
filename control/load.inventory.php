@@ -197,6 +197,7 @@ elseif (isset($_POST['op_up'])) {
             $newfilename = $uplo->get_newname(); // get the name of the new file
 
             $fullpathfile = $uplo->fullPathtoFile;
+            ini_set('auto_detect_line_endings', 1);
 
             if (!($fh = fopen($fullpathfile, "r"))) {
                 $errs[] = "Unable to open uploaded file data. Can not continue.";
@@ -220,6 +221,7 @@ elseif (isset($_POST['op_up'])) {
                 $sth_get_sku = $mdb->prepare("SELECT product_id FROM cm_inventory WHERE sku = ?");
 
                 while (($data = fgetcsv($fh, 64000, ",")) !== FALSE) {
+
                     if ($skip_first_row) {
                         $skip_first_row = false;
                         continue;
@@ -371,7 +373,7 @@ $smarty->display('control/header.tpl');
     </p>
 
     <p>
-        The data file should be a standard comma-separated values, quoted with &quot;, with fields in the following order:
+        The data file should be a standard comma-separated values, with fields in the following order:
         <? 
         asort($datafile_pos);
         $cols = array();
