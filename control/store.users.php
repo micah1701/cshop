@@ -156,20 +156,24 @@ if ($SHOWFORM) {
     if ($ACTION == OP_EDIT) {
 
         $user->set_id($itemid);
-        $fex->elem_vals = $user->fetch();
-        if (defined('CSHOP_ALLOW_ANON_ACCOUNT') and empty($fex->elem_vals['email'])) {
-            $fex->elem_vals['email'] = $fex->elem_vals['anon_email'];
+        if (! ($fex->elem_vals = $user->fetch())) {
+            $errs[] = 'No such user found';
         }
+        else {
+            if (defined('CSHOP_ALLOW_ANON_ACCOUNT') and empty($fex->elem_vals['email'])) {
+                $fex->elem_vals['email'] = $fex->elem_vals['anon_email'];
+            }
 
-        $item_name = $fex->elem_vals[$table_namecol];
-        
-        $fex->add_element($reqIdKey, array('hid id', 'hidden', $itemid, 0)); // important
+            $item_name = $fex->elem_vals[$table_namecol];
+            
+            $fex->add_element($reqIdKey, array('hid id', 'hidden', $itemid, 0)); // important
 
-        $confirm_msg = sprintf('This will remove this %s from the site permanently. Are you sure?', $table_title);
-        $fex->add_element('op_kill', array(OP_KILL, 'submit', null, null, 'onclick="return confirm(\''. $confirm_msg . '\')"'));
+            $confirm_msg = sprintf('This will remove this %s from the site permanently. Are you sure?', $table_title);
+            $fex->add_element('op_kill', array(OP_KILL, 'submit', null, null, 'onclick="return confirm(\''. $confirm_msg . '\')"'));
 
-        /** get all addrs belonging to this captain **/
-        $billaddr = $user->fetchBillingAddr();
+            /** get all addrs belonging to this captain **/
+            $billaddr = $user->fetchBillingAddr();
+        }
     }
     $fex->add_element($user->get_colmap()); 
     $fex->add_element('op', array($ACTION, 'submit')); // the button
@@ -264,7 +268,7 @@ else {
         for ($ptr = $offset; ($range == 0) or (($offset + $range) > $ptr); $ptr++) {
             if (! $row = $res->fetchRow(DB_FETCHMODE_ASSOC, $ptr)) break;
 
-            if (empty($row['perms'])) $row['perms'] = 'anon';
+            if (!empty($row['is_anon'])) $row['perms'] = 'anon';
 
             $vals = array();
             foreach ($cols as $k) {

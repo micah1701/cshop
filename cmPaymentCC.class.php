@@ -53,6 +53,11 @@ class cmPaymentCC extends db_container {
         return $this->cc_types;
     }
 
+    function store($vals, $force_insert) {
+        if (isset($vals['csc1'])) unset($vals['csc1']);
+        return parent::store($vals, $force_insert);
+    }
+
 
     /**
      * util function to retrieve ccno

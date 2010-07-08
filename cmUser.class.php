@@ -109,7 +109,7 @@ class cmUser extends db_container {
 
         $vals['email'] = null;
         $vals['is_anon'] = true;
-        $vals['perms'] = 'PUBLIC';
+        $vals['perms'] = 'ANON';
         return $this->store($vals);
     }
 
@@ -321,7 +321,7 @@ class cmUser extends db_container {
         $site = SITE_DOMAIN_NAME;
         $user = $this->fetch();
         $mash = $user['token'];
-        $recip = sprintf('%s <%s>', $this->get_full_name(), $user['email']);
+        $recip = sprintf('%s <%s>', $this->get_full_name(), $this->get_email());
         $bcc = $this->order_confirm_bcc;
         $link = sprintf('http://%s'.CSHOP_PASS_RECOVER_LINK_FMT,  
                         $_SERVER['HTTP_HOST'], 
