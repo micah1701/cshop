@@ -39,6 +39,8 @@ CREATE TABLE `cm_auth_user` (
   `anon_email` varchar(255) default NULL,
   `is_anon` tinyint(1) default NULL,
   `emp_code` varchar(32) default NULL,
+  is_active bool DEFAULT 1,
+  created_at timestamp default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `uq_user` (`username`),
   UNIQUE KEY `uq_em` (`email`),
