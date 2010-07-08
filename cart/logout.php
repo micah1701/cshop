@@ -10,6 +10,6 @@
 require_once(CONFIG_DIR . 'cshop.config.php');
 page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>CSHOP_CLASSES_AUTH_AUTH));
 
-$auth->unauth();
+$auth->logout();
 
 header("Location: checkout.php?w=".uniqid('000'));
