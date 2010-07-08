@@ -27,7 +27,7 @@ define ('CSHOP_CLASSES_USER', 'cmUser');
 define ('CSHOP_CLASSES_CART', 'cmCart');
 define ('CSHOP_CLASSES_COUPON', 'cmCoupon');
 define ('CSHOP_CLASSES_ORDER', 'cmOrder');
-define ('CSHOP_CLASSES_PAYMENT', 'cmPaymentGatewayManual');
+define ('CSHOP_CLASSES_PAYMENT_GATEWAY', 'cmPaymentGatewayManual');
 define ('CSHOP_CLASSES_PAYMETHOD', 'cmPaymentCC');
 define ('CSHOP_CLASSES_PRODUCT', 'cmProduct');
 define ('CSHOP_CLASSES_PRODUCT_CATEGORY', 'cmProductCategory');

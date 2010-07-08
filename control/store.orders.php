@@ -8,7 +8,7 @@ require_once(CONFIG_DIR . 'cshop.config.php');
 require_once(CSHOP_CLASSES_USER . '.class.php');
 require_once(CSHOP_CLASSES_ORDER . '.class.php');
 require_once(CSHOP_CLASSES_CART . '.class.php');
-require_once(CSHOP_CLASSES_PAYMENT . '.class.php');
+require_once(CSHOP_CLASSES_PAYMENT_GATEWAY . '.class.php');
 
 require_once('formex.class.php');
 require_once("fu_HTML_Table.class.php");      
@@ -138,8 +138,7 @@ elseif ($ACTION == OP_TRANSACT && defined('CSHOP_CONTROL_SHOW_TRANSACTION_CONTRO
 
     $pay = cmClassFactory::getInstanceOf(CSHOP_CLASSES_PAYMETHOD, $pdb);
 
-    $gateclass = CSHOP_CLASSES_PAYMENT;
-    $gate = new $gateclass($user, $pay, $order);
+    $gate = cmPaymentGateway::factory(CSHOP_CLASSES_PAYMENT_GATEWAY, $user, $pay, $order);
 
     $xtype = $_POST['xtype'];
     $amt = $_POST['xamt'];
@@ -276,27 +275,28 @@ if ($ACTION == OP_VIEW) {
 
             $order_totals = $order->fetch_totals();
 
-            // all this to get an instance of CSHOP_CLASSES_PAYMENT
+            // all this to get an instance of a payment gateway object
             $user = $order->get_user();
-            $pay = cmClassFactory::getInstanceOf(CSHOP_CLASSES_PAYMETHOD, $pdb);
-            $gateclass = CSHOP_CLASSES_PAYMENT;
-            $gate = new $gateclass($user, $pay, $order);
+            $pay = $user->payment_method_factory();
+            if ($pay->method_name == 'Credit Card') {
+                $gate = cmPaymentGateway::factory(CSHOP_CLASSES_PAYMENT_GATEWAY, $user, $pay, $order);
 
-            if ($transaction_options = $gate->get_transaction_options()) {
+                if ($transaction_options = $gate->get_transaction_options()) {
 
-                $fex = new formex();
-                $fex->field_prefix = '';
-                $fex->add_element('xtype', array('Type', 'select', $transaction_options));
-                $fex->add_element('xamt', array('Amount', 'text', '', array('size'=>5)));
-                $fex->add_element('xamt', array('Amount', 'text', '', array('size'=>5)));
-                $fex->add_element('op_xaction', array('RUN', 'submit'));
-                $fex->add_element($reqIdKey, array(null, 'hidden', $itemid)); // important
+                    $fex = new formex();
+                    $fex->field_prefix = '';
+                    $fex->add_element('xtype', array('Type', 'select', $transaction_options));
+                    $fex->add_element('xamt', array('Amount', 'text', '', array('size'=>5)));
+                    $fex->add_element('xamt', array('Amount', 'text', '', array('size'=>5)));
+                    $fex->add_element('op_xaction', array('RUN', 'submit'));
+                    $fex->add_element($reqIdKey, array(null, 'hidden', $itemid)); // important
 
-                if ($order_totals['billed_to_date'] == 0) {
-                    $fex->elem_vals = array('xamt' => $order_totals['grand_total']);
+                    if ($order_totals['billed_to_date'] == 0) {
+                        $fex->elem_vals = array('xamt' => $order_totals['grand_total']);
+                    }
+
+                    $smarty->assign('xform', $fex->get_struct());
                 }
-
-                $smarty->assign('xform', $fex->get_struct());
             }
         }
     }

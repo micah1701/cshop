@@ -63,7 +63,7 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
     var $_FAKE_SUCCESS = false;
 
 
-    function cmPaymentGatewayANET(&$user, &$pay, &$order) {
+    function __construct($user, $pay, $order) {
         $this->_user =& $user;
         $this->_payment =& $pay;
         $this->_order =& $order;

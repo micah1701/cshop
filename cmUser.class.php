@@ -2,6 +2,7 @@
 require_once('db_container.class.php');
 require_once(CONFIG_DIR.'cshop.config.php');
 require_once(CSHOP_CLASSES_ADDRESSBOOK.'.class.php');
+require_once(CSHOP_CLASSES_PAYMETHOD.'.class.php');
 require_once('cshop/mailer.class.php');
 require_once('Mail.php');
 require_once('Mail/mime.php');
@@ -454,6 +455,11 @@ EOM;
                 return false;
             }
         }
+    }
+
+
+    function payment_method_factory() {
+        return cmClassFactory::getInstanceOf(CSHOP_CLASSES_PAYMETHOD, $this->db);
     }
 
 

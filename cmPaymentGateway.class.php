@@ -75,28 +75,20 @@ abstract class cmPaymentGateway extends PEAR {
     /** keep a log of things in CSHOP_LOG_FILE */
     var $do_logging = false;
 
-    function cmPaymentGateway(&$user, &$pay, &$order) {
-        echo 'self!?';
+    function __construct($user, $pay, $order) {
         $this->_user =& $user;
-        echo 'self!?';
         $this->_payment =& $pay;
-        echo 'self!?';
         $this->_order =& $order;
-        echo 'self!?';
         $this->_self_description = $this->get_self_description();
-        echo 'self!?';
     }
 
 
-    function factory($type, &$user, &$pay, &$order) {
-        switch ($type) {
-            case 'anet':
-                return new cmPaymentGatewayANET($user, $pay, $order);
-            case 'Manual':
-                return new cmPaymentGatewayManual($user, $pay, $order);
-            default:
-                return $this->raiseError("we dont have an implementation for $type!");
-        }
+    static function factory() {
+      $args = func_get_args();
+      $klass = array_shift($args);
+      $_reflect = new ReflectionClass($klass);
+
+      return $_reflect->newInstanceArgs($args);
     }
 
     /** create a string to describe this class and the server it is hosted from

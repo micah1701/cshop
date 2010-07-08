@@ -152,11 +152,14 @@
             <strong>Payment Method:</strong>
           </td>
           <td>
-            <~ $orderinfo.payment_method ~> <br />
-          <~ if $orderinfo.cc_type ~>
-            <~ $orderinfo.cc_type ~>: <~ $orderinfo.cc_number ~><br />
-            Exp: <~ $orderinfo.cc_expires ~><br />
-          <~/if~>
+              <~ $orderinfo.payment_method ~> <br />
+              <~ if $orderinfo.cc_type ~>
+                  <~ $orderinfo.cc_type ~>: <~ $orderinfo.cc_number ~><br />
+                  Exp: <~ $orderinfo.cc_expires ~><br />
+              <~/if~>
+              <~ if $orderinfo.cc_owner ~>
+                  Ref: <strong><~ $orderinfo.cc_owner ~></strong><br />
+              <~/if~>
           </td>
         </tr>
         <tr>

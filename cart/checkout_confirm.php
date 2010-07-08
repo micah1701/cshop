@@ -12,7 +12,7 @@ require_once(CSHOP_CLASSES_CART.'.class.php');
 require_once(CSHOP_CLASSES_ORDER.'.class.php');
 require_once(CSHOP_CLASSES_USER.'.class.php');
 require_once(CSHOP_CLASSES_PAYMETHOD.'.class.php');
-require_once(CSHOP_CLASSES_PAYMENT.'.class.php');
+require_once(CSHOP_CLASSES_PAYMENT_GATEWAY.'.class.php');
 require_once(CSHOP_CLASSES_GIFTCARD.'.class.php');
 
 // init page auth objects
@@ -45,9 +45,9 @@ if ($cart_total > 0) {
     }
     else {
         /* now what it really is all about is payment */
-        $c = CSHOP_CLASSES_PAYMETHOD;
-        $pay = new $c($pdb);
+        $pay = $user->payment_method_factory();
         $pay->set_id($payid);
+
         if (!$pay->fetch()) {
             trigger_error('payment info cannot be re-used', E_USER_NOTICE);
             $payment_error = "Sorry, your payment info cannot be re-submitted. Please go back and re-enter the payment information";
@@ -77,14 +77,12 @@ $smarty->register_modifier('currency_format', array(&$cart, 'currency_format'));
 
 /** here is where the order is offically created **/
 if (isset($_POST['op_confirm'])) {
-    $c = CSHOP_CLASSES_ORDER;
-    $order = new $c($pdb);
+    $order = cmClassFactory::getInstanceOf(CSHOP_CLASSES_ORDER, $pdb);
     $order->set_user($user);
     $order->set_cart($cart);
     $res = $order->create();
 
-    $c = CSHOP_CLASSES_PAYMENT;
-    $gate = new $c($user, $pay, $order);
+    $gate = cmPaymentGateway::factory(CSHOP_CLASSES_PAYMENT_GATEWAY, $user, $pay, $order);
     $gate->setErrorHandling (PEAR_ERROR_RETURN);
 
     $PAYMENT_SUCCESS = false;
@@ -170,8 +168,11 @@ if (isset($_POST['op_confirm'])) {
 
 if ($pay) {
     $payment = $pay->fetch();
-    $payment['ccno'] = substr($payment['ccno'], -4, 4);
+    if (isset($payment['ccno']))
+        $payment['ccno'] = substr($payment['ccno'], -4, 4);
+
     $smarty->assign('payment_info', $payment);
+    $smarty->assign('payment_method_name', $pay->method_name);
 }
 
 
