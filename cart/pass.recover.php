@@ -139,7 +139,7 @@ elseif ($ACTION == OP_RESET_PASS_PROC) { // new password entered - check and cha
         }
         else {
             $res = $user->change_pword($newpw);
-            if (PEAR::isError($res)) {
+            if (PEAR::isError($res) and $res->getMessage() != 'warning: 0 rows were changed') {
                 $err = $res->getMessage();
             }
             $user->force_pword_change(false);
