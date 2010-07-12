@@ -22,6 +22,8 @@ $SUCCESS = null;
 $errs = array();
 
 $recover_key_name = 'm';
+$pw_min_length = 6;
+$smarty->assign('pw_min_length', $pw_min_length);
 
 /** define set of actions this script can perform **/
 define('OP_GET_EMAIL', 'NEXT STEP');
@@ -128,13 +130,13 @@ elseif ($ACTION == OP_RESET_PASS_PROC) { // new password entered - check and cha
     elseif (strcmp($newpw, $_POST['f_newpass2']) != 0) {
         $err = "PASS_NO_MATCH";
     }
-    elseif (strlen($newpw) < 5 or !preg_match('/[0-9]+/', $newpw)) {
+    elseif (strlen($newpw) < $pw_min_length or !preg_match('/[0-9]+/', $newpw)) {
         $err = "PASS_TOO_EASY";
     }
     else { // all passed. Change the pw in the DB and congratulate the user.
         unset($_SESSION['change_password_uniq']);
         $user->set_id($_POST['f_uid']);
-        if (!$user->fetch('username')) { // just make sure the is was valid
+        if (!$userinfo = $user->fetch(array('username', 'email'))) { // just make sure the is was valid
             $err = "INVALID_UID";
         }
         else {
@@ -142,7 +144,11 @@ elseif ($ACTION == OP_RESET_PASS_PROC) { // new password entered - check and cha
             if (PEAR::isError($res) and $res->getMessage() != 'warning: 0 rows were changed') {
                 $err = $res->getMessage();
             }
+            // added these 2 $_SESSION lines as a hack for momenta :/
+            $_SESSION['email'] = $user->get_email();
+            $_SESSION['name'] = $user->get_full_name();
             $user->force_pword_change(false);
+            $auth->force_preauth($user->get_id()); 
         }
     }
 
