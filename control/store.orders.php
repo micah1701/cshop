@@ -8,7 +8,7 @@ require_once(CONFIG_DIR . 'cshop.config.php');
 require_once(CSHOP_CLASSES_USER . '.class.php');
 require_once(CSHOP_CLASSES_ORDER . '.class.php');
 require_once(CSHOP_CLASSES_CART . '.class.php');
-require_once(CSHOP_CLASSES_PAYMENT . '.class.php');
+require_once(CSHOP_CLASSES_PAYMENT_GATEWAY . '.class.php');
 
 require_once('formex.class.php');
 require_once("fu_HTML_Table.class.php");      
@@ -36,6 +36,17 @@ $table_title = 'Order';
 
 $orderclass = CSHOP_CLASSES_ORDER;
 $order = new $orderclass($pdb);
+
+$order_list_colors = array(
+    array('#e0e0e0','#d2d2d2'),
+    array('#dfd', '#cec'),
+    array('#ddf', '#cce'),
+    array('#ddb', '#eec'),
+    array('#dee', '#eff'),
+    array('#555', '#666'),
+    array('#333', '#444'),
+    array('#eb8', '#fc9'),
+);
 
 /** decide on a course of action... **/
 if (isset($_POST['op_update']) and $_POST['op_update'] == OP_UPDATE) {
@@ -127,8 +138,7 @@ elseif ($ACTION == OP_TRANSACT && defined('CSHOP_CONTROL_SHOW_TRANSACTION_CONTRO
 
     $pay = cmClassFactory::getInstanceOf(CSHOP_CLASSES_PAYMETHOD, $pdb);
 
-    $gateclass = CSHOP_CLASSES_PAYMENT;
-    $gate = new $gateclass($user, $pay, $order);
+    $gate = cmPaymentGateway::factory(CSHOP_CLASSES_PAYMENT_GATEWAY, $user, $pay, $order);
 
     $xtype = $_POST['xtype'];
     $amt = $_POST['xamt'];
@@ -265,27 +275,28 @@ if ($ACTION == OP_VIEW) {
 
             $order_totals = $order->fetch_totals();
 
-            // all this to get an instance of CSHOP_CLASSES_PAYMENT
+            // all this to get an instance of a payment gateway object
             $user = $order->get_user();
-            $pay = cmClassFactory::getInstanceOf(CSHOP_CLASSES_PAYMETHOD, $pdb);
-            $gateclass = CSHOP_CLASSES_PAYMENT;
-            $gate = new $gateclass($user, $pay, $order);
+            $pay = $user->payment_method_factory();
+            if ($pay->method_name == 'Credit Card') {
+                $gate = cmPaymentGateway::factory(CSHOP_CLASSES_PAYMENT_GATEWAY, $user, $pay, $order);
 
-            if ($transaction_options = $gate->get_transaction_options()) {
+                if ($transaction_options = $gate->get_transaction_options()) {
 
-                $fex = new formex();
-                $fex->field_prefix = '';
-                $fex->add_element('xtype', array('Type', 'select', $transaction_options));
-                $fex->add_element('xamt', array('Amount', 'text', '', array('size'=>5)));
-                $fex->add_element('xamt', array('Amount', 'text', '', array('size'=>5)));
-                $fex->add_element('op_xaction', array('RUN', 'submit'));
-                $fex->add_element($reqIdKey, array(null, 'hidden', $itemid)); // important
+                    $fex = new formex();
+                    $fex->field_prefix = '';
+                    $fex->add_element('xtype', array('Type', 'select', $transaction_options));
+                    $fex->add_element('xamt', array('Amount', 'text', '', array('size'=>5)));
+                    $fex->add_element('xamt', array('Amount', 'text', '', array('size'=>5)));
+                    $fex->add_element('op_xaction', array('RUN', 'submit'));
+                    $fex->add_element($reqIdKey, array(null, 'hidden', $itemid)); // important
 
-                if ($order_totals['billed_to_date'] == 0) {
-                    $fex->elem_vals = array('xamt' => $order_totals['grand_total']);
+                    if ($order_totals['billed_to_date'] == 0) {
+                        $fex->elem_vals = array('xamt' => $order_totals['grand_total']);
+                    }
+
+                    $smarty->assign('xform', $fex->get_struct());
                 }
-
-                $smarty->assign('xform', $fex->get_struct());
             }
         }
     }
@@ -334,7 +345,7 @@ else {
     /** **/
 
     /** decide how to order the results */
-    $orderable = array('ord.id','order_create_date', 'email', 'orders_status', 'amt_quoted', 'ship_date');
+    $orderable = array('ord.id','order_create_date', 'email', 'orders_status', 'amt_quoted', 'perms', 'ship_date');
     if (isset($_GET['by']) and in_array($_GET['by'], $orderable)) {
         $orby = $_GET['by'];
         $orderdir = (isset($_GET['dir']) and $_GET['dir'] == 'D')? 'DESC' : 'ASC';
@@ -368,12 +379,12 @@ else {
     }
     /** **/
 
-    $header_row = array('ord.id'=>'Order ID','order_token'=>'Order Number','email'=>'User', 'orders_status'=>'Status', 'order_create_date'=>'Order Date', 'amt_quoted'=>'Total', 'ship_date'=>'Ship Date');
+    $header_row = array('ord.id'=>'Order ID','order_token'=>'Order Number','email'=>'User', 'perms'=>'Cust', 'orders_status'=>'Status', 'order_create_date'=>'Order Date', 'amt_quoted'=>'Total', 'ship_date'=>'Ship Date');
 
     if ($orders = $order->fetch_any(null, $offset, $range, $orby, $where, $orderdir)) {
         
         /** list all cm_categories in one big ass dump using HTML_Table **/
-        $table = new fu_HTML_Table(array("width" => "600"));
+        $table = new fu_HTML_Table(array("width" => "860"));
         $table->setAutoGrow(true);
         $table->setAutoFill("n/a");
         $table->addSortRow($header_row, $orby, null, 'TH', null, $orderdir);
@@ -386,6 +397,7 @@ else {
             $vals = array($o['id'],
                           $o['order_token'],
                           "$name &lt;{$email}&gt;",
+                          $o['perms'],
                           $order->statuses[$o['orders_status']],
                           date('d M Y', strtotime($o['order_create_date'])),
                           $o['amt_quoted'],
@@ -394,7 +406,15 @@ else {
                               $_SERVER['PHP_SELF'], 
                               $reqIdKey,
                               $o['order_token']);
-            $table->addRow(array_values($vals), '', true, $link);
+
+            $class = '';
+
+            if (isset($order_list_colors[$o['orders_status']]))
+                $table->bgcolor_alts = $order_list_colors[$o['orders_status']];
+            else 
+                $table->bgcolor_alts = $order_list_colors[0];
+            
+            $table->addRow(array_values($vals), $class, false, $link);
         }
 
         $pager = new res_pager($offset, $range, $order->numRows);
@@ -455,10 +475,10 @@ if (isset($_GET['info'])) { ?>
     <div class="headlineW">
        <h2 class="productName headline"><?= SITE_DOMAIN_NAME ?> :: <?= $pagetitle ?></h2>
     </div>
-    <div style="width: 600px; padding: 4px;" align="right">
+    <div style="width: 860px; padding: 4px;" align="right">
       <? $filt->display(); ?>
     </div>
-    <div style="width: 600px; border: 1px solid black; padding: 4px">
+    <div style="width: 860px; border: 1px solid black; padding: 4px">
     <? if (!isset($table)) { ?>
         No matching orders were found.
     <? } else { ?>

@@ -213,6 +213,7 @@ class cmOrder extends db_container {
         if ($gc_total = $this->cart->get_giftcard_total()) {
             $vals['giftcard_total'] = $gc_total;
         }
+        $vals['uses_wholesale_pricing'] = $this->cart->uses_wholesale_pricing();
 
         $this->db->autoCommit(false); // BEGIN.
 
@@ -646,16 +647,21 @@ class cmOrder extends db_container {
 
         $billing = $this->fetch_addr('billing');
 
-        $ccno = $gate->truncate_ccno($pay->get_ccno()); // may or may not chop the # off
+        if ($pay->method_name == 'Credit Card') {
+            $ccno = $gate->truncate_ccno($pay->get_ccno()); // may or may not chop the # off
 
-        $vals = array('cc_type' => $pay->get_cctype(),
-                      'cc_owner' => $billing['name'],
-                      'cc_number' => $ccno,
-                      'cc_expires' => $pay->get_ccexp('my'));
+            $vals = array('cc_type' => $pay->get_cctype(),
+                          'cc_owner' => $billing['name'],
+                          'cc_number' => $ccno,
+                          'cc_expires' => $pay->get_ccexp('my'));
+        }
+        elseif ($pay->method_name == 'Purchase Order') {
+            $vals = array('cc_owner' => $pay->get_header('po_no'));
+        }
 
         $vals['amt_billed_to_date'] = $gate->get_captured_amount();
         $vals['currency'] = $gate->currency_code;
-        $vals['payment_method'] = $gate->gateway_name;
+        $vals['payment_method'] = $pay->method_name;
 
         return $this->store($vals);
     }

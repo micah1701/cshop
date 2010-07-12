@@ -9,7 +9,6 @@ require_once(CONFIG_DIR . 'cshop.config.php');
 require_once('formex.class.php');
 require_once(CSHOP_CLASSES_CART.'.class.php');
 require_once(CSHOP_CLASSES_USER.'.class.php');
-require_once(CSHOP_CLASSES_PAYMETHOD.'.class.php');
 require_once(CSHOP_CLASSES_TAXCALCULATOR.'.class.php');
 require_once(CSHOP_CLASSES_SHIPMETHOD.'.class.php');
 require_once(CSHOP_CLASSES_GIFTCARD.'.class.php');
@@ -82,9 +81,6 @@ else { #if (isset($_GET['shipping'])) {
 $cart = cmClassFactory::getInstanceOf(CSHOP_CLASSES_CART, $pdb);
 $user = cmClassFactory::getInstanceOf(CSHOP_CLASSES_USER, $pdb);
 
-/* now what it really is all about is payment */
-$pay = cmClassFactory::getInstanceOf(CSHOP_CLASSES_PAYMETHOD, $pdb);
-
 /* decide what currency to show. They would have set this in the cart */
 $sess->register('CSHOP_CURRENCY_DISPLAY');
 $cart->set_display_currency($CSHOP_CURRENCY_DISPLAY);
@@ -97,6 +93,9 @@ $uid = $user->get_auth_id();
 $user->set_id($uid);
 
 $cartid = $cart->get_id(); // actually called set_id() on cart too! yes, strange.
+
+/* now what it really is all about is payment */
+$pay = $user->payment_method_factory();
 
 
 
@@ -232,7 +231,6 @@ elseif ($ACTION == OP_ADD_BILL) {
         $fex->add_element($pay->get_colmap());
         if (! ($errs = $fex->validate($_POST))) {
             $payvals = $fex->get_submitted_vals($_POST);
-            $payvals['ccno'] = cmPaymentCC::clean_ccno($payvals['ccno']);
             $errs = $pay->check_values($payvals);
         }
 
@@ -264,7 +262,8 @@ elseif ($ACTION == OP_ADD_BILL) {
             if (!$errs) {
                 // get values from the CC input form and store
                 $payvals['user_id'] = $user->get_id();
-                $pay->set_csc($_POST['f_csc1']);
+                if (isset($_POST['f_csc1'])) $pay->set_csc($_POST['f_csc1']);
+
                 $payid = $pay->store($payvals);
 
                 $cart->set_payment($pay);
@@ -496,8 +495,6 @@ if ($SHOWFORM) {
                 /* just add in ship total here, there is no choice for ass! */
                 $fex->add_element('ship_method', array(null, 'hidden', null));
 
-                /* add a field for the CSC - this is not really saved anywhere so it is not in the object */
-                $fex->add_element('csc1', array('Card Security Code', 'text', null, array('size'=>4), 1));
 
                 /* use this persons previous billing addr if we have it */
                 if ($billing = $user->fetchBillingAddr()) {
@@ -505,6 +502,8 @@ if ($SHOWFORM) {
                     $fex->add_element('billing_addr_id', array(null, 'hidden', $billing['id']));
                     $fex->elem_vals = $billing; 
                 }
+                //$smarty->assign('payment_method_class', get_class($pay));
+                $smarty->assign('payment_method_name', $pay->method_name);
             }
 
             $smarty->assign('PAYMENT_REQUIRED', $PAYMENT_REQUIRED);

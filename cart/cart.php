@@ -22,7 +22,7 @@ $user = cmClassFactory::getInstanceOf(CSHOP_CLASSES_USER, $pdb);
 $product = cmClassFactory::getInstanceOf(CSHOP_CLASSES_PRODUCT, $pdb);
 
 // init page auth objects
-page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>'defaultAuth'));
+page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>'defaultAuth', 'perm'=>CSHOP_CLASSES_AUTH_PERM));
 
 $product_detail_page = CSHOP_PRODUCT_DETAIL_PAGE;
 $smarty->assign('product_detail_page', $product_detail_page);
@@ -43,6 +43,11 @@ if (count($cart->currency_opts) > 1) {
     $smarty->assign('current_currency_display', $cart->get_display_currency());
 }
 
+$user->set_auth($auth);
+$smarty->assign('user', $user->fetch());
+
+if (defined('CSHOP_ENABLE_WHOLESALE_PRICING') && CSHOP_ENABLE_WHOLESALE_PRICING)
+    $cart->set_uses_wholesale_pricing( $user->has_perm('DEALER') );
 
 
 /** ADD AN ITEM **/

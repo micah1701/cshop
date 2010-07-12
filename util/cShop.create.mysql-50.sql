@@ -39,6 +39,8 @@ CREATE TABLE `cm_auth_user` (
   `anon_email` varchar(255) default NULL,
   `is_anon` tinyint(1) default NULL,
   `emp_code` varchar(32) default NULL,
+  is_active bool DEFAULT 1,
+  created_at timestamp default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `uq_user` (`username`),
   UNIQUE KEY `uq_em` (`email`),
@@ -111,6 +113,7 @@ CREATE TABLE `cm_cart` (
   `purchased` tinyint(1) default NULL,
   `is_all_digital` tinyint(1) default NULL,
   `cm_paymentcc_id` int(10) unsigned default NULL,
+  uses_wholesale_pricing bool,
   PRIMARY KEY  (`id`),
   KEY `ix_uid` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -488,6 +491,7 @@ CREATE TABLE `cm_orders` (
   `amt_quoted` decimal(15,2) NOT NULL default '0.00',
   `amt_billed_to_date` decimal(15,2) NOT NULL default '0.00',
   `order_token` varchar(32) default NULL,
+  uses_wholesale_pricing bool,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `uq_tok` (`order_token`),
   KEY `ix_uid` (`user_id`),

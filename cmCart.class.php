@@ -95,6 +95,11 @@ class cmCart extends db_container {
     /* when garbaging old carts, delete those older than this many days */
     var $gc_age = 28;
 
+    /* does the cart belong to a user who has the ability to use 
+     * special/wholesale pricing level (iow, are the prices for items to come 
+     * from cm_products.list_price?) */
+    var $_uses_wholesale_pricing = false;
+
 
     /* saves cart to session
      */
@@ -139,7 +144,7 @@ class cmCart extends db_container {
      * @return id of new row
      */
     function create_stub() {
-        $this->store(array('user_id'=>NULL, 'create_date'=>$this->db->getOne('select now()')));
+        $this->store(array('user_id'=>NULL, 'create_date'=>$this->db->getOne('select now()'), 'uses_wholesale_pricing' => $this->_uses_wholesale_pricing));
         return $this->get_id();
     }
 
@@ -226,6 +231,7 @@ class cmCart extends db_container {
          }
          else {
 
+             $pctr->wholesale_pricing = $this->_uses_wholesale_pricing;
              $product_price = $pctr->get_price($invid, $options);
 
              $vals = array('cart_id' => $this->get_id(),
@@ -1454,6 +1460,27 @@ class cmCart extends db_container {
             return;
 
         return $this->store(array('is_all_digital' => $toggle));
+    }
+
+    /**
+     * set flag to indicate if this cart should operate on wholesale pricing 
+     * (cm_product.list_price as opposed to cm_products.price)
+     */
+    function set_uses_wholesale_pricing($toggle=true) {
+        if (!defined('CSHOP_ENABLE_WHOLESALE_PRICING') || ! CSHOP_ENABLE_WHOLESALE_PRICING) return;
+
+        $this->_uses_wholesale_pricing = $toggle;
+        if ($this->get_id()) {
+            return $this->store(array('uses_wholesale_pricing' => $toggle));
+        }
+    }
+
+    function uses_wholesale_pricing() {
+        if ($this->get_id()) {
+            $val = $this->fetch(array('uses_wholesale_pricing'));
+            $this->_uses_wholesale_pricing = $val['uses_wholesale_pricing'];
+        }
+        return $this->_uses_wholesale_pricing;
     }
 
 }

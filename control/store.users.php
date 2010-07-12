@@ -121,8 +121,14 @@ if (isset($_POST['op']) and ($ACTION == OP_ADD or $ACTION == OP_EDIT)) {
 }
 elseif (($ACTION == OP_KILL)) {
     $user->set_id($itemid);
-    $res = $user->kill();
-    $msg = "The selected $table_title was totally removed.";
+
+    if ($orders = $user->fetch_order_history()) {
+        $errs[] = "User cannot be removed with existing orders";
+    }
+    else {
+        $res = $user->kill();
+        $msg = "The selected $table_title was totally removed.";
+    }
 }
 elseif ($ACTION == OP_PASS) {
     $user->set_id($itemid);
@@ -150,23 +156,46 @@ if ($SHOWFORM) {
     if ($ACTION == OP_EDIT) {
 
         $user->set_id($itemid);
-        $fex->elem_vals = $user->fetch();
-        if (defined('CSHOP_ALLOW_ANON_ACCOUNT') and empty($fex->elem_vals['email'])) {
-            $fex->elem_vals['email'] = $fex->elem_vals['anon_email'];
+        if (! ($fex->elem_vals = $user->fetch())) {
+            $errs[] = 'No such user found';
         }
+        else {
+            if (defined('CSHOP_ALLOW_ANON_ACCOUNT') and empty($fex->elem_vals['email'])) {
+                $fex->elem_vals['email'] = $fex->elem_vals['anon_email'];
+            }
 
-        $item_name = $fex->elem_vals[$table_namecol];
-        
-        $fex->add_element($reqIdKey, array('hid id', 'hidden', $itemid, 0)); // important
+            $item_name = $fex->elem_vals[$table_namecol];
+            
+            $fex->add_element($reqIdKey, array('hid id', 'hidden', $itemid, 0)); // important
 
-        $confirm_msg = sprintf('This will remove this %s from the site permanently. Are you sure?', $table_title);
-        $fex->add_element('op_kill', array(OP_KILL, 'submit', null, null, 'onclick="return confirm(\''. $confirm_msg . '\')"'));
+            $confirm_msg = sprintf('This will remove this %s from the site permanently. Are you sure?', $table_title);
+            $fex->add_element('op_kill', array(OP_KILL, 'submit', null, null, 'onclick="return confirm(\''. $confirm_msg . '\')"'));
 
-        /** get all addrs belonging to this captain **/
-        $billaddr = $user->fetchBillingAddr();
+            /** get all addrs belonging to this captain **/
+            $billaddr = $user->fetchBillingAddr();
+        }
     }
     $fex->add_element($user->get_colmap()); 
     $fex->add_element('op', array($ACTION, 'submit')); // the button
+
+    if ($orders = $user->fetch_order_history()) {
+        $table = new fu_HTML_Table(array("width" => "820"));
+        $table->setAutoGrow(true);
+        $table->setAutoFill("-");
+        $table->addRow(array('Order Number', 'Ship name', 'Status', 'Date', 'Amt Quoted'), 'header', false);
+        foreach ($orders as $o) {
+            $vals = array($o['order_token'],
+                          $o['shipping_name'],
+                          $o['status'],
+                          date('d M Y', strtotime($o['order_create_date'])),
+                          $o['amt_quoted']);
+            $link = sprintf('store.orders.php?tok=%s',
+                              $o['order_token']);
+            $table->addRow($vals, '', false, $link);
+        }
+
+
+    }
 }
 else {
     /** list all cm_categories in one big ass dump using HTML_Table **/
@@ -177,7 +206,7 @@ else {
 
     $header_row = array();
     if (!isset($user->control_header_cols)) {
-        $cols = array('cust_name', 'last_name', 'first_name', 'company', 'email');
+        $cols = array('cust_name', 'last_name', 'first_name', 'company', 'email', 'perms');
         foreach ($cols as $k) {
             if (!empty($user->colmap[$k])) {
                 $header_row[$k] = $user->colmap[$k][0];
@@ -189,7 +218,7 @@ else {
         $cols = array_keys($user->control_header_cols);
     }
 
-    if (isset($_GET['by']) and in_array($_GET['by'], $cols)) {
+    if (isset($_GET['by']) and (in_array($_GET['by'], $cols) or $_GET['by'] == 'num_orders')) {
         $orderby = $_GET['by'];
     }
     else {
@@ -197,8 +226,10 @@ else {
     }
     $orderdir = (isset($_GET['dir']) and $_GET['dir'] == 'D')? 'DESC' : 'ASC';
 
-    $table->addSortRow($header_row, null, null, 'TH', null);
     $cols = array_keys($header_row);
+
+    $header_row['num_orders'] = '#Orders';
+    $table->addSortRow($header_row, $orderby, null, 'TH', null, $orderdir);
 
     /** decide how to filter the results */
     $where = "1=1"; 
@@ -217,13 +248,13 @@ else {
     /** **/
 
     if (defined('CSHOP_ALLOW_ANON_ACCOUNT')) {
-        $sql = sprintf("SELECT id, %s, IFNULL(email, anon_email) AS email FROM %s WHERE $where ORDER BY %s %s",
+        $sql = sprintf("SELECT u.id, %s, IFNULL(email, anon_email) AS email, COUNT(o.user_id) AS num_orders FROM %s u LEFT JOIN cm_orders o ON (o.user_id = u.id) WHERE $where GROUP BY u.id ORDER BY %s %s",
                         join(',', $cols),
                         $user->get_table_name(),
                         $orderby, $orderdir);
     }
     else {
-        $sql = sprintf("SELECT id, %s FROM %s WHERE $where ORDER BY %s %s",
+        $sql = sprintf("SELECT u.id, %s, COUNT(o.user_id) AS num_orders FROM %s u LEFT JOIN cm_orders o ON (o.user_id = u.id) WHERE $where GROUP BY u.id ORDER BY %s %s",
                         join(',', $cols),
                         $user->get_table_name(),
                         $orderby, $orderdir);
@@ -237,16 +268,19 @@ else {
         for ($ptr = $offset; ($range == 0) or (($offset + $range) > $ptr); $ptr++) {
             if (! $row = $res->fetchRow(DB_FETCHMODE_ASSOC, $ptr)) break;
 
+            if (!empty($row['is_anon'])) $row['perms'] = 'anon';
+
             $vals = array();
             foreach ($cols as $k) {
                 $vals[] = $row[$k];
             }
+            $vals[] = $row['num_orders'];
 
             $link = sprintf('%s?%s=%d',
                               $_SERVER['PHP_SELF'], 
                               $reqIdKey,
                               $row['id']);
-            $table->addRow($vals, '', true, $link);
+            $table->addRow($vals, '', false, $link);
         }
     }
 
@@ -254,6 +288,7 @@ else {
     $smarty->assign('pager', $pager);
 
     /** create filter form **/
+    $colmap = $user->get_colmap();
     $filt = new filter_form('GET');
     $filt->left_td_style = '';
     $filt->field_prefix = '';
@@ -265,7 +300,6 @@ else {
     $filt->add_element('hdr2', array('email:', 'heading'));
     $filt->add_element('f_email', array('', 'text', null, array('size'=>20)));
     $filt->add_element('op_filter', array('GO', 'submit'));
-    $colmap = $user->get_colmap();
     if (isset($colmap['perms'])) {
         $filt->set_element_opts('f_perms', array(''=>'[ANY]') + $colmap['perms'][2]);
     }
@@ -374,6 +408,20 @@ $smarty->display('control/header.tpl');
 
      </div>
   </div>
+
+  <div style="margin: 5em 0">
+    <div class="headlineW">
+      <h2 class="productName headline">Order History</h2>
+    </div>
+    <div class="history" style="width: 854px">
+        <? if (!empty($orders)) { ?>
+          <?= $table->toHTML() ?>
+        <? } else { ?>
+            No orders found for this user.
+        <? } ?>
+    </div>
+  </div>
+
 <? } else { ?>
     <div style="width: 600px; padding: 4px;" align="right">
       <? $filt->display(); ?>

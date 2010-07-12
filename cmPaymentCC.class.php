@@ -30,7 +30,8 @@ class cmPaymentCC extends db_container {
                             );
 
     function get_colmap() {
-        // will this work?
+        /* add a field for the CSC - this is not really saved anywhere so it is not in the colmap */
+        $this->colmap['csc1'] = array('Card Security Code', 'text', null, array('size'=>4), true);
         $this->colmap['cctype'][2] = $this->get_payment_types();
         return $this->colmap;
     }
@@ -50,6 +51,11 @@ class cmPaymentCC extends db_container {
             }
         }
         return $this->cc_types;
+    }
+
+    function store($vals, $force_insert) {
+        if (isset($vals['csc1'])) unset($vals['csc1']);
+        return parent::store($vals, $force_insert);
     }
 
 
@@ -113,9 +119,12 @@ class cmPaymentCC extends db_container {
      * @param $vals ccno, ccexp
      * @return array one or more errors
      */
-    function check_values($vals) {
+    function check_values(&$vals) {
 
         $errs = array();
+
+        if (!empty($vals['ccno']))
+            $vals['ccno'] = $this->clean_ccno($vals['ccno']);
 
         // TODO return error codes, not strings
         if (empty($vals['ccno']) or empty($vals['ccexp'])) {

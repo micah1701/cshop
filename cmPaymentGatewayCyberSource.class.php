@@ -55,7 +55,7 @@ class cmPaymentGatewayCyberSource extends cmPaymentGateway {
 
     var $does_AVS = true;
 
-    function cmPaymentGatewayCyberSource(&$user, &$pay, &$order) {
+    function cmPaymentGatewayCyberSource($user, $pay, $order) {
         $this->_user =& $user;
         $this->_payment =& $pay;
         $this->_order =& $order;

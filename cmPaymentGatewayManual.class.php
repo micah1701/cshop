@@ -10,7 +10,7 @@ class cmPaymentGatewayManual extends cmPaymentGateway {
 
     var $_VERSION = '1.0';
 
-    function cmPaymentGatewayManual(&$user, &$pay, &$order) {
+    function cmPaymentGatewayManual($user, $pay, $order) {
         $this->_user =& $user;
         $this->_payment =& $pay;
         $this->_order =& $order;

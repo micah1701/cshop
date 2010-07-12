@@ -27,7 +27,7 @@ define ('CSHOP_CLASSES_USER', 'cmUser');
 define ('CSHOP_CLASSES_CART', 'cmCart');
 define ('CSHOP_CLASSES_COUPON', 'cmCoupon');
 define ('CSHOP_CLASSES_ORDER', 'cmOrder');
-define ('CSHOP_CLASSES_PAYMENT', 'cmPaymentGatewayManual');
+define ('CSHOP_CLASSES_PAYMENT_GATEWAY', 'cmPaymentGatewayManual');
 define ('CSHOP_CLASSES_PAYMETHOD', 'cmPaymentCC');
 define ('CSHOP_CLASSES_PRODUCT', 'cmProduct');
 define ('CSHOP_CLASSES_PRODUCT_CATEGORY', 'cmProductCategory');
@@ -193,8 +193,12 @@ define('CSHOP_CONTROL_SHOW_TRANSACTIONS', true);
 /** show controls to allow admin to place A/net transaction from the order detail page? */
 define('CSHOP_CONTROL_SHOW_TRANSACTION_CONTROLLER', false);
 
+/** enable use of wholesale/dealer pricing in storefront and cart? */
+define('CSHOP_ENABLE_WHOLESALE_PRICING', true);
+
 /* make formex use old-style uppercase field keys like TAG, CLASS, etc */
 define('FORMEX_BACK_COMPAT_UC_FIELD_KEYS', true);
+
 
 /** choices for "Class" under media tab in products admin. Max 16chars each */
 $CSHOP_MEDIA_CLASSES = array('listing'=>'Listing',

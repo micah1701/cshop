@@ -28,6 +28,8 @@ class cmProduct extends db_container {
 
     var $use_related_products = CSHOP_USE_RELATED_PRODUCTS;
 
+    var $wholesale_pricing = false;
+
 
 
     /* form definition arrays suitable for formex() */
@@ -844,7 +846,7 @@ class cmProduct extends db_container {
      */
     function get_price($invid=null, $options=null)
     {
-        $base = $this->fetch_baseprice();
+        $base = ($this->wholesale_pricing)? $this->fetch_listprice() : $this->fetch_baseprice();
 
         /* we might have an adder in the inventory table, check there */
         if (defined('CSHOP_INVENTORY_ALLOW_ADDER') && CSHOP_INVENTORY_ALLOW_ADDER && is_numeric($invid)) { 

@@ -47,7 +47,7 @@
             <td valign="top">
                 <strong>Customer:</strong>
             </td>
-            <td><a href="store.users.php?uid=<~ $user.id ~>">
+            <td><~ if !$user.is_anon ~><a href="store.users.php?uid=<~ $user.id ~>"><~/if~>
                     <~ if $user.cust_name ~>
                         <~ $user.cust_name ~>
                     <~ else ~>
@@ -152,11 +152,14 @@
             <strong>Payment Method:</strong>
           </td>
           <td>
-            <~ $orderinfo.payment_method ~> <br />
-          <~ if $orderinfo.cc_type ~>
-            <~ $orderinfo.cc_type ~>: <~ $orderinfo.cc_number ~><br />
-            Exp: <~ $orderinfo.cc_expires ~><br />
-          <~/if~>
+              <~ $orderinfo.payment_method ~> <br />
+              <~ if $orderinfo.cc_type ~>
+                  <~ $orderinfo.cc_type ~>: <~ $orderinfo.cc_number ~><br />
+                  Exp: <~ $orderinfo.cc_expires ~><br />
+              <~/if~>
+              <~ if $orderinfo.cc_owner ~>
+                  Ref: <strong><~ $orderinfo.cc_owner ~></strong><br />
+              <~/if~>
           </td>
         </tr>
         <tr>

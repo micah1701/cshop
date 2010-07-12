@@ -22,6 +22,8 @@ $SUCCESS = null;
 $errs = array();
 
 $recover_key_name = 'm';
+$pw_min_length = 6;
+$smarty->assign('pw_min_length', $pw_min_length);
 
 /** define set of actions this script can perform **/
 define('OP_GET_EMAIL', 'NEXT STEP');
@@ -30,7 +32,7 @@ define('OP_RESET_PASS', 'RESET PASSWORD');
 define('OP_RESET_PASS_PROC', 'DO RESET PASSWORD');
 
 
-$user = new cmUser($pdb);
+$user = cmClassFactory::getInstanceOf(CSHOP_CLASSES_USER, $pdb);
 $mosh = new mosh_tool();
 
 
@@ -74,7 +76,7 @@ if ($ACTION == OP_SEND_TOKEN) { // check email addr and send email to user
 elseif ($ACTION == OP_RESET_PASS) { // link in email was clicked - check it out...
     $err = NULL;
     $SHOWFORM = NULL;
-    if (!preg_match('/^[a-f0-9]{16}$/', $_GET[$recover_key_name])) {
+    if (!preg_match('/^[a-f0-9]+$/', $_GET[$recover_key_name])) {
         $err = "MASH_INCOMPLETE";
     }
     elseif (!preg_match('/^[0-9]+$/', $_GET['u'])) {
@@ -128,21 +130,25 @@ elseif ($ACTION == OP_RESET_PASS_PROC) { // new password entered - check and cha
     elseif (strcmp($newpw, $_POST['f_newpass2']) != 0) {
         $err = "PASS_NO_MATCH";
     }
-    elseif (strlen($newpw) < 5 or !preg_match('/[0-9]+/', $newpw)) {
+    elseif (strlen($newpw) < $pw_min_length or !preg_match('/[0-9]+/', $newpw)) {
         $err = "PASS_TOO_EASY";
     }
     else { // all passed. Change the pw in the DB and congratulate the user.
         unset($_SESSION['change_password_uniq']);
         $user->set_id($_POST['f_uid']);
-        if (!$user->fetch('username')) { // just make sure the is was valid
+        if (!$userinfo = $user->fetch(array('username', 'email'))) { // just make sure the is was valid
             $err = "INVALID_UID";
         }
         else {
             $res = $user->change_pword($newpw);
-            if (PEAR::isError($res)) {
+            if (PEAR::isError($res) and $res->getMessage() != 'warning: 0 rows were changed') {
                 $err = $res->getMessage();
             }
+            // added these 2 $_SESSION lines as a hack for momenta :/
+            $_SESSION['email'] = $user->get_email();
+            $_SESSION['name'] = $user->get_full_name();
             $user->force_pword_change(false);
+            $auth->force_preauth($user->get_id()); 
         }
     }
 
