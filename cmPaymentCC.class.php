@@ -53,7 +53,7 @@ class cmPaymentCC extends db_container {
         return $this->cc_types;
     }
 
-    function store($vals, $force_insert) {
+    function store($vals, $force_insert=false) {
         if (isset($vals['csc1'])) unset($vals['csc1']);
         return parent::store($vals, $force_insert);
     }

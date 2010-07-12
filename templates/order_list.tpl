@@ -18,7 +18,7 @@
                 Status
               </th>
               <th>
-                Amount Billed
+                Amount
               </th>
               <th>
                 &nbsp;
@@ -39,7 +39,7 @@
                 <~ $o.status ~>
               </td>
               <td>
-                $<~ $o.amt_billed_to_date ~>
+                $<~ $o.amt_quoted ~>
               </td>
               <td>
                 <a href="/cart/order_detail.php?tok=<~ $o.order_token ~>">MORE INFO &raquo;&raquo;</a>
