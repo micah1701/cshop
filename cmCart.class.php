@@ -909,7 +909,9 @@ class cmCart extends db_container {
          $sql = sprintf("SELECT SUM(qty * price) FROM cm_cart_items ci
                          WHERE EXISTS 
                                 (SELECT NULL FROM cm_products_categories pc, cm_categories c
-                                 WHERE ci.product_id = pc.cm_products_id AND c.is_taxable = 1)
+                                 WHERE ci.product_id = pc.cm_products_id 
+                                   AND pc.cm_categories_id = c.id 
+                                   AND c.is_taxable = 1)
                          AND cart_id = %d",
                          $this->get_id());
          $amt = intval($this->db->getOne($sql));
