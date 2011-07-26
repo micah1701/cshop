@@ -417,7 +417,7 @@ else {
             $table->addRow(array_values($vals), $class, false, $link);
         }
 
-        $pager = new res_pager($offset, $range, $order->numRows);
+        $pager = new res_pager($offset, $range, $order->numRows, 0, 26);
         $smarty->assign('pager', $pager);
 
         $sep = (strpos($_SERVER['REQUEST_URI'], '?') === false)? '?' : '&';

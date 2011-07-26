@@ -284,7 +284,7 @@ else {
         }
     }
 
-    $pager = new res_pager($offset, $range, $numrows);
+    $pager = new res_pager($offset, $range, $numrows, 0, 26);
     $smarty->assign('pager', $pager);
 
     /** create filter form **/
