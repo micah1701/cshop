@@ -229,7 +229,7 @@ a.printInvoice {
 
 div.headlineW {
     width: 860px;
-    margin: 0 0 8px 0;
+    margin: 13px 0 8px 0;
     position: relative;
 }
 h2.headline {
@@ -566,6 +566,7 @@ td.formLabelCell {
     max-width: 878px;
 }
 .csvVersion a {
+    display: block;
     font-size: 90%;
     background: url(img/csv_icon.gif) right center no-repeat;
     height: 17px;
