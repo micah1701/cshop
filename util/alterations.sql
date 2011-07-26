@@ -332,6 +332,7 @@ CREATE TABLE cm_bundles (
     PRIMARY KEY (`id`)
 ) Engine=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
+ALTER TABLE cm_categories ENGINE InnoDB;
 CREATE TABLE `cm_bundles_categories` (
   id int unsigned not null AUTO_INCREMENT,
   `cm_bundles_id` int(10) unsigned NOT NULL,
@@ -373,11 +374,15 @@ ALTER TABLE cm_cart_items ADD is_bundle bool;
 
 
 -- Tue Apr 13 15:09:40 EDT 2010
+ALTER TABLE cm_inventory ENGINE InnoDB;
+ALTER TABLE cm_products ENGINE InnoDB;
+
 ALTER TABLE cm_inventory ADD KEY `fk_pid_inv` (`product_id`);
 ALTER TABLE cm_inventory ADD CONSTRAINT `cm_inventory_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `cm_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 
 -- Fri Apr 16 14:06:04 EDT 2010
+ALTER TABLE cm_products_categories ENGINE InnoDB;
 ALTER TABLE cm_products_categories ADD FOREIGN KEY (cm_categories_id) REFERENCES cm_categories (id) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE cm_products_categories ADD FOREIGN KEY (cm_products_id) REFERENCES cm_products (id) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -415,22 +420,32 @@ ALTER TABLE cm_order_items ADD UNIQUE (download_token);
 
 -- Fri Apr 30 14:37:30 EDT 2010
 delete from cm_order_transactions where cm_orders_id not in (select id from cm_orders);
+ALTER TABLE cm_orders ENGINE InnoDB;
+ALTER TABLE cm_order_transactions ENGINE InnoDB;
 ALTER TABLE cm_order_transactions MODIFY cm_orders_id int not null;
 ALTER TABLE cm_order_transactions ADD FOREIGN KEY (cm_orders_id) REFERENCES cm_orders (id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 delete from cm_order_history where order_id not in (select id from cm_orders);
+ALTER TABLE cm_order_history ENGINE InnoDB;
 ALTER TABLE cm_order_history MODIFY order_id int not null;
 ALTER TABLE cm_order_history ADD FOREIGN KEY (order_id) REFERENCES cm_orders (id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 delete from cm_order_items where order_id not in (select id from cm_orders);
+ALTER TABLE cm_order_items ENGINE InnoDB;
 ALTER TABLE cm_order_items MODIFY order_id int not null;
 ALTER TABLE cm_order_items ADD FOREIGN KEY (order_id) REFERENCES cm_orders (id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Tue May 25 20:56:57 EDT 2010
 ALTER TABLE auth_user RENAME cm_auth_user;
+ALTER TABLE cm_auth_user ENGINE InnoDB;
 ALTER TABLE cm_orders MODIFY user_id INT(10) UNSIGNED NOT NULL;
+-- !!! 
+DELETE FROM cm_orders where user_id NOT IN (SELECT id from cm_auth_user);
+-- !!! 
 ALTER TABLE cm_orders ADD FOREIGN KEY (user_id) REFERENCES cm_auth_user (id) ON DELETE NO ACTIOn ON UPDATE CASCADE;
 
+ALTER TABLE cm_address_book ENGINE InnoDB;
+DELETE FROM cm_address_book WHERE user_id NOT IN (SELECT id from cm_auth_user);
 ALTER TABLE cm_address_book MODIFY user_id int(10) unsigned not null;
 ALTER TABLE cm_address_book ADD FOREIGN KEY (user_id) REFERENCES cm_auth_user (id) ON DELETE CASCADE ON UPDATE CASCADE;
 
