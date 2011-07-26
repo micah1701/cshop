@@ -209,7 +209,6 @@ $invform = $fex->get_struct();
 <head>
 <title>inventory control framelet</title>
 <link rel="stylesheet" href="/control/cshop/store.css" type="text/css">
-<link rel="stylesheet" href="/control/control.css" type="text/css">
 <script type="text/javascript">
 <!--
     var attribFields = new Array('f_sizes', 'f_colors');
