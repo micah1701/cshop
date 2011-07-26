@@ -99,7 +99,7 @@ elseif ($ACTION == OP_BY_USER) {
     $sql = "SELECT user_id, CONCAT(u.fname, ' ', u.lname, ' [', u.email, ']') AS name
                 , SUM(amt_billed_to_date) as sum
                 , COUNT(o.id) as num
-            FROM cm_orders o left join auth_user u ON (u.id = o.user_id) 
+            FROM cm_orders o left join cm_auth_user u ON (u.id = o.user_id) 
             WHERE orders_status != ".CM_ORDER_STATUS_CANCELLED." 
             GROUP BY user_id 
             ORDER BY %s %s";
