@@ -46,12 +46,29 @@ $cmOrder = new $orderclass($pdb);
 $c = CSHOP_CLASSES_PRODUCT;
 $cmProduct = new $c($pdb);
 
-
-
 $ACTION = OP_ORDERS_PRODUCTS;
 if (isset($_GET['report'])) {
     $ACTION = $_GET['report'];
 }
+
+
+
+/* decide what month we are on */
+if (isset($_GET['m']) && preg_match('/^\d{4}-\d{2}$/', $_GET['m'])) {
+    $req_month = $_GET['m'];
+}
+else {
+    $req_month = date('Y-m');
+}
+
+/* get next and prev months links */
+$heading = date('M Y', strtotime($req_month . '-01'));
+list($y, $m) = split('-', $req_month, 2);
+$heading_nextlink = "?report=$ACTION&m=" . date('Y-m', mktime(0, 0, 0, intval($m)+1,   1,   intval($y)));
+$heading_prevlink = "?report=$ACTION&m=" . date('Y-m', mktime(0, 0, 0, intval($m)-1,   1,   intval($y)));
+$xgets[] = "m=$req_month";
+
+
 
 
 
@@ -96,34 +113,27 @@ elseif ($ACTION == OP_BY_PRODUCT) {
     $def_orby = 'prcnt';
 }
 elseif ($ACTION == OP_BY_USER) {
-    $sql = "SELECT user_id, CONCAT(u.fname, ' ', u.lname, ' [', u.email, ']') AS name
+
+    /* create a condition clause based on month and order status */
+    $where = "orders_status != ".CM_ORDER_STATUS_CANCELLED; 
+    $where .= ' AND DATE_FORMAT(order_create_date, "%%Y-%%m") = "' . $req_month . '"';
+
+    $sql = "SELECT user_id 
+                , u.cust_name
+                , IFNULL(u.email, u.anon_email) AS email
+                , (CASE WHEN u.anon_email IS NULL THEN '' ELSE 'Guest' END) AS is_guest
                 , SUM(amt_billed_to_date) as sum
                 , COUNT(o.id) as num
             FROM cm_orders o left join cm_auth_user u ON (u.id = o.user_id) 
-            WHERE orders_status != ".CM_ORDER_STATUS_CANCELLED." 
+            WHERE $where
             GROUP BY user_id 
             ORDER BY %s %s";
-    $header_row = array('name'=> 'Customer', 'num'=>'#Orders','sum'=>'Total');
+    $header_row = array('cust_name'=> 'Customer', 'email' => 'email', 'is_guest' => 'Guest', 'num'=>'#Orders', 'sum'=>'Total');
     $link_fmt = 'store.orders.php?uid=%d&f_oid=&op_filter=GO';
     $link_vals = array('user_id');
     $def_orby = 'sum';
 }
 else { // if ($ACTION == OP_ORDERS_PRODUCTS) {
-
-    /* decide what month we are on */
-    if (isset($_GET['m']) && preg_match('/^\d{4}-\d{2}$/', $_GET['m'])) {
-        $req_month = $_GET['m'];
-    }
-    else {
-        $req_month = date('Y-m');
-    }
-
-    /* get next and prev months links */
-    $heading = date('M Y', strtotime($req_month . '-01'));
-    list($y, $m) = split('-', $req_month, 2);
-    $heading_nextlink = '?m=' . date('Y-m', mktime(0, 0, 0, intval($m)+1,   1,   intval($y)));
-    $heading_prevlink = '?m=' . date('Y-m', mktime(0, 0, 0, intval($m)-1,   1,   intval($y)));
-    $xgets[] = "m=$req_month";
 
     /* set up format for header sort links */
     $link_fmt = 'store.orders.php?tok=%s&op_filter=GO';
