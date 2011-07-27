@@ -328,15 +328,20 @@ if ($ACTION == OP_VIEW) {
 }
 else {
     /** create filter form **/
+    $filter_columns = array('order.id'=>'Order ID', 'order.token' => 'Order Number', 'user.email' => 'customer email', 'user.name' => 'customer name');
     $filt = new filter_form('GET');
     $filt->left_td_style = '';
+    $filt->right_td_style = '';
     $filt->field_prefix = '';
-    $filt->add_element('hdr1', array('<b>Filter by::</b> Status:', 'heading'));
+    $filt->add_element('hdr1', array('<b>Filter by::</b>', 'heading'));
+    $filt->add_element('fc', array('', 'select', null));
+    $filt->add_element('hdr2', array('=', 'heading'));
+    $filt->add_element('fq', array('', 'text', null, array('size'=>15)));
+    $filt->add_element('hdr3', array('&nbsp;Status:', 'heading'));
     $filt->add_element('status', array('', 'select', null));
-    $filt->add_element('hdr2', array('Order ID:', 'heading'));
-    $filt->add_element('f_oid', array('', 'text', null, array('size'=>4)));
     $filt->add_element('op_filter', array('GO', 'submit'));
     $filt->set_element_opts('status', array(''=>'[ANY]') + $order->get_statuses());
+    $filt->set_element_opts('fc', $filter_columns);
 
 
     /** decide on which result page to show **/
@@ -377,6 +382,22 @@ else {
             $w[] = sprintf('DATE_FORMAT(ord.order_create_date, \'%%Y-%%m\') = \'%s\'',
                            addslashes($_GET['month']));
         }
+
+        if (!empty($_GET['fc']) and in_array($_GET['fc'], array_keys($filter_columns))) {
+            if ($_GET['fc'] == 'order.id') {
+                $w[] = sprintf('ord.id = %d', $_GET['fq']);
+            }
+            elseif ($_GET['fc'] == 'order.token') {
+                $w[] = sprintf('ord.order_token = %s', $pdb->quote($_GET['fq']));
+            }
+            elseif ($_GET['fc'] == 'user.email') {
+                $w[] = sprintf('u.email LIKE %s', $pdb->quote($_GET['fq']));
+            }
+            elseif ($_GET['fc'] == 'user.name' and strlen($_GET['fq']) > 2) {
+                $w[] = 'u.cust_name LIKE \'%%'.addslashes($_GET['fq']).'%%\'';
+            }
+        }
+
         if (count($w)) {
             $where = join(' AND ', $w);
         }
