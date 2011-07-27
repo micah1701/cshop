@@ -285,13 +285,12 @@ $numrows = $res->numRows();
 
 if ($ACTION == OP_ORDERS_PRODUCTS) {
     /* add two rows for the sums of order totals and product counts */
-    foreach (array('table_sums', 'product_counts', 'num_orders') as $var) {
+    foreach (array('table_sums' => 'SALE TOTAL:', 'product_counts' => '#sold', 'num_orders'=>'#orders') as $var => $label) {
         $vals = array();
         foreach (array_keys($header_row) as $k) {
             $vals[] = (isset(${$var}[$k]))? ${$var}[$k] : null;
         }
-        if ($var == 'product_counts') $vals[0] = '#sold:';
-        else $vals[0] = 'TOTALS:';
+        $vals[0] = $label;
         $table->addRow($vals, 'tfoot');
     }
 }
