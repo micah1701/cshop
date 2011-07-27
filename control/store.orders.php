@@ -373,6 +373,10 @@ else {
             $w[] = sprintf('DATE_FORMAT(ord.order_create_date, \'%%b %%Y\') = \'%s\'',
                            addslashes($_GET['f_month']));
         }
+        if (!empty($_GET['month'])) {
+            $w[] = sprintf('DATE_FORMAT(ord.order_create_date, \'%%Y-%%m\') = \'%s\'',
+                           addslashes($_GET['month']));
+        }
         if (count($w)) {
             $where = join(' AND ', $w);
         }

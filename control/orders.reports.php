@@ -129,7 +129,7 @@ elseif ($ACTION == OP_BY_USER) {
             GROUP BY user_id 
             ORDER BY %s %s";
     $header_row = array('cust_name'=> 'Customer', 'email' => 'email', 'is_guest' => 'Guest', 'num'=>'#Orders', 'sum'=>'Total');
-    $link_fmt = 'store.orders.php?uid=%d&f_oid=&op_filter=GO';
+    $link_fmt = "store.orders.php?uid=%d&month=$req_month&f_oid=&op_filter=GO";
     $link_vals = array('user_id');
     $def_orby = 'sum';
 }
