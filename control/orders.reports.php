@@ -162,15 +162,6 @@ else { // if ($ACTION == OP_ORDERS_PRODUCTS) {
     /* the base columns for the report, shortly to be added to. */
     $header_row = array('order_token'=>'Order Number', 'datef' => 'Date', 'ship_total'=>'Shipping', 'tax_total'=>'Tax', 'amt_quoted' => 'Total');
 
-
-    /* create a column for each active product in the DB */
-    $products = $cmProduct->fetch_any(array('id', 'title', 'sku'), 0, 0, 'title', 'is_active = 1');
-    foreach ($products as $product) {
-        $txt = sprintf('%s<br>%s%s', $product['sku'], substr($product['title'], 0, 30), (strlen($product['title']) > 30)? '...' : ''); 
-        $header_row['product_'.$product['id']] = $txt;
-    }
-
-
     $where = preg_replace('/%%/', '%', $where); // dupe %'s in sprintf format cause problems.
 
     // get sums of costs and product sales total for summary footer
@@ -178,14 +169,24 @@ else { // if ($ACTION == OP_ORDERS_PRODUCTS) {
                  FROM cm_orders WHERE $where";
     $table_sums = $pdb->getRow($sql_sums);
     $product_counts = array(); 
+    $num_orders = array(); 
 
-    $sql_sums_products = "SELECT product_id, SUM(qty*price) AS tot, SUM(qty) AS cnt 
-                          FROM cm_order_items oi, cm_orders o WHERE $where AND o.id=oi.order_id 
-                          GROUP BY product_id";
+    // for each product sold in the time period, get the stats on total amounts sold and #of orders 
+    $sql_sums_products = "SELECT p.id, p.title, p.sku, SUM(qty*oi.price) AS tot, SUM(oi.qty) AS cnt, COUNT(o.id) AS num_orders 
+                          FROM cm_orders o JOIN cm_order_items oi ON o.id = oi.order_id 
+                                           JOIN cm_products p ON oi.product_id = p.id 
+                          WHERE $where AND o.id=oi.order_id 
+                          GROUP BY product_id
+                          ORDER BY num_orders DESC";
     $res = $pdb->query($sql_sums_products);
-    while ($row = $res->fetchRow()) {
-        $table_sums['product_'.$row['product_id']] = $row['tot'];
-        $product_counts['product_'.$row['product_id']] = $row['cnt'];
+
+    while ($gr_product = $res->fetchRow()) {
+        $txt = sprintf('%s%s<br>[%s]', substr($gr_product['title'], 0, 30), (strlen($gr_product['title']) > 30)? '...' : '', $gr_product['sku']); 
+        $header_row['product_'.$gr_product['id']] = $txt;
+
+        $table_sums['product_'.$gr_product['id']] = $gr_product['tot'];
+        $num_orders['product_'.$gr_product['id']] = $gr_product['num_orders'];
+        $product_counts['product_'.$gr_product['id']] = $gr_product['cnt'];
     }
 
     // need to add a column for each type of tax collected, with sums
@@ -284,7 +285,7 @@ $numrows = $res->numRows();
 
 if ($ACTION == OP_ORDERS_PRODUCTS) {
     /* add two rows for the sums of order totals and product counts */
-    foreach (array('table_sums', 'product_counts') as $var) {
+    foreach (array('table_sums', 'product_counts', 'num_orders') as $var) {
         $vals = array();
         foreach (array_keys($header_row) as $k) {
             $vals[] = (isset(${$var}[$k]))? ${$var}[$k] : null;
