@@ -1120,9 +1120,18 @@ class cmCart extends db_container {
                 }
                 if (PEAR::isError($res)) // sux
                     trigger_error("Error in cmCart::pull_inventory() for line item {$item['id']}: " . $res->getMessage(), E_USER_WARNING);
+
+                $this->after_product_purchase($item['product_id'], $item['qty'], $item['price']);
             }
         }
     }
+
+
+    /*
+     * callback hook for actions to take after a given line item is finalized 
+     * and purchased as part of a completed order
+     */
+    function after_product_purchase($pid, $qty, $price) { }
 
     /**
      * for each item in the cart, add the given qty's back to the inventory.
