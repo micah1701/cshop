@@ -454,3 +454,8 @@ ALTER TABLE cm_address_book ADD FOREIGN KEY (user_id) REFERENCES cm_auth_user (i
 ALTER TABLE cm_cart ADD uses_wholesale_pricing bool;
 ALTER TABLE cm_orders ADD uses_wholesale_pricing bool;
 ALTER TABLE cm_auth_user ADD is_active bool DEFAULT 1;
+
+
+-- Fri Jul 29 13:32:41 EDT 2011
+ALTER TABLE cm_giftcards ADD transaction_id VARCHAR(32); 
+

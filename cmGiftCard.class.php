@@ -58,28 +58,43 @@ class cmGiftCard extends db_container {
         if (PEAR::isError($xmlresp)) { return $xmlresp; }
         elseif (empty($xmlresp)) {  return $this->raiseError("No response from giftcard gateway"); }
 
-        $dom =& $this->_create_dom_obj($xmlresp);
-        if (!is_object($dom)) { return $this->raiseError("Could not parse gateway response"); }
+        $dom =& $this->_parse_xml_response($xmlresp);
+        if (PEAR::isError($dom)) return $dom;
 
-        if (! ($node_code =& $this->_dom_get_node($dom, 'Response_Code'))) {
-            return $this->raiseError('Could not understand giftcard gateway response');
-        }
-        else {
-            if ($this->_dom_get_node_content($node_code) != '00') { // that means its bad
-                $node_res =& $this->_dom_get_node($dom, 'Response_Text');
-                return $this->raiseError('Failed to get gift card balance: '. $this->_dom_get_node_content($node_res));
-            }
-            else {
-                if ( $node_balance =& $this->_dom_get_node($dom, 'Amount_Balance') ) {
-                    $bal = floatval($this->_dom_get_node_content($node_balance));
-                    if ($bal > 0) { 
-                        return $bal;
-                        // foster 19 nov 2009 - no it is not in cents, it is in real dollars
-                        // sprintf("%.02f", $bal/100);// Amount_Balance is in "cents"
-                    }
-                }
+        if ( $node_balance =& $this->_dom_get_node($dom, 'Amount_Balance') ) {
+            $bal = floatval($this->_dom_get_node_content($node_balance));
+            if ($bal > 0) { 
+                return $bal;
+                // foster 19 nov 2009 - no it is not in cents, it is in real dollars
+                // sprintf("%.02f", $bal/100);// Amount_Balance is in "cents"
             }
         }
+    }
+
+
+
+    /**
+     * create a new giftcard in the STS system, saving the new GC number and associating with
+     * a complete order
+     */
+    function create(&$order, $merch_id, $amount) {
+        $xmlstr = $this->_build_creation_request($merch_id, $amount);
+        $xmlresp = $this->_send_request($xmlstr);
+        if (PEAR::isError($xmlresp)) { return $xmlresp; }
+        elseif (empty($xmlresp)) {  return $this->raiseError("No response from giftcard gateway"); }
+
+        $dom =& $this->_parse_xml_response($xmlresp);
+        if (PEAR::isError($dom)) return $dom;
+
+        $sxml = new SimpleXMLElement($xmlresp);
+
+        $vals = array('gc_amt' => $sxml->Amount_Balance,
+                      'order_id' => $order->get_id(),
+                      'gc_no' => $sxml->Card_Number,
+                      'transaction_id' => $sxml->Transaction_ID,
+                      'auth_reference' => $sxml->Auth_Reference);
+
+        return $this->store($vals);
     }
 
 
@@ -106,6 +121,26 @@ class cmGiftCard extends db_container {
         if (PEAR::isError($xmlresp)) { return $xmlresp; }
         elseif (empty($xmlresp)) {  return $this->raiseError("No response from giftcard gateway"); }
 
+        $dom =& $this->_parse_xml_response($xmlresp);
+        if (PEAR::isError($dom)) return $dom;
+
+        $node_ref =& $this->_dom_get_node($dom, 'Auth_Reference');
+        $ref_code = $this->_dom_get_node_content($node_ref);
+
+        $vals = array('redeemed_amt' => $myvals['gc_amt'],
+                      'order_id' => $order->get_id(),
+                      'auth_reference' => $ref_code);
+
+        return $this->store($vals);
+    }
+
+
+    /**
+     * basic common parsing of STS gateway response XML, checking for errors in Response_Code
+     * and return a PEAR::Error if found. Otherwise returns a DOM object
+     */
+    function _parse_xml_response($xmlresp) {
+
         $dom =& $this->_create_dom_obj($xmlresp);
         if (!is_object($dom)) { return $this->raiseError("Could not parse gateway response"); }
 
@@ -118,17 +153,11 @@ class cmGiftCard extends db_container {
                 return $this->raiseError('Failed to redeem gift card balance: '. $this->_dom_get_node_content($node_res));
             }
             else {
-                $node_ref =& $this->_dom_get_node($dom, 'Auth_Reference');
-                $ref_code = $this->_dom_get_node_content($node_ref);
-
-                $vals = array('redeemed_amt' => $myvals['gc_amt'],
-                              'order_id' => $order->get_id(),
-                              'auth_reference' => $ref_code);
-
-                return $this->store($vals);
+                return $dom;
             }
         }
     }
+
 
 
     /**
@@ -194,6 +223,17 @@ class cmGiftCard extends db_container {
                       'POS_Entry_Mode' => 'M',
                       'Action_Code' => '01',
                       'Card_Number' => $card_no,
+                      'Transaction_Amount' => $amt);
+        return $this->_build_simple_xml_req($vals); 
+    }
+
+    function _build_creation_request($merch_id, $amt) {
+        $vals = array('Merchant_Number' => $merch_id,
+                      'Terminal_ID' => CSHOP_GIFTCARD_TERMINALID,
+                      'Trans_Type' => 'N',
+                      'POS_Entry_Mode' => 'M',
+                      'Action_Code' => '06',
+                      'Card_Number' => 'NewAccountRQ', #special card# for new card requests, per Ray's email
                       'Transaction_Amount' => $amt);
         return $this->_build_simple_xml_req($vals); 
     }
