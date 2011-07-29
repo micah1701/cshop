@@ -712,7 +712,7 @@ class cmOrder extends db_container {
             }
 
             $cart->pull_inventory();
-            $cart->set_purchased();
+            $cart->set_purchased($this);
 
             $this->store_history($cart->get_user_comment(), true); // notify user here
             $cart->set_user_comment('');
@@ -725,7 +725,12 @@ class cmOrder extends db_container {
         }
         $this->db->autoCommit(true);
 
+        $this->after_finalize();
     }
+
+
+    /* empty hook to be called when order is finalized and booked */
+    function after_finalize() { }
 
     /**
      * similar to cmCart::fetch_totals()
