@@ -150,7 +150,7 @@ class cmGiftCard extends db_container {
         else {
             if ($this->_dom_get_node_content($node_code) != '00') { // that means its bad
                 $node_res =& $this->_dom_get_node($dom, 'Response_Text');
-                return $this->raiseError('Failed to redeem gift card balance: '. $this->_dom_get_node_content($node_res));
+                return $this->raiseError('Gift Card Transaction API Error: '. $this->_dom_get_node_content($node_res));
             }
             else {
                 return $dom;
