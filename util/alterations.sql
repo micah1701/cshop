@@ -437,6 +437,10 @@ ALTER TABLE cm_order_items ADD FOREIGN KEY (order_id) REFERENCES cm_orders (id) 
 
 -- Tue May 25 20:56:57 EDT 2010
 ALTER TABLE auth_user RENAME cm_auth_user;
+
+ALTER TABLE auth_user_seq RENAME cm_auth_user_seq;
+UPDATE cm_auth_user_seq SET id = (SELECT MAX(id)+1000 FROM cm_auth_user);
+
 ALTER TABLE cm_auth_user ENGINE InnoDB;
 ALTER TABLE cm_orders MODIFY user_id INT(10) UNSIGNED NOT NULL;
 -- !!! 
@@ -458,4 +462,5 @@ ALTER TABLE cm_auth_user ADD is_active bool DEFAULT 1;
 
 -- Fri Jul 29 13:32:41 EDT 2011
 ALTER TABLE cm_giftcards ADD transaction_id VARCHAR(32); 
+
 
