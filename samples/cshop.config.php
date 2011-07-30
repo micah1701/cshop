@@ -13,6 +13,7 @@
 
 /*
  * @changelog:
+ * 1.5.6 : 2011/07/29 swipeit upgrade, changes to cmGiftcard and add Order post-finalize hooks
  * 1.5.5 : 2009/10/28 add product bundles (puredark)
  * 1.5.4 : 2009/09/12 puredark changes and additions
  * 1.5.3 : 2009/01/02 
@@ -20,7 +21,7 @@
  * 1.5.0 : 2008/02/05 new INFINITE CATS (for EXR) - NOT BC
  * 1.4 : 2008/01/15 control product tabs re-done w jQuery; add cmCategory::get_featured_products()
  */
-define ('CSHOP_VERSION', '1.5.5');
+define ('CSHOP_VERSION', '1.5.6');
 
 define ('CSHOP_CLASSES_ADDRESSBOOK', 'cmAddressBook');
 define ('CSHOP_CLASSES_USER', 'cmUser');
