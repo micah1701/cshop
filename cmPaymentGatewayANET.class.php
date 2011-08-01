@@ -62,6 +62,9 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
     /* if true, will pretend that all authorization requests succeed. For testing, of course. */
     var $_FAKE_SUCCESS = false;
 
+    /* default type of transaction to run against A.net. Should be AUTH_ONLY or AUTH_CAPTURE */
+    var $_default_transaction_type = 'AUTH_ONLY';
+
 
     function __construct($user, $pay, $order) {
         $this->_user =& $user;
