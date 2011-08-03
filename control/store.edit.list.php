@@ -112,7 +112,7 @@ for ($ptr=$offset; $ptr<$ptrlimit; $ptr++) {
                    $row['sku'],
                    ($row['is_active'])? 'Y' : 'N',
                    $row['order_weight'],
-                   ($row['feature_rank'] == 0)? '-' : $row['feature_rank'],
+                   (empty($row['feature_rank']))? '-' : $row['feature_rank'],
                    ); 
     // store.edit.php?nid=444
     $link = sprintf('store.edit.php?productid=%d', $row['id']);

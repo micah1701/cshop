@@ -611,7 +611,7 @@ class cmProduct extends db_container {
         }
 
         if (!$orby) {
-            $orby = "p.feature_rank, p.title, p.id";
+            $orby = "p.title, p.id";
         }
 
         $sql .= "\n) ORDER BY $orby";

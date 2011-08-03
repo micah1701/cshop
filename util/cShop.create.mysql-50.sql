@@ -340,7 +340,7 @@ CREATE TABLE `cm_products` (
   `is_active` tinyint(1) default NULL,
   `is_featured` tinyint(1) default NULL,
   `is_digital` tinyint(1) default NULL,
-  `feature_rank` int(10) unsigned NOT NULL default '0',
+  `feature_rank` tinyint(4) unsigned DEFAULT NULL,
   `sku` varchar(64) default NULL,
   `description` text,
   `size_attr` text,

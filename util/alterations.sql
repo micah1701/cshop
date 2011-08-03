@@ -464,3 +464,6 @@ ALTER TABLE cm_auth_user ADD is_active bool DEFAULT 1;
 ALTER TABLE cm_giftcards ADD transaction_id VARCHAR(32); 
 
 
+-- Wed Aug  3 16:07:47 EDT 2011
+ALTER TABLE cm_products MODIFY feature_rank tinyint(4) unsigned;
+
