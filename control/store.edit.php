@@ -237,7 +237,6 @@ elseif ($ACTION == OP_KILL) {
 
 
 if ($SHOWFORM) {
-    $fex->js_src_inline = true;
     $fex->left_td_style = '';
 
     if ($ACTION == OP_EDIT) {
