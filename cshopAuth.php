@@ -49,8 +49,8 @@ class cshopAuth extends jen_Auth {
                 else
                     $this->auth["perm"] = 1;
 
-                $this->auth["user_full_name"] = $row["first_name"] . " " . $row["last_name"];
-                $this->auth["user_first_name"] = $row["first_name"];
+                $this->auth["user_full_name"] = $row["fname"] . " " . $row["lname"];
+                $this->auth["user_first_name"] = $row["fname"];
                 #$this->auth["user_company"] = $row["company"];
                 $this->auth["user_email"] = $row["email"];
                 $this->auth["auth_id"] = $row["id"];
