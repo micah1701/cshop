@@ -40,5 +40,11 @@ if (isset($smarty) and is_object($smarty)) {
 
     /* add a custom Smarty modifier to clean up strings to avoid ugluy URLs. */
     $smarty->register_modifier('cleanforurl', 'smarty_modifier_cleanforurl');
+
+    if (defined('CSHOP_EDITOR_USE_MARKDOWN') && CSHOP_EDITOR_USE_MARKDOWN) {
+        /* add markdown syn */
+        include_once('modifier.markdown.php');
+        $smarty->register_modifier('markdown', 'smarty_modifier_markdown');
+    }
 }
 
