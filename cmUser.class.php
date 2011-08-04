@@ -419,10 +419,17 @@ EOM;
       * return the user's full name. 
      */
     function get_full_name() {
-        if ($this->_id && empty($this->header['fname'])) {
-            $this->fetch(array('fname', 'lname'));
+        if ($this->_id && empty($this->header['full_name'])) {
+            $uservals = $this->fetch();
+
+            if (empty($uservals['cust_name']) and !empty($uservals['fname']))
+                $uservals['cust_name'] = $uservals['fname'] . ' ' . $uservals['lname'];
+            elseif (empty($uservals['cust_name']) and !empty($uservals['first_name']))
+                $uservals['cust_name'] = $uservals['first_name'] . ' ' . $uservals['last_name'];
+
+            $this->header['full_name'] = $uservals['cust_name'];
         }
-        return sprintf('%s %s', $this->header['fname'], $this->header['lname']);
+        return $this->header['full_name'];
     }
 
 

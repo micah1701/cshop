@@ -706,6 +706,8 @@ class cmOrder extends db_container {
     function finalize(&$pay, &$gate, &$cart) {
         $this->db->autoCommit(false);
         try {
+            $this->before_finalize();
+
             if ($pay) {
                 $this->store_payment_info($pay, $gate);
                 $pay->kill(); // erase ccno from db!
@@ -729,7 +731,10 @@ class cmOrder extends db_container {
     }
 
 
-    /* empty hook to be called when order is finalized and booked */
+    /* empty hook to be called in finalize() before order is captured */
+    function before_finalize() { }
+
+    /* empty hook to be called after order is finalized and booked and committed */
     function after_finalize() { }
 
     /**
@@ -863,11 +868,6 @@ class cmOrder extends db_container {
         $uservals = $user->fetch();
         if (empty($uservals['email'])) $uservals['email'] = $user->get_email();
 
-        if (empty($uservals['cust_name']) and !empty($uservals['fname']))
-            $uservals['cust_name'] = $uservals['fname'] . ' ' . $uservals['lname'];
-        elseif (empty($uservals['cust_name']) and !empty($uservals['first_name']))
-            $uservals['cust_name'] = $uservals['first_name'] . ' ' . $uservals['last_name'];
-
         $smarty->assign('user', $uservals);
 
         $orderinfo = $this->fetch();
@@ -916,7 +916,7 @@ class cmOrder extends db_container {
         $msg = $smarty->fetch("float:emails/order_notify.txt.tpl");
         $msg_html = $smarty->fetch("float:emails/order_notify.html.tpl");
 
-        $recip = sprintf("%s <%s>", $uservals['cust_name'], $uservals['email']);
+        $recip = sprintf("%s <%s>", $user->get_full_name(), $uservals['email']);
 
         if ($orderinfo['orders_status'] == $this->default_order_status)
             $status = 'CONFIRMATION';
