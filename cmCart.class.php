@@ -1116,7 +1116,8 @@ class cmCart extends db_container {
                     $res = $bundle->pull_inventory($skus, $item['qty']);
                 }
                 else {
-                    $res = $product->pull_inventory($item['inventory_id'], $item['qty']);
+                    if (empty($item['is_digital'])) # dont pull inventory for non-physical goods
+                        $res = $product->pull_inventory($item['inventory_id'], $item['qty']);
                 }
                 if (PEAR::isError($res)) // sux
                     trigger_error("Error in cmCart::pull_inventory() for line item {$item['id']}: " . $res->getMessage(), E_USER_WARNING);
