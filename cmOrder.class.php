@@ -988,6 +988,22 @@ class cmOrder extends db_container {
         return ($res >= 1);
     }
 
+
+    /**
+     * does the order contain ALL digital goods? If so we might want to mark it shipped automatically
+     */
+    function is_all_digital_goods() {
+        if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS) return;
+
+        $sql = sprintf("SELECT NOT EXISTS (SELECT TRUE FROM %s 
+                        WHERE (is_digital = 0 OR is_digital IS NULL) AND order_id = %d) AS r",
+                        $this->_items_table,
+                        $this->get_id());
+        $res = $this->db->getOne($sql);
+        return ($res >= 1);
+    }
+
+
     /**
      * does the order contains any digital items.
      * @return bool
@@ -1012,8 +1028,8 @@ class cmOrder extends db_container {
                 $row['download_url'] = sprintf(CSHOP_DOWNLOAD_LINK_FMT, $this->fetch_token(), $row['download_token']);
                 $items[] = $row;
             }
+            return $items;
         }
-        return $items;
     }
 
 
