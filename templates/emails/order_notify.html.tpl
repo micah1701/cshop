@@ -216,7 +216,7 @@
     </td>
   </tr>
 
-    <~ if $has_digital_goods ~>
+    <~ if $has_digital_goods and $download_list  ~>
       <tr>
         <td colspan="2">
             <div style="text-align: left; border-bottom: 1px solid #555">

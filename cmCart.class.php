@@ -242,7 +242,7 @@ class cmCart extends db_container {
                            'inventory_id' => $invid,
                            'product_descrip' => $pctr->get_title(),
                            #'product_attribs' => serialize($attribs), // obsolete? maybe.
-                           'is_digital' => $pctr->get_header('is_digital'),
+                           'is_digital' => $this->item_is_digital($pctr, $options),
                            'has_item_options' => (is_array($options) and count($options)));
 
              if ($this->do_apply_discount_to_lineitems()) {
@@ -1435,8 +1435,19 @@ class cmCart extends db_container {
      * @return bool
      */
     function requires_shipping() {
-        if (!$this->is_all_digital()) 
-            return true;
+        return (!$this->is_all_digital());
+    }
+
+
+    /**
+     * determine if a product in the cart is a digital one or not. By default, we only use this in add_item()
+     * to set the is_digital flag on the cart item. But, can be overridden if need be
+     * @params $product a cmProduct obj
+     *         $options array product options array
+     * @return bool
+     */
+    function item_is_digital($product, $options=array()) {
+        return $product->get_header('is_digital');
     }
 
 

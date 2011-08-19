@@ -80,15 +80,19 @@
 
     <div class="checkoutFormBox" id="checkoutShippingAddrArea">
         <h2 class="checkoutSectionHeader">Shipping Address</h2>
-        <div class="userInstruction">
-            <~ if $has_shipping ~>
-            Please edit your shipping address as needed.
-            <br />
-            [<a href="<~ $smarty.server.PHP_SELF ~>?op_add_ship">Add a new shipping address</a>]
-            <~else~>
-            Please enter the shipping address for your order. 
-            <~/if~>
-        </div>
+        <~ if $skip_shipping_addr ~>
+           <div class="userInstruction">Shipping address not required for this order.</div>
+        <~ else ~>
+            <div class="userInstruction">
+                <~ if $has_shipping ~>
+                Please edit your shipping address as needed.
+                <br />
+                [<a href="<~ $smarty.server.PHP_SELF ~>?op_add_ship">Add a new shipping address</a>]
+                <~else~>
+                Please enter the shipping address for your order. 
+                <~/if~>
+            </div>
+        <~/if~>
 
         <~ include file=float:checkout_address_form.tpl ~>
     </div>

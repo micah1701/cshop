@@ -995,21 +995,23 @@ class cmOrder extends db_container {
     function fetch_digital_goods() {
         if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS) return;
 
-        $sql = sprintf("SELECT id, product_id, product_descrip, download_token FROM %s WHERE is_digital = 1 AND order_id = %d", 
-                        $this->_items_table,
-                        $this->get_id());
-        $res = $this->db->query($sql);
-        $items = array();
-        while ($row = $res->fetchRow()) {
-            if (empty($row['download_token'])) { // create and save new URL if not done yet.
-                $row['download_token'] = $this->generate_download_token($row['product_id']);
+        if (defined('CSHOP_DOWNLOAD_LINK_FMT')) {
+            $sql = sprintf("SELECT id, product_id, product_descrip, download_token FROM %s WHERE is_digital = 1 AND order_id = %d", 
+                            $this->_items_table,
+                            $this->get_id());
+            $res = $this->db->query($sql);
+            $items = array();
+            while ($row = $res->fetchRow()) {
+                if (empty($row['download_token'])) { // create and save new URL if not done yet.
+                    $row['download_token'] = $this->generate_download_token($row['product_id']);
 
-                $oi = db_container::factory($this->db, $this->_items_table);
-                $oi->set_id($row['id']);
-                $oi->store(array('download_token' => $row['download_token']));
+                    $oi = db_container::factory($this->db, $this->_items_table);
+                    $oi->set_id($row['id']);
+                    $oi->store(array('download_token' => $row['download_token']));
+                }
+                $row['download_url'] = sprintf(CSHOP_DOWNLOAD_LINK_FMT, $this->fetch_token(), $row['download_token']);
+                $items[] = $row;
             }
-            $row['download_url'] = sprintf(CSHOP_DOWNLOAD_LINK_FMT, $this->fetch_token(), $row['download_token']);
-            $items[] = $row;
         }
         return $items;
     }
