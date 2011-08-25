@@ -322,7 +322,7 @@ $smarty->display('control/header.tpl');
     <? if (CSHOP_USE_RELATED_PRODUCTS) { ?>
   	  <div class="tabLabel<?= ($tab == 'related')? ' tabSelected' : '' ?>" id="tabrel" rel="relContainer">Related</div>
     <? } ?>
-    <? if (CSHOP_ENABLE_DIGITAL_DOWNLOADS) { ?>
+    <? if (CSHOP_ENABLE_DIGITAL_DOWNLOADS_CONTROL_TAB) { ?>
   	  <div class="tabLabel<?= ($tab == 'downloads')? ' tabSelected' : '' ?>" id="tabrel" rel="downContainer">Downloads</div>
     <? } ?>
 <? } ?>
@@ -404,7 +404,7 @@ $smarty->display('control/header.tpl');
           </div>
       <? } ?>
 
-      <? if (CSHOP_ENABLE_DIGITAL_DOWNLOADS) { ?>
+      <? if (CSHOP_ENABLE_DIGITAL_DOWNLOADS_CONTROL_TAB) { ?>
           <div class="formContainer" id="downContainer"<? if ($tab == 'downloads') { ?> style="display: block"<? } ?>>
             <div class="heading">
                 :: Downloads ::

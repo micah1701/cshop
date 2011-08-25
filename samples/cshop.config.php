@@ -167,8 +167,11 @@ define('CSHOP_USE_PRODUCT_OPTION_TAB', false);
 /* use the related products feature? (this will only enable the form element in control) */
 define('CSHOP_USE_RELATED_PRODUCTS', false);
 
-/* enable the tab for digital downloads in control? */
+/* enable functionality around digital downloads? (shipping screen bypass, send download link, etc.) */
 define('CSHOP_ENABLE_DIGITAL_DOWNLOADS', false);
+
+/* enable the tab for digital downloads in control, so admin can attach URLs to products to be downloaded? */
+define('CSHOP_ENABLE_DIGITAL_DOWNLOADS_CONTROL_TAB', false);
 
 /** have fields for "adders" in each row of inventory, and look there for pricing? */
 define('CSHOP_INVENTORY_ALLOW_ADDER', false);
