@@ -89,9 +89,8 @@ if (isset($_POST['op_confirm'])) {
 
     /* check all giftcards attached to this cart for validity. If any fail, set $payment_error_type */
     if (CSHOP_ACCEPT_GIFTCARDS) {
-        $giftcardclass = CSHOP_CLASSES_GIFTCARD;
         foreach ($cart->get_giftcards() as $gc_vals) {
-            $gc = new $giftcardclass($pdb);
+            $gc = cmClassFactory::getInstanceOf(CSHOP_CLASSES_GIFTCARD, $pdb);
             $gc->setErrorHandling (PEAR_ERROR_RETURN);
             $gc->set_id($gc_vals['id']);
 
@@ -118,11 +117,8 @@ if (isset($_POST['op_confirm'])) {
      * failure we need to re-credit all the GCs that have been bled dry */
 
     /* cart has a zero total */
-    if (!$pay && $cart_total == 0 && $payment_error_type) { 
-        if (CSHOP_ACCEPT_GIFTCARDS) { // paranoia
-            $PAYMENT_SUCCESS = true; // because we dont actually need payments
-        }
-        elseif (CSHOP_DO_TAKE_COUPONS) { 
+    if (!$pay && $cart_total == 0 && !$payment_error_type) { 
+        if (CSHOP_ACCEPT_GIFTCARDS || CSHOP_DO_TAKE_COUPONS) { // paranoia
             $PAYMENT_SUCCESS = true; // because we dont actually need payments
         }
     }

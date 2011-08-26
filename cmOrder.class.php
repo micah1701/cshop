@@ -795,7 +795,7 @@ class cmOrder extends db_container {
     function get_giftcards() {
         if (defined('CSHOP_ACCEPT_GIFTCARDS') && CSHOP_ACCEPT_GIFTCARDS) {
             $sql = "SELECT id, CONCAT('xxxxxxxxx', SUBSTRING(gc_no, -3)) AS gc_no, gc_amt 
-                    FROM cm_giftcards WHERE order_id = " . $this->get_id();
+                    FROM cm_giftcards WHERE redeemed_amt IS NOT NULL AND order_id = " . $this->get_id();
             return $this->db->getAll($sql);
         }
         else {
