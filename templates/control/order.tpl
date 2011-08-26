@@ -378,10 +378,10 @@
                       <td align="center">CSC</td>
                   </tr>
                   <tr>
-                      <td align="center"><~ if $trans.verify_addr eq 1 ~>Y<~ elseif $trans.verify_addr eq NULL ~>&ndash;<~else~>N<~/if~></td>
-                      <td align="center"><~ if $trans.verify_zip eq 1 ~>Y<~ elseif $trans.verify_zip eq NULL  ~>&ndash;<~else~>N<~/if~></td>
-                      <td align="center"><~ if $trans.verify_international eq 1 ~>Y<~ elseif $trans.verify_international eq NULL  ~>&ndash;<~else~>N<~/if~></td>
-                      <td align="center"><~ if $trans.verify_csc eq 1 ~>Y<~ elseif $trans.verify_csc eq NULL  ~>&ndash;<~else~>N<~/if~></td>
+                      <td align="center"><~ if $trans.verify_addr ~>Y<~ elseif $trans.verify_addr eq NULL ~>&ndash;<~else~>N<~/if~></td>
+                      <td align="center"><~ if $trans.verify_zip ~>Y<~ elseif $trans.verify_zip eq NULL  ~>&ndash;<~else~>N<~/if~></td>
+                      <td align="center"><~ if $trans.verify_international ~>Y<~ elseif $trans.verify_international eq NULL  ~>&ndash;<~else~>N<~/if~></td>
+                      <td align="center"><~ if $trans.verify_csc ~>Y<~ elseif $trans.verify_csc eq NULL  ~>&ndash;<~else~>N<~/if~></td>
                   </tr>
                </table>
               <~/if~>

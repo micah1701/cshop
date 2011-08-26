@@ -224,7 +224,7 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
                     $res = $this->avs_result_flags & CMPAY_AVS_UNSUP;
                     break;
             }
-            return $res;
+            return (!empty($res));
         }
     }
 
@@ -533,7 +533,7 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
                 $this->avs_result_flags = CMPAY_AVS_ADDR;
                 break;
             case 'B':
-                $this->avs_result_flags = CMPAY_AVS_ERR & CMPAY_AVS_UNSUP;
+                $this->avs_result_flags = CMPAY_AVS_ERR | CMPAY_AVS_UNSUP;
                 break;
             case 'E':
             case 'R':
@@ -555,7 +555,7 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
                 break;
             case 'X':
             case 'Y':
-                $this->avs_result_flags = CMPAY_AVS_ZIP & CMPAY_AVS_ADDR;
+                $this->avs_result_flags = CMPAY_AVS_ZIP | CMPAY_AVS_ADDR;
                 break;
             case 'P':
                 $this->avs_result_flags = null;
