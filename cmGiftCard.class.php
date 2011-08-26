@@ -3,10 +3,9 @@
 require_once('HTTP/Request.php');
 require_once('db_container.class.php');
 
-define('CSHOP_GIFTCARD_LOG', '/tmp/cm_giftcard_transactions.log');
-
-# test gc# used for swipeit: 6018220010604273
-
+/**
+ * interface for SmartTransactionSystems (STS) API for creating and using gift cards
+ */
 class cmGiftCard extends db_container {
 
     var $colmap = array('gc_no' => array('Gift Card Number', 'text', null, array('size'=>14), 1),
@@ -53,6 +52,7 @@ class cmGiftCard extends db_container {
             return $this->raiseError("giftcard number is not set");
         }
 
+        $this->log("get_balance(): gc_number={$this->gc_number}");
         $xmlstr = $this->_build_balance_inquiry_request($this->gc_number);
         $xmlresp = $this->_send_request($xmlstr);
         if (PEAR::isError($xmlresp)) { return $xmlresp; }
@@ -78,6 +78,7 @@ class cmGiftCard extends db_container {
      * a complete order
      */
     function create(&$order, $merch_id, $amount) {
+        $this->log("create(): order.id={$order->get_id()} amount={$amount}");
         $xmlstr = $this->_build_creation_request($merch_id, $amount);
         $xmlresp = $this->_send_request($xmlstr);
         if (PEAR::isError($xmlresp)) { return $xmlresp; }
@@ -116,6 +117,7 @@ class cmGiftCard extends db_container {
         if (! ($myvals = $this->fetch())) {
             return $this->raiseError('could not find the identified giftcard record');
         }
+        $this->log("redeem(): order.id={$order->get_id()} gc_no={$myvals['gc_no']}, gc_amt={$myvals['gc_amt']}");
         $xmlstr = $this->_build_redemption_request($myvals['gc_no'], $myvals['gc_amt']);
         $xmlresp = $this->_send_request($xmlstr);
         if (PEAR::isError($xmlresp)) { return $xmlresp; }
@@ -159,6 +161,15 @@ class cmGiftCard extends db_container {
     }
 
 
+    /**
+     * log something somewhere
+     */
+    function log($msg) {
+        if ($this->do_log) { 
+            error_log(date('r')." - cmGiftCard \n".$msg."\n\n", 3, CSHOP_LOG_FILE); 
+        }
+    }
+
 
     /**
      * send the given XML to the server as configured in
@@ -171,7 +182,7 @@ class cmGiftCard extends db_container {
      */
     function _send_request($xmlstr) {
 
-        if ($this->do_log) { error_log(date('r') . "> _send_request(): $xmlstr\n", 3, CSHOP_GIFTCARD_LOG); }
+        $this->log("send_request(): $xmlstr");
         $hr = new HTTP_Request(CSHOP_GIFTCARD_POST_URL);
         $hr->setMethod(HTTP_REQUEST_METHOD_POST);
         $hr->addPostData('Auth_Request', $xmlstr, true);
@@ -182,7 +193,7 @@ class cmGiftCard extends db_container {
         }
         else {
             $res = $hr->getResponseBody();
-            if ($this->do_log) { error_log(date('r') . "> response: $res\n", 3, CSHOP_GIFTCARD_LOG); }
+            $this->log("response: $res");
 
             /* STS sends the XML wrapped in some HTML and control chars and other nonsense
              * remove the cruft: */
