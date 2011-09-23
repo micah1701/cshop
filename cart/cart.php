@@ -180,7 +180,7 @@ if (count($cartitems)) {
     unset($totals['grand_total']);
 
     if (defined('CSHOP_SHOW_RELATED_PRODUCTS_IN_CART') and CSHOP_SHOW_RELATED_PRODUCTS_IN_CART) {
-        if ($related_ids = $cart->fetch_related_products()) {
+        if ($related_ids = $cart->fetch_related_products(CSHOP_SHOW_RELATED_PRODUCTS_IN_CART)) {
             foreach ($related_ids as $pid) {
                 $product->set_id($pid);
                 $smarty->append('related', $product->fetch(array('title','id'),false,true));

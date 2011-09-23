@@ -1259,7 +1259,7 @@ class cmCart extends db_container {
       * any product that is in the cart, ordering by the frequency of said relation
       * @return array
       */
-     function fetch_related_products() {
+     function fetch_related_products($limit=0) {
          /* a SUBSELECT would be nice! */
          $sql = sprintf("SELECT product_id FROM %s
                          WHERE cart_id = %d",
@@ -1271,6 +1271,7 @@ class cmCart extends db_container {
                      FROM cm_products_relations 
                      WHERE cm_products_id IN (". join(',',$my_products) .") 
                      GROUP BY related_to ORDER BY relcount DESC";
+             if ($limit) $sql .= sprintf(" LIMIT %d", $limit);
              return $this->db->getCol($sql);
          }
      }
