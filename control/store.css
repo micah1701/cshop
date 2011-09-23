@@ -603,3 +603,16 @@ div.orderTransactForm table {
 
 tr.whsl {
 }
+.formexCheckarray span {
+    display: block;
+    padding: 4px 0;
+    clear: left;
+}
+.formexCheckarray label {
+}
+.formexCheckarray label input {
+    float: left;
+    margin: 0 5px 0 0;
+    padding: 0;
+}
+
