@@ -89,6 +89,8 @@ class cmGiftCard extends db_container {
 
         $sxml = new SimpleXMLElement($xmlresp);
 
+        if (empty($sxml->Card_Number)) return $this->raiseError("Gateway did not return a Card Number.");
+
         $vals = array('gc_amt' => $sxml->Amount_Balance,
                       'order_id' => $order->get_id(),
                       'gc_no' => $sxml->Card_Number,
