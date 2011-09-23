@@ -243,12 +243,16 @@ if (isset($_GET['op_csv'])) {
     $table->addSortRow(array_values($csv_headers));
 }
 else {
-    $table = new fu_HTML_Table();
+    $table = new fu_HTML_Table(array("id" => "reports"));
     $table->setAutoGrow(true);
     $table->setAutoFill("-");
 
     $xgets[] = "report=$ACTION";
     $table->addSortRow($header_row, $fake_orby, null, 'TH', join('&', $xgets), $order_dir);
+
+    #$tfoot = $table->getFooter();
+    #$tfoot->addRow(array_values($header_row));
+
     $sep = (strpos($_SERVER['REQUEST_URI'], '?') === false)? '?' : '&';
     $csv_link = $_SERVER['REQUEST_URI'] . $sep . 'op_csv';
 }
@@ -352,9 +356,19 @@ $smarty->display('control/header.tpl');
     <? if (!$numrows) { ?>
         <strong class="indicator">No results found.</strong>
     <? } else { ?>
+    <div style="max-height: 800px">
         <? echo $table->toHTML() ?>
+    </div>
     <? } ?>
 </div>
+<script type="text/javascript" src="js/jquery.fixedheadertable.min.js"></script>
+<script type="text/javascript">
+$( function() {
+
+$('table#reports').fixedHeaderTable({ footer: false, cloneHeadToFoot: false, fixedColumn: true });
+
+});
+</script>
 
 <? 
 $smarty->display('control/footer.tpl');
