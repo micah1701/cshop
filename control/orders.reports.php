@@ -356,7 +356,7 @@ $smarty->display('control/header.tpl');
     <? if (!$numrows) { ?>
         <strong class="indicator">No results found.</strong>
     <? } else { ?>
-    <div style="max-height: 800px">
+    <div style="height: 500px; width: 70%;">
         <? echo $table->toHTML() ?>
     </div>
     <? } ?>
