@@ -52,6 +52,17 @@ if (isset($_GET['report'])) {
 }
 
 
+$order_list_colors = array(
+    array('#e0e0e0','#d2d2d2'),
+    array('#dfd', '#cec'),
+    array('#ddf', '#cce'),
+    array('#ddb', '#eec'),
+    array('#dee', '#eff'),
+    array('#555', '#666'),
+    array('#333', '#444'),
+    array('#eb8', '#fc9'),
+);
+
 
 /* decide what month we are on */
 if (isset($_GET['m']) && preg_match('/^\d{4}-\d{2}$/', $_GET['m'])) {
@@ -104,7 +115,9 @@ elseif ($ACTION == OP_BY_STATUS) {
 }
 elseif ($ACTION == OP_BY_PRODUCT) {
     $sql = "SELECT product_id, COUNT(product_id) AS orcnt, SUM(qty) AS prcnt, p.title 
-            FROM cm_order_items LEFT JOIN cm_products p ON (p.id = product_id)  
+                , o.orders_status 
+            FROM cm_order_items JOIN cm_orders o ON o.id = cm_order_items.order_id
+                LEFT JOIN cm_products p ON (p.id = product_id)  
             GROUP BY product_id
             ORDER BY %s %s";
     $header_row = array('title'=>'Product', 'orcnt'=>'Order Count', 'prcnt'=>'Total Sold');
@@ -141,7 +154,7 @@ else { // if ($ACTION == OP_ORDERS_PRODUCTS) {
     $def_orby = 'id';
 
     /* things that go after SELECT in the $sql */
-    $fields = array('id', 'order_token', 'order_create_date', 'DATE_FORMAT(order_create_date, \'%%d %%b %%Y\') AS datef'
+    $fields = array('id', 'order_token', 'order_create_date', 'orders_status', 'DATE_FORMAT(order_create_date, \'%%d %%b %%Y\') AS datef'
                   , 'ship_total', 'tax_total', 'tax_method', 'amt_quoted');
 
 
@@ -170,7 +183,7 @@ else { // if ($ACTION == OP_ORDERS_PRODUCTS) {
     $sql = "SELECT $fields FROM cm_orders WHERE $where ORDER BY %s %s";
 
     /* the base columns for the report, shortly to be added to. */
-    $header_row = array('order_token'=>'Order Number', 'datef' => 'Date', 'ship_total'=>'Shipping', 'tax_total'=>'Tax', 'amt_quoted' => 'Total');
+    $header_row = array('order_token'=>'Order Number', 'datef' => 'Date', 'orders_status'=>'Status','ship_total'=>'Shipping', 'tax_total'=>'Tax', 'amt_quoted' => 'Total');
 
     $where = preg_replace('/%%/', '%', $where); // dupe %'s in sprintf format cause problems.
 
@@ -284,6 +297,14 @@ while ($row = $res->fetchRow()) {
             $taxkey = preg_replace('/\W+/', '_', $row['tax_method']);
             $row['tax_'.$taxkey] = $row['tax_total'];
         }
+
+        if (isset($order_list_colors[$row['orders_status']]))
+            $table->bgcolor_alts = $order_list_colors[$row['orders_status']];
+        else 
+            $table->bgcolor_alts = $order_list_colors[0];
+
+        $row['orders_status'] = $cmOrder->statuses[$row['orders_status']];
+
     }
 
     foreach (array_keys($header_row) as $k) {
@@ -293,6 +314,7 @@ while ($row = $res->fetchRow()) {
 
     $table->addRow($vals, null, (!empty($link)), $link);
 }
+$table->bgcolor_alts = $order_list_colors[0];
 $numrows = $res->numRows();
 
 
@@ -356,7 +378,7 @@ $smarty->display('control/header.tpl');
     <? if (!$numrows) { ?>
         <strong class="indicator">No results found.</strong>
     <? } else { ?>
-    <div style="height: 500px; width: 70%;">
+    <div style="height: 470px">
         <? echo $table->toHTML() ?>
     </div>
     <? } ?>
