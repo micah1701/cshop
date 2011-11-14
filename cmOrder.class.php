@@ -967,7 +967,7 @@ class cmOrder extends db_container {
     function requires_shipping() {
         if (!defined('CSHOP_ENABLE_DIGITAL_DOWNLOADS') || ! CSHOP_ENABLE_DIGITAL_DOWNLOADS) return true;
 
-        $sql = sprintf("SELECT COUNT(*) FROM %s WHERE is_digital IS NULL AND order_id = %d", 
+        $sql = sprintf("SELECT COUNT(*) FROM %s WHERE order_id = %d AND (is_digital IS NULL OR is_digital = 0) ",
                         $this->_items_table,
                         $this->get_id());
         $res = $this->db->getOne($sql);
