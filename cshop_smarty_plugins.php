@@ -10,11 +10,17 @@ function smarty_modifier_tabindex($str, $ti) {
 }
 
 function cshop_link_to($params, $smarty) {
-    $parts = array('product', $params['product']['id'], smarty_modifier_cleanforurl($params['product']['title']));
-    if (isset($params['category'])) {
-        $parts = $parts + array('in', smarty_modifier_cleanforurl($params['category']['name']));
+    if (isset($params['category']) and !isset($params['product'])) {
+        $parts = array('browse', smarty_modifier_cleanforurl($params['category']['name']));
     }
-    return join('/', $parts);
+    else {
+        $parts = array('product', $params['product']['id'], smarty_modifier_cleanforurl($params['product']['title']));
+        if (isset($params['category']) && !empty($params['category']['urlkey'])) {
+            $parts[] = 'in';
+            $parts[] = $params['category']['urlkey'];
+        }
+    }
+    return '/'.join('/', $parts);
 }
 
 
