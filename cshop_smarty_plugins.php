@@ -9,6 +9,13 @@ function smarty_modifier_tabindex($str, $ti) {
     return preg_replace('/<(input|textarea|select) ([^>]+)>/', "<$1 tabindex=\"$ti\" $2>", $str);
 }
 
+function cshop_link_to($params, $smarty) {
+    $parts = array('product', $params['product']['id'], smarty_modifier_cleanforurl($params['product']['title']));
+    if (isset($params['category'])) {
+        $parts = $parts + array('in', smarty_modifier_cleanforurl($params['category']['name']));
+    }
+    return join('/', $parts);
+}
 
 
 /* takes an email address and breaks it up into an insane Javascripty 
@@ -33,6 +40,9 @@ function smarty_modifier_obfuscate_email($str) {
 }
 
 if (isset($smarty) and is_object($smarty)) {
+    /* add Smarty function to create nice urls for products */
+    $smarty->register_function('cshop_link_to', 'cshop_link_to');
+
     $smarty->register_modifier('obfuscate_email', 'smarty_modifier_obfuscate_email');
 
     /* add a custom Smarty modifier to add tabindex attribs to inputs */
