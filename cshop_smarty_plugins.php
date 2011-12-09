@@ -11,7 +11,7 @@ function smarty_modifier_tabindex($str, $ti) {
 
 function cshop_link_to($params, $smarty) {
     if (isset($params['category']) and !isset($params['product'])) {
-        $parts = array('browse', smarty_modifier_cleanforurl($params['category']['name']));
+        $parts = array('browse', smarty_modifier_cleanforurl($params['category']['urlkey']));
     }
     else {
         $parts = array('product', $params['product']['id'], smarty_modifier_cleanforurl($params['product']['title']));
