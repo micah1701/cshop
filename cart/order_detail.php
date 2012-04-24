@@ -11,17 +11,17 @@ require_once(CSHOP_CLASSES_USER.'.class.php');
 require_once(CSHOP_CLASSES_CART.'.class.php');
 
 // init page auth objects
-page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>CSHOP_CLASSES_AUTH_AUTH, 'perm'=>CSHOP_CLASSES_AUTH_PERM));
+page_open(array('sess'=>CSHOP_CLASSES_AUTH_SESSION, 'auth'=>'defaultAuth', 'perm'=>CSHOP_CLASSES_AUTH_PERM));
 
 // flag for smarty
 $smarty->assign('page_id', 'order_detail');
 $smarty->assign('pagetitle', 'Order Detail');
 
 $c = CSHOP_CLASSES_USER;
-$user = new $c($pdb);
+$current_user = new $c($pdb);
 
-$uid = $user->get_auth_id();
-$user->set_id($uid);
+$uid = $current_user->get_auth_id();
+$current_user->set_id($uid);
 $orderinfo = null;
 $err = null;
 
@@ -58,54 +58,56 @@ if (!$orderinfo = $order->fetch()) {
     trigger_error("The given parameter did not match any order", E_USER_ERROR);
 }
 else {
+
+
+    $order_user = $order->get_user();
+    // orders made by anon users are allowed to view order without being logged in.
     if ($uid != $orderinfo['user_id']) {
-        if ($auth->conditional_login()) { // will show login form if not logged in yet.
-            trigger_error("illegal attempt to access order", E_USER_ERROR);
-        }
-        else {
-            trigger_error("order access deferred pending login", E_USER_WARNING);
-            exit();
+
+        $order_user_info = $order_user->fetch();
+
+        if (!$order_user_info['is_anon'] && $auth->conditional_login()) { // will show login form if not logged in yet.
+             trigger_error("illegal attempt to access order", E_USER_ERROR);
         }
     }
-    else {
-        $orderitems = $order->fetch_items();
-        $orderinfo['cc_number'] = 'xxxxxxxxxxxx'.substr($orderinfo['cc_number'], -4, 4);
-        $smarty->assign('orderinfo', $orderinfo);
 
-        $grand_total = $orderinfo['amt_billed_to_date'];
-        $cart_totals = $order->fetch_totals();
+    $orderitems = $order->fetch_items();
+    $orderinfo['cc_number'] = 'xxxxxxxxxxxx'.substr($orderinfo['cc_number'], -4, 4);
+    $smarty->assign('orderinfo', $orderinfo);
 
-        $gc_total = $order->get_giftcard_total();
-        $smarty->assign('giftcards', $order->get_giftcards());
-        $smarty->assign('gc_total', $gc_total);
+    $grand_total = $orderinfo['amt_billed_to_date'];
+    $cart_totals = $order->fetch_totals();
 
-        /** set and display ***********************************************************/
-        $smarty->assign('cart_totals', $cart_totals);
-        $smarty->assign('grand_total', $grand_total); 
+    $gc_total = $order->get_giftcard_total();
+    $smarty->assign('giftcards', $order->get_giftcards());
+    $smarty->assign('gc_total', $gc_total);
 
-        $smarty->assign('cart', $orderitems);
-        $smarty->assign('billing', $order->fetch_addr('billing'));
-        if (!$order->requires_shipping())
-            $smarty->assign('no_shipping_required', true);
-        else
-            $smarty->assign('shipping', $order->fetch_addr('shipping'));
+    /** set and display ***********************************************************/
+    $smarty->assign('cart_totals', $cart_totals);
+    $smarty->assign('grand_total', $grand_total); 
 
-        $smarty->assign('discount_amt', abs($cart_totals['discount']['amt']));
-        $smarty->assign('discount_descrip', $cart_totals['discount']['descrip']);
+    $smarty->assign('cart', $orderitems);
+    $smarty->assign('billing', $order->fetch_addr('billing'));
+    if (!$order->requires_shipping())
+        $smarty->assign('no_shipping_required', true);
+    else
+        $smarty->assign('shipping', $order->fetch_addr('shipping'));
 
-        $smarty->assign('order_status', $order->get_status());
+    $smarty->assign('discount_amt', abs($cart_totals['discount']['amt']));
+    $smarty->assign('discount_descrip', $cart_totals['discount']['descrip']);
 
-        $smarty->assign('history', $order->fetch_history());
+    $smarty->assign('order_status', $order->get_status());
 
-        if ($order->has_digital_goods()) {
-            $smarty->assign('has_digital_goods', true);
-            $smarty->assign('download_list', $order->fetch_digital_goods());
-        }
+    $smarty->assign('history', $order->fetch_history());
+
+    if ($order->has_digital_goods()) {
+        $smarty->assign('has_digital_goods', true);
+        $smarty->assign('download_list', $order->fetch_digital_goods());
     }
 }
 
 $smarty->assign('product_detail_page', CSHOP_HOME_PAGE);
 
-$smarty->assign('user', $user->fetch());
-$smarty->assign('user_email', $user->get_email());
+$smarty->assign('user', $order_user->fetch());
+$smarty->assign('user_email', $order_user->get_email());
 $smarty->display('float:order_detail.tpl');
