@@ -269,9 +269,8 @@
 <br>
 
 <hr size="1">
-<div align="center">
-Please note, you can 
-    <a href="<~ $order_view_link ~>">view complete details and status on your order at any time on our site.</a>
+<div align="center" style="font-size: 105%">
+    <a href="<~ $order_view_link ~>">To view complete details and status on your order click here.</a>
 </div>
 
 
