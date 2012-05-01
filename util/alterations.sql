@@ -469,3 +469,6 @@ ALTER TABLE cm_products MODIFY feature_rank tinyint(4) unsigned;
 
 -- Thu Aug  4 12:28:28 EDT 2011
 ALTER TABLE cm_cart MODIFY purchased int(10) unsigned;
+
+-- Tue May  1 17:17:37 EDT 2012
+ALTER TABLE cm_auth_user MODIFY password varchar(255);
