@@ -38,22 +38,14 @@ $cart_total = $cart->get_grandtotal();
 
 $pay = null;
 if ($cart_total > 0) {
-    if (! $payid = $cart->get_payment_id()) {
-        trigger_error('could not find payment info', E_USER_NOTICE);
-        $payment_error = "Sorry, your payment record could not be found.  Please go back and re-enter the payment information";
-        $payment_error_type = 'PAYMENT_MISSING';
-    }
-    else {
-        /* now what it really is all about is payment */
-        $pay = $user->payment_method_factory();
-        $pay->set_id($payid);
+    /* what it really is all about is payment */
+    $pay = $user->payment_method_factory();
 
-        if (!$pay->fetch()) {
-            trigger_error('payment info cannot be re-used', E_USER_NOTICE);
-            $payment_error = "Sorry, your payment info cannot be re-submitted. Please go back and re-enter the payment information";
-            $payment_error_type = 'PAYMENT_RESUBMIT';
-            $pay = null;
-        }
+    if (!$pay->fetch()) {
+        #trigger_error('payment info cannot be re-used', E_USER_NOTICE);
+        $payment_error = "Sorry, your payment info cannot be re-submitted. Please go back and re-enter the payment information";
+        $payment_error_type = 'PAYMENT_RESUBMIT';
+        $pay = null;
     }
 }
 

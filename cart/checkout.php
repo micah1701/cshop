@@ -266,8 +266,6 @@ elseif ($ACTION == OP_ADD_BILL) {
 
                 $payid = $pay->store($payvals);
 
-                $cart->set_payment($pay);
-
                 $pdb->commit();
                 header("Location: checkout_confirm.php\n");
                 exit();

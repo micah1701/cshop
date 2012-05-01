@@ -21,7 +21,7 @@ class cmPaymentCC extends db_container {
 
     /** we hold the CSC code for the card only in the _SESSION by this key - named something random for (sec|obsc)urity */
     var $_csc_sesskey = '_cm_HbT';
-    
+
     /* kinds of CCs we can put up wit */
     var $cc_types = array('VISA' => 'Visa',
                            'MC'   => 'MasterCard',
@@ -54,8 +54,28 @@ class cmPaymentCC extends db_container {
     }
 
     function store($vals, $force_insert=false) {
+        global $sess;
+        $sess::regenerate();
+
         if (isset($vals['csc1'])) unset($vals['csc1']);
-        return parent::store($vals, $force_insert);
+        if (!isset($_SESSION['cmPaymentCC']) || $force_insert) {
+            $_SESSION['cmPaymentCC'] = $vals;
+        }
+    }
+
+    function fetch() {
+        if (isset($_SESSION['cmPaymentCC'])) return $_SESSION['cmPaymentCC'];
+    }
+
+    function get_header($col) {
+        if (isset($_SESSION['cmPaymentCC']) && isset($_SESSION['cmPaymentCC'][$col])) {
+            return $_SESSION['cmPaymentCC'][$col];
+        }
+    }
+
+    function kill() {
+        unset($_SESSION['cmPaymentCC']);
+        unset($_SESSION[$this->_csc_sesskey]);
     }
 
 

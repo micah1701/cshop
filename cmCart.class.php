@@ -928,33 +928,6 @@ class cmCart extends db_container {
      }
 
 
-     /**
-      * set the payment id that is being used for this cart. Used during
-      * checkout when a user has entered their payment info for an order but
-      * has not been authorized or confirmed yet.  
-      * @param $pay obj a cshop/cmPayment object of some kind
-      * @return success
-      */
-      function set_payment(&$pay) {
-          if (!is_object($pay)) {
-              return $this->raiseError("$pay is not an object", E_USER_ERROR);
-          }
-          $this->_payment = $pay;
-          return $this->store(array('cm_paymentcc_id' => $pay->get_id()));
-      }
-
-      /**
-       * get the payment id that belongs to this cart, if any
-       * @return int an id referencing the payment table / false
-       */
-       function get_payment_id() {
-           $cartid = $this->get_id();
-           if ($r = $this->fetch(array('cm_paymentcc_id'))) {
-               return $r['cm_paymentcc_id'];
-           }
-       }
-
-
        /**
         * any comments added during checkout process. get them. (from the session)
         * @return str
