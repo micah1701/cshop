@@ -50,7 +50,7 @@ define('OP_EDIT_LOGIN', 'UPDATE LOGIN');
 $cart = cmClassFactory::getInstanceOf(CSHOP_CLASSES_CART,$pdb);
 
 /* decide what currency to show. They would have set this in the cart */
-$sess->register('CSHOP_CURRENCY_DISPLAY');
+$sess::register('CSHOP_CURRENCY_DISPLAY');
 $cart->set_display_currency($CSHOP_CURRENCY_DISPLAY);
 
 /** setup smarty with a method from the $cart object to convery currencies */

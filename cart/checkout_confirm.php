@@ -58,7 +58,7 @@ if ($cart_total > 0) {
 }
 
 /* decide what currency to show. They would have set this in the cart */
-$sess->register('CSHOP_CURRENCY_DISPLAY');
+$sess::register('CSHOP_CURRENCY_DISPLAY');
 if (isset($_GET['curr'])) {
     $CSHOP_CURRENCY_DISPLAY = $_GET['curr'];
 }

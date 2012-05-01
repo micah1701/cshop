@@ -31,7 +31,7 @@ $smarty->assign('product_detail_page', $product_detail_page);
 $smarty->register_modifier('currency_format', array(&$cart, 'currency_format'));
 
 /* decide what currency to display here */
-$sess->register('CSHOP_CURRENCY_DISPLAY');
+$sess::register('CSHOP_CURRENCY_DISPLAY');
 if (isset($_GET['curr'])) {
     $CSHOP_CURRENCY_DISPLAY = $_GET['curr'];
 }
@@ -162,7 +162,7 @@ elseif (isset($_GET['clearcoupon'])) { // didn't like that discount code from ea
     $smarty->assign('discount_cleared', 1);
 }
 
-$sess->register('sess_promo_code');
+$sess::register('sess_promo_code');
 
 if (!empty($sess_promo_code)) {
     if (!$cart->apply_discount($sess_promo_code)) {

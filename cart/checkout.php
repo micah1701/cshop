@@ -82,7 +82,7 @@ $cart = cmClassFactory::getInstanceOf(CSHOP_CLASSES_CART, $pdb);
 $user = cmClassFactory::getInstanceOf(CSHOP_CLASSES_USER, $pdb);
 
 /* decide what currency to show. They would have set this in the cart */
-$sess->register('CSHOP_CURRENCY_DISPLAY');
+$sess::register('CSHOP_CURRENCY_DISPLAY');
 $cart->set_display_currency($CSHOP_CURRENCY_DISPLAY);
 
 /** setup smarty with a method from the $cart object to convery currencies */
@@ -192,7 +192,7 @@ elseif (isset($_POST['f_ship_method']) and $ACTION == OP_PICK_SHIP) {
     }
     else {
         // we saved our last set of quotes in the session to check for tampering
-        $sess->register('shipquotes');
+        $sess::register('shipquotes');
         if (! in_array($_POST['f_ship_method'], array_keys($shipquotes))) {
             trigger_error("Selected shipmethod was not a valid selection", E_USER_ERROR);
         }
@@ -204,7 +204,7 @@ elseif (isset($_POST['f_ship_method']) and $ACTION == OP_PICK_SHIP) {
         $SUCCESS = $cart->store(array('ship_total'=>$ship_total,
                                       'ship_method'=>$ship_method));
         if ($SUCCESS) {
-            $sess->unregister('shipquotes'); // forget those old quotes, for safety
+            $sess::unregister('shipquotes'); // forget those old quotes, for safety
             header("Location: {$_SERVER['PHP_SELF']}?billing\n");
             exit();
         }
@@ -234,7 +234,7 @@ elseif ($ACTION == OP_ADD_BILL) {
             $errs = $pay->check_values($payvals);
         }
 
-        if (!$errs) { 
+        if (!$errs) {
             if (isset($_POST['f_same_as_shipping'])) {
                 /* should be a method in cmUser() for this... */
                 $ship = $user->fetch(array('shipping_addr_id'));
