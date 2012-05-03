@@ -202,6 +202,7 @@ div.orderItems .backordered {
     color: #d33;
     background-color:#e0e0e0;
     font-weight: bold;
+    text-align: left;
 }
 .userWarning {
     color: #000;
