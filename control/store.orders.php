@@ -236,7 +236,10 @@ elseif ($ACTION == OP_GC_LOAD && defined('CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER
                     $msg = "STS Gift Card";
                 }
                 $order->store_history("$msg \"{$item['product_descrip']}\" activated, amount {$item['price']}. $card_list", false);
-                $order->store_item_options($oi, array("gc_activated" => array('descr'=>'', 'value'=>$success_count)));
+
+                $already_activated_cards = (empty($item['item_options']['gc_activated']))? 0 : $item['item_options']['gc_activated']['value'];
+
+                $order->store_item_options($oi, array("gc_activated" => array('descr'=>'', 'value'=> $success_count + $already_activated_cards)));
             }
         }
     }
@@ -377,9 +380,14 @@ if ($ACTION == OP_VIEW) {
     if (defined('CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER') && CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER) {
         $inactive_giftcards = array();
         foreach ($orderitems as $item) {
-            if (empty($item['item_options']['gc_activated']) && !empty($item['item_options']['swi_cm_amt'])) {
+
+            $already_activated_cards = (empty($item['item_options']['gc_activated']))? 0 : $item['item_options']['gc_activated']['value'];
+
+            if ($already_activated_cards < $item['qty'] && !empty($item['item_options']['swi_cm_amt'])) {
+                $item['num_to_activate'] = $item['qty'] - $already_activated_cards;
                 $inactive_giftcards[] = $item;
             }
+
         }
         $smarty->assign('giftcards', $inactive_giftcards);
     }

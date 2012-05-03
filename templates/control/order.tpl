@@ -414,7 +414,7 @@
                     </th>
                 </tr>
                 <~ foreach from=$giftcards item=gc ~>
-                    <~ section loop=$gc.qty name=gc_dupes ~>
+                    <~ section loop=$gc.num_to_activate name=gc_dupes ~>
                         <tr>
                             <td>
                                 <~ if $smarty.section.gc_dupes.index eq 0 ~>
@@ -423,7 +423,7 @@
                             </td>
                             <td align="center">
                                 <~ if $smarty.section.gc_dupes.index eq 0 ~>
-                                    <~ $gc.qty ~>
+                                    <~ $gc.num_to_activate ~>
                                 <~/if~>
                             </td>
                             <td>
