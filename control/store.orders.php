@@ -300,6 +300,15 @@ if ($ACTION == OP_VIEW) {
             }
         }
     }
+    if (defined('CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER') && CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER) {
+        $giftcards = array();
+        foreach ($orderitems as $item) {
+            if (!$item['is_digital'] && !empty($item['item_options']['swi_cm_amt'])) {
+                $giftcards[] = $item;
+            }
+        }
+        $smarty->assign('giftcards', $giftcards);
+    }
 
     /* ORDER UPDATE FORM - built in the USA */
     $fex = new formex('POST');

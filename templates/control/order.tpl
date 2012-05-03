@@ -392,6 +392,59 @@
     </td>
   </tr>
 <~/if~>
+<~ if $smarty.const.CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER ~>
+  <tr>
+    <td colspan="2">
+      <div class="orderItems">
+        <h3 class="order">GIFTCARD TRANSACTIONS</h3>
+        <form>
+            <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <th align="left">
+                        Product
+                    </th>
+                    <th align="left">
+                        Qty
+                    </th>
+                    <th align="left">
+                        Amount
+                    </th>
+                    <th align="left">
+                        Enter GC #
+                    </th>
+                </tr>
+                <~ foreach from=$giftcards item=gc ~>
+                    <~ section loop=$gc.qty name=gc_dupes ~>
+                        <tr>
+                            <td>
+                                <~ if $smarty.section.gc_dupes.index eq 0 ~>
+                                    <strong><~ $gc.product_descrip ~></strong>
+                                <~/if~>
+                            </td>
+                            <td align="center">
+                                <~ if $smarty.section.gc_dupes.index eq 0 ~>
+                                    <~ $gc.qty ~>
+                                <~/if~>
+                            </td>
+                            <td>
+                                <~ $gc.price|currency_format ~>
+                            </td>
+                            <td>
+                                <input type="text" size="46" name="gc_number[<~ $gc.id ~>][]">
+                            </td>
+                        </tr>
+                    <~ /section ~>
+                <~ /foreach ~>
+            </table>
+
+            <div class="orderTransactForm" align="right">
+                <input type="submit" value="LOAD GIFT CARDS" name="op_gc_load">
+            </div>
+        </form>
+      </div>
+    </td>
+  </tr>
+<~/if~>
 </table>
 
 
