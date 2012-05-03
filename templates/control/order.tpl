@@ -201,7 +201,7 @@
         </tr>
         <~ if $h.comments ~>
           <tr style="background: <~ $bg ~>">
-            <td colspan="3"><strong>Comments:</strong> <~ $h.comments|escape:"html" ~></td>
+            <td colspan="3"><strong>Comments:</strong> <~ $h.comments|escape:"html"|nl2br ~></td>
           </tr>
         <~/if~>
       <~/foreach ~>
@@ -397,7 +397,7 @@
     <td colspan="2">
       <div class="orderItems">
         <h3 class="order">GIFTCARD TRANSACTIONS</h3>
-        <form>
+        <form id="gc_form" action="store.orders.php" method="post">
             <table cellpadding="0" cellspacing="0" border="0">
                 <tr>
                     <th align="left">
@@ -438,6 +438,7 @@
             </table>
 
             <div class="orderTransactForm" align="right">
+                <input type="hidden" value="<~ $orderinfo.order_token ~>" name="tok">
                 <input type="submit" value="LOAD GIFT CARDS" name="op_gc_load">
             </div>
         </form>

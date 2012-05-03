@@ -21,6 +21,7 @@ define ('OP_UPDATE', 'UPDATE');
 define ('OP_VIEW', 'VIEW ORDER');
 define ('OP_DUMP', 'CSVDUMP');    
 define ('OP_TRANSACT', 'TRANSACT');    
+define ('OP_GC_LOAD', 'LOAD GIFT CARD');
 define ('OP_EDIT_LINEITEM', 'EDIT ORDER ITEMS');    
 
 $ACTION = null;
@@ -58,7 +59,7 @@ elseif (isset($_GET[$reqIdKey]) and !empty($_GET[$reqIdKey])) {
     if (isset($_GET['do_dump'])) {
         $ACTION = OP_DUMP;
     }
-    else {           
+    else {
         $ACTION = OP_VIEW;
     }
 }
@@ -74,6 +75,10 @@ elseif (isset($_POST['op_oiform'])) {
 elseif (isset($_POST['op_xaction'])) {
     $ACTION = OP_TRANSACT;
     $itemid = $_POST[$reqIdKey];
+}
+elseif (isset($_POST['op_gc_load'])) {
+    $ACTION = OP_GC_LOAD;
+    $itemid = $_POST['tok'];
 }
 else {
     $SHOWFORM = false;
@@ -168,6 +173,59 @@ elseif ($ACTION == OP_TRANSACT && defined('CSHOP_CONTROL_SHOW_TRANSACTION_CONTRO
             //throw $e;
         }
     }
+
+}
+elseif ($ACTION == OP_GC_LOAD && defined('CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER') && CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER) {
+
+    $order->set_id_by_token($itemid);
+    $gc = cmClassFactory::getInstanceOf(CSHOP_CLASSES_GIFTCARD, $pdb);
+
+    $orderitems = $order->fetch_items();
+
+    $errs = array();
+    foreach ($orderitems as $item) {
+        if (in_array($item['id'], array_keys($_POST['gc_number']))) {
+            $gc_numbers = $_POST['gc_number'][$item['id']];
+
+            $product = cmClassFactory::getInstanceOf(CSHOP_CLASSES_PRODUCT, $pdb);
+            $product->set_id($item['product_id']);
+            $product_merch_id = $product->get_header('sts_merchant_id');
+
+            for ($i=0; $i<count($gc_numbers); $i++){
+                $gc_number = trim($gc_numbers[$i]);
+                if (!empty($gc_number)) {
+                    if (empty($product_merch_id)) {
+                        $errs[] = sprintf('Product "%s" does not have a STS Merchant ID, so can\'t be activated here.', $item['product_descrip']);
+                    }
+                    else {
+                        $res = $gc->activate($order, $product_merch_id, $item['price'], $gc_number);
+                        #$res = print_r(array($product_merch_id, $item['price'], $gc_number));
+                        if (!PEAR::isError($res)) {
+                            #$gc_vals = array('gc_no'=>'123456780', 'transaction_id' => '3e12982132131038oi');
+                            $gc_vals = $gc->fetch(array('gc_no','transaction_id'));
+
+                            # store the giftcard details as options on the order line item, so admin can see
+                            $oi = db_container::factory($pdb, $order->_items_table);
+                            $oi->set_id($item['id']);
+
+                            $order->store_item_options($oi, array("gc_activated" => array('descr'=>'', 'value'=>1),
+                                                                  "gc_no_$i" => array('descr'=>'Card No',  'value'=>$gc_vals['gc_no'])));
+
+                            $order->store_history("STS Gift Card \"{$item['product_descrip']}\" activated. {$gc_vals['gc_no']} amount {$item['price']}. [transID:{$gc_vals['transaction_id']}]", false);
+                        }
+                        else {
+                            $msg = "Virtual Gift Card FAILURE:".$res->getMessage();
+                            $this->store_history($msg, false);
+                            $errs[] = $msg;
+                            trigger_error($msg . "\n\n" . $res->getDebugInfo(), E_USER_WARNING);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    $ACTION = OP_VIEW;
+
 
 }
 /* update the order status */
@@ -301,13 +359,13 @@ if ($ACTION == OP_VIEW) {
         }
     }
     if (defined('CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER') && CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER) {
-        $giftcards = array();
+        $inactive_giftcards = array();
         foreach ($orderitems as $item) {
-            if (!$item['is_digital'] && !empty($item['item_options']['swi_cm_amt'])) {
-                $giftcards[] = $item;
+            if (empty($item['item_options']['gc_activated']) && !empty($item['item_options']['swi_cm_amt'])) {
+                $inactive_giftcards[] = $item;
             }
         }
-        $smarty->assign('giftcards', $giftcards);
+        $smarty->assign('giftcards', $inactive_giftcards);
     }
 
     /* ORDER UPDATE FORM - built in the USA */
