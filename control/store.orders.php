@@ -206,11 +206,11 @@ elseif ($ACTION == OP_GC_LOAD && defined('CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER
                         $errs[] = sprintf('Product "%s" does not have a STS Merchant ID, so can\'t be activated here.', $item['product_descrip']);
                     }
                     else {
-                        #$res = $gc->activate($order, $product_merch_id, $item['price'], $gc_number);
-                        $res = print_r(array($product_merch_id, $item['price'], $gc_number));
+                        $res = $gc->activate($order, $product_merch_id, $item['price'], $gc_number);
+                        # TESTING $res = print_r(array($product_merch_id, $item['price'], $gc_number));
                         if (!PEAR::isError($res)) {
-                            $successful_cards[] = array('gc_no'=>rand('100000000000001','999999999999999'), 'transaction_id' => '3e12982132131038oi');
-                            #$successful_cards[] = $gc->fetch(array('gc_no','transaction_id'));
+                            # TESTING $successful_cards[] = array('gc_no'=>rand('100000000000001','999999999999999'), 'transaction_id' => '3e12982132131038oi');
+                            $successful_cards[] = $gc->fetch(array('gc_no','transaction_id'));
                         }
                         else {
                             $msg = "Virtual Gift Card FAILURE:".$res->getMessage();
@@ -244,8 +244,6 @@ elseif ($ACTION == OP_GC_LOAD && defined('CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER
         }
     }
     $ACTION = OP_VIEW;
-
-
 }
 /* update the order status */
 elseif ($ACTION == OP_UPDATE) {
