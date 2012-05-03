@@ -179,6 +179,7 @@ elseif ($ACTION == OP_GC_LOAD && defined('CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER
 
     $order->set_id_by_token($itemid);
     $gc = cmClassFactory::getInstanceOf(CSHOP_CLASSES_GIFTCARD, $pdb);
+    $gc->setErrorHandling (PEAR_ERROR_RETURN);
 
     $orderitems = $order->fetch_items();
 
@@ -215,7 +216,7 @@ elseif ($ACTION == OP_GC_LOAD && defined('CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER
                         }
                         else {
                             $msg = "Virtual Gift Card FAILURE:".$res->getMessage();
-                            $this->store_history($msg, false);
+                            $order->store_history($msg, false);
                             $errs[] = $msg;
                             trigger_error($msg . "\n\n" . $res->getDebugInfo(), E_USER_WARNING);
                         }
