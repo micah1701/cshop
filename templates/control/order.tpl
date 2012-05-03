@@ -392,7 +392,7 @@
     </td>
   </tr>
 <~/if~>
-<~ if $smarty.const.CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER ~>
+<~ if $smarty.const.CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER and $giftcards ~>
   <tr>
     <td colspan="2">
       <div class="orderItems">
