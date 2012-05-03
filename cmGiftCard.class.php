@@ -71,6 +71,31 @@ class cmGiftCard extends db_container {
         }
     }
 
+    /**
+     * activate an existing physical GC for the given merch
+     */
+    function activate(&$order, $merch_id, $amount, $card_no) {
+        $this->log("activate(): order.id={$order->get_id()} amount={$amount}, card={$card_no}");
+        $xmlstr = $this->_build_activation_request($merch_id, $card_no, $amount);
+        $xmlresp = $this->_send_request($xmlstr);
+        if (PEAR::isError($xmlresp)) { return $xmlresp; }
+        elseif (empty($xmlresp)) {  return $this->raiseError("No response from giftcard gateway"); }
+
+        $dom =& $this->_parse_xml_response($xmlresp);
+        if (PEAR::isError($dom)) return $dom;
+
+        $sxml = new SimpleXMLElement($xmlresp);
+
+        if (empty($sxml->Card_Number)) return $this->raiseError("Gateway did not return a Card Number.");
+
+        $vals = array('gc_amt' => $sxml->Amount_Balance,
+                      'order_id' => $order->get_id(),
+                      'gc_no' => $sxml->Card_Number,
+                      'transaction_id' => $sxml->Transaction_ID,
+                      'auth_reference' => $sxml->Auth_Reference);
+
+        return $this->store($vals);
+    }
 
 
     /**
@@ -239,6 +264,19 @@ class cmGiftCard extends db_container {
                       'Transaction_Amount' => $amt);
         return $this->_build_simple_xml_req($vals); 
     }
+
+
+    function _build_activation_request($merch_id, $card_no, $amt) {
+        $vals = array('Merchant_Number' => $merch_id,
+                      'Terminal_ID' => CSHOP_GIFTCARD_TERMINALID,
+                      'Trans_Type' => 'N',
+                      'POS_Entry_Mode' => 'M',
+                      'Action_Code' => '06',
+                      'Card_Number' => $card_no,
+                      'Transaction_Amount' => $amt);
+        return $this->_build_simple_xml_req($vals);
+    }
+
 
     function _build_creation_request($merch_id, $amt) {
         $vals = array('Merchant_Number' => $merch_id,
