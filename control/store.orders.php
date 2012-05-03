@@ -184,13 +184,20 @@ elseif ($ACTION == OP_GC_LOAD && defined('CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER
     $orderitems = $order->fetch_items();
 
     $errs = array();
+
     foreach ($orderitems as $item) {
         if (in_array($item['id'], array_keys($_POST['gc_number']))) {
+            $successful_cards = array();
             $gc_numbers = $_POST['gc_number'][$item['id']];
 
+            # get product's STS merchant ID
             $product = cmClassFactory::getInstanceOf(CSHOP_CLASSES_PRODUCT, $pdb);
             $product->set_id($item['product_id']);
             $product_merch_id = $product->get_header('sts_merchant_id');
+
+            # store the giftcard details as options on the order line item, so admin can see
+            $oi = db_container::factory($pdb, $order->_items_table);
+            $oi->set_id($item['id']);
 
             for ($i=0; $i<count($gc_numbers); $i++){
                 $gc_number = trim($gc_numbers[$i]);
@@ -199,20 +206,11 @@ elseif ($ACTION == OP_GC_LOAD && defined('CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER
                         $errs[] = sprintf('Product "%s" does not have a STS Merchant ID, so can\'t be activated here.', $item['product_descrip']);
                     }
                     else {
-                        $res = $gc->activate($order, $product_merch_id, $item['price'], $gc_number);
-                        #$res = print_r(array($product_merch_id, $item['price'], $gc_number));
+                        #$res = $gc->activate($order, $product_merch_id, $item['price'], $gc_number);
+                        $res = print_r(array($product_merch_id, $item['price'], $gc_number));
                         if (!PEAR::isError($res)) {
-                            #$gc_vals = array('gc_no'=>'123456780', 'transaction_id' => '3e12982132131038oi');
-                            $gc_vals = $gc->fetch(array('gc_no','transaction_id'));
-
-                            # store the giftcard details as options on the order line item, so admin can see
-                            $oi = db_container::factory($pdb, $order->_items_table);
-                            $oi->set_id($item['id']);
-
-                            $order->store_item_options($oi, array("gc_activated" => array('descr'=>'', 'value'=>1),
-                                                                  "gc_no_$i" => array('descr'=>'Card No',  'value'=>$gc_vals['gc_no'])));
-
-                            $order->store_history("STS Gift Card \"{$item['product_descrip']}\" activated. {$gc_vals['gc_no']} amount {$item['price']}. [transID:{$gc_vals['transaction_id']}]", false);
+                            $successful_cards[] = array('gc_no'=>rand('100000000000001','999999999999999'), 'transaction_id' => '3e12982132131038oi');
+                            #$successful_cards[] = $gc->fetch(array('gc_no','transaction_id'));
                         }
                         else {
                             $msg = "Virtual Gift Card FAILURE:".$res->getMessage();
@@ -222,6 +220,23 @@ elseif ($ACTION == OP_GC_LOAD && defined('CSHOP_CONTROL_SHOW_STS_GIFTCARD_LOADER
                         }
                     }
                 }
+            }
+
+
+            if ($success_count = count($successful_cards)) {
+                $card_list = '';
+                foreach ($successful_cards as $gc) {
+                    $card_list .= "\n{$gc['gc_no']} [transID:{$gc['transaction_id']}]";
+                    $order->store_item_options($oi, array( "gc_no_{$gc['gc_no']}" => array('descr'=>'Card No',  'value'=>$gc['gc_no'])));
+                }
+                if ($success_count > 1) {
+                    $msg = "{$success_count} STS Gift Cards";
+                }
+                else {
+                    $msg = "STS Gift Card";
+                }
+                $order->store_history("$msg \"{$item['product_descrip']}\" activated, amount {$item['price']}. $card_list", false);
+                $order->store_item_options($oi, array("gc_activated" => array('descr'=>'', 'value'=>$success_count)));
             }
         }
     }
