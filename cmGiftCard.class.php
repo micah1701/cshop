@@ -267,7 +267,7 @@ class cmGiftCard extends db_container {
 
 
     function _build_activation_request($merch_id, $card_no, $amt) {
-        $vals = array('Merchant_Number' => $merch_id,
+        $vals = array('Merchant_Number' => (ON_LIVE_SERVER)? $merch_id : CSHOP_GIFTCARD_TEST_MERCHANT_ACCOUNT_ID,
                       'Terminal_ID' => CSHOP_GIFTCARD_TERMINALID,
                       'Trans_Type' => 'N',
                       'POS_Entry_Mode' => 'M',
@@ -279,7 +279,7 @@ class cmGiftCard extends db_container {
 
 
     function _build_creation_request($merch_id, $amt) {
-        $vals = array('Merchant_Number' => $merch_id,
+        $vals = array('Merchant_Number' => (ON_LIVE_SERVER)? $merch_id : CSHOP_GIFTCARD_TEST_MERCHANT_ACCOUNT_ID,
                       'Terminal_ID' => CSHOP_GIFTCARD_TERMINALID,
                       'Trans_Type' => 'N',
                       'POS_Entry_Mode' => 'M',
