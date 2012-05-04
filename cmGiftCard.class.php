@@ -37,6 +37,11 @@ class cmGiftCard extends db_container {
         return $this->gc_amount;
     }
 
+    function find_by_card_number($card_no) {
+        $w = "gc_no = " . $this->db->quote($card_no);
+        return $this->fetch_any(null, 0, 0, null, $w);
+    }
+
 
     /** 
      * inquire as to how much is left on this card.
