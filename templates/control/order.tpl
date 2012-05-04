@@ -430,7 +430,7 @@
                                 <~ $gc.price|currency_format ~>
                             </td>
                             <td>
-                                <input type="text" size="46" name="gc_number[<~ $gc.id ~>][]">
+                                <input type="text" size="46" class="gc_number" name="gc_number[<~ $gc.id ~>][]">
                             </td>
                         </tr>
                     <~ /section ~>
@@ -464,6 +464,12 @@ $(document).ready(
                     oiHasUp = true;
                 }
             } );
+
+            // remove non-numeric junk from beginning and end of GC# inputs, by client req.
+            $('form#gc_form input.gc_number').bind('blur', function() {
+                var val = $(this).val();
+                $(this).val( val.replace(/^[^\d]+/g, '').replace(/[^\d]+$/g, '') );
+            });
         }
 );
 
