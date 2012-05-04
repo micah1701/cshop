@@ -236,13 +236,17 @@ elseif ($ACTION == OP_ADD_BILL) {
 
         if (!$errs) {
             if (isset($_POST['f_same_as_shipping'])) {
-                /* should be a method in cmUser() for this... */
                 $ship = $user->fetch(array('shipping_addr_id'));
-                $user->activateAddress('billing', $ship['shipping_addr_id']);
+                if (! ($errs = $fex->validate($ship))) {
+                    $user->activateAddress('billing', $ship['shipping_addr_id']);
+                }
             }
             else {
                 $fex = new formex();
                 $fex->add_element($user->addr->get_colmap());
+                if (!empty($user->addr->billing_extra_colmap)) {
+                    $fex->add_element($user->addr->billing_extra_colmap);
+                }
                 if (! ($errs = $fex->validate($_POST))) {
 
                     $vals = $fex->get_submitted_vals($_POST);
@@ -493,6 +497,9 @@ if ($SHOWFORM) {
                 /* just add in ship total here, there is no choice for ass! */
                 $fex->add_element('ship_method', array(null, 'hidden', null));
 
+                if (!empty($user->addr->billing_extra_colmap)) {
+                    $fex->add_element($user->addr->billing_extra_colmap);
+                }
 
                 /* use this persons previous billing addr if we have it */
                 if ($billing = $user->fetchBillingAddr()) {
