@@ -150,13 +150,13 @@ if ($ACTION == OP_ADD_SHIP) {
         $cart->set_user_comment($_POST['f_user_comments']);
     }
 
-    if (!$cart->requires_shipping()) {
+    if (empty($errs) && !$cart->requires_shipping()) {
         $pdb->commit();
         header("Location: {$_SERVER['PHP_SELF']}?billing\n"); // goto: billing 
         exit();
     }
     elseif (empty($errs)) {
-        
+
         $fex->add_element($user->addr->get_colmap());
 
         if (! ($errs = $fex->validate($_POST))) {
