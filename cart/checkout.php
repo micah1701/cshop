@@ -235,31 +235,27 @@ elseif ($ACTION == OP_ADD_BILL) {
         }
 
         if (!$errs) {
-            if (isset($_POST['f_same_as_shipping'])) {
-                $ship = $user->fetch(array('shipping_addr_id'));
-                if (! ($errs = $fex->validate($ship))) {
-                    $user->activateAddress('billing', $ship['shipping_addr_id']);
-                }
+
+
+            $fex = new formex();
+            $fex->add_element($user->addr->get_colmap());
+
+            if (!empty($user->addr->billing_extra_colmap)) {
+                $fex->add_element($user->addr->billing_extra_colmap);
             }
-            else {
-                $fex = new formex();
-                $fex->add_element($user->addr->get_colmap());
-                if (!empty($user->addr->billing_extra_colmap)) {
-                    $fex->add_element($user->addr->billing_extra_colmap);
+
+            if (! ($errs = $fex->validate($_POST))) {
+
+                $vals = $fex->get_submitted_vals($_POST);
+                $vals['user_id'] = $uid;
+
+                $res = $user->addr->store($vals);
+                if (PEAR::isError($res) and $res->getCode() != DBCON_ZERO_EFFECT) { //"0 rows were changed"
+                    $errs[] = "Address could not be saved: " . $res->getMessage();
+                   trigger_error($res->getDebugInfo(), E_USER_WARNING);
                 }
-                if (! ($errs = $fex->validate($_POST))) {
-
-                    $vals = $fex->get_submitted_vals($_POST);
-                    $vals['user_id'] = $uid;
-
-                    $res = $user->addr->store($vals);
-                    if (PEAR::isError($res) and $res->getCode() != DBCON_ZERO_EFFECT) { //"0 rows were changed"
-                        $errs[] = "Address could not be saved: " . $res->getMessage();
-                        trigger_error($res->getDebugInfo(), E_USER_WARNING);
-                    }
-                    else { // store the id of the new addr row in the user table
-                        $user->activateAddress('billing', $user->addr->get_id());
-                    }
+                else { // store the id of the new addr row in the user table
+                    $user->activateAddress('billing', $user->addr->get_id());
                 }
             }
 
