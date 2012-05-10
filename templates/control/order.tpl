@@ -55,6 +55,7 @@
                     <~/if~></a><br />
                  <~ if $user.company ~><~ $user.company ~><br /><~/if~>
                  &lt;<~ $user_email ~>&gt;
+                 <~ if $user.telephone ~><br>phone: <~ $user.telephone ~><~/if~>
             </td>
          </tr>
         <tr>
