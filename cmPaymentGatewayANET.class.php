@@ -243,6 +243,7 @@ class cmPaymentGatewayANET extends cmPaymentGateway {
     function send($req) {
         $url = ($this->testmode)? $this->_transact_url_test : $this->_transact_url;
         $http = new HTTP_Request($url . '?' . $req);
+	$http->setMethod(HTTP_REQUEST_METHOD_POST);
         if (PEAR::isError($http->sendRequest())) {
             return $http;
         }
